@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   Home, 
@@ -202,11 +201,11 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
       isCollapsed ? "w-16" : "w-64"
     )}>
       {/* Header - matching navbar height */}
-      <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+      <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between h-20">
         {!isCollapsed && (
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">NE</span>
+            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-base">NE</span>
             </div>
             <h1 className="text-lg font-bold text-black dark:text-white">
               Nome da Empresa
