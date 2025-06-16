@@ -29,7 +29,12 @@ import {
   SmilePlus,
   MessageSquarePlus,
   CirclePlus,
-  X
+  X,
+  PenLine,
+  PenOff,
+  Zap,
+  NotebookPen,
+  IdCard
 } from 'lucide-react';
 import {
   Tooltip,
@@ -54,6 +59,12 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 interface Conversa {
@@ -98,7 +109,7 @@ const ChannelLogo = ({ canal }: { canal: string }) => {
       return (
         <div className="w-4 h-4 bg-gradient-to-br from-purple-600 via-pink-600 to-orange-400 rounded-sm flex items-center justify-center">
           <svg viewBox="0 0 24 24" className="w-3 h-3 fill-white">
-            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.281-.073-1.689-.073-4.948 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
           </svg>
         </div>
       );
@@ -354,6 +365,9 @@ const AtendimentosOmnichannel = () => {
   const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
   const [isEditContactOpen, setIsEditContactOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState<Conversa | null>(null);
+  const [isSignatureActive, setIsSignatureActive] = useState(false);
+  const [isContactListOpen, setIsContactListOpen] = useState(false);
+  const [isChatbotListOpen, setIsChatbotListOpen] = useState(false);
 
   const conversaAtual = conversasExemplo.find(c => c.id === conversaSelecionada);
   
@@ -806,7 +820,7 @@ const AtendimentosOmnichannel = () => {
           </div>
 
           {/* Mensagens - Container com altura controlada */}
-          <div className="flex-1 flex flex-col min-h-0 max-h-[calc(100vh-200px)]">
+          <div className="flex-1 flex flex-col min-h-0">
             <ScrollArea className="flex-1 p-4">
               <div className="space-y-4">
                 {mensagens.map((mensagem) => (
@@ -840,11 +854,67 @@ const AtendimentosOmnichannel = () => {
               </div>
             </ScrollArea>
 
-            {/* Input de Mensagem - Ajustado para alinhar com sidebar */}
-            <div className="p-4 pl-6 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
+            {/* Input de Mensagem - Ajustado posicionamento */}
+            <div className="p-3 pl-6 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
               <div className="flex items-end gap-2">
+                {/* Menu suspenso com opções */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <EllipsisVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-56">
+                    <DropdownMenuItem
+                      onClick={() => setIsSignatureActive(!isSignatureActive)}
+                      className="flex items-center gap-2"
+                    >
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                        isSignatureActive ? 'bg-red-100' : 'bg-green-100'
+                      }`}>
+                        {isSignatureActive ? (
+                          <PenOff className="h-3 w-3 text-red-600" />
+                        ) : (
+                          <PenLine className="h-3 w-3 text-green-600" />
+                        )}
+                      </div>
+                      <span>{isSignatureActive ? 'Desativar Assinatura' : 'Ativar Assinatura'}</span>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuItem className="flex items-center gap-2">
+                      <Zap className="h-4 w-4" />
+                      <span>Respostas Rápidas</span>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuItem className="flex items-center gap-2">
+                      <NotebookPen className="h-4 w-4" />
+                      <span>Anotações</span>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuItem 
+                      className="flex items-center gap-2"
+                      onClick={() => setIsContactListOpen(true)}
+                    >
+                      <IdCard className="h-4 w-4" />
+                      <span>Compartilhar Contatos</span>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuItem 
+                      className="flex items-center gap-2"
+                      onClick={() => setIsChatbotListOpen(true)}
+                    >
+                      <BotMessageSquare className="h-4 w-4" />
+                      <span>Transferir para Chatbot</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
                 <Button variant="ghost" size="icon">
                   <Paperclip className="h-4 w-4" />
+                </Button>
+
+                <Button variant="ghost" size="icon">
+                  <SmilePlus className="h-4 w-4" />
                 </Button>
                 
                 <div className="flex-1">
@@ -856,10 +926,6 @@ const AtendimentosOmnichannel = () => {
                     className="resize-none"
                   />
                 </div>
-
-                <Button variant="ghost" size="icon">
-                  <SmilePlus className="h-4 w-4" />
-                </Button>
                 
                 <Button onClick={enviarMensagem} disabled={!novaMensagem.trim()}>
                   <Send className="h-4 w-4" />
@@ -998,6 +1064,87 @@ const AtendimentosOmnichannel = () => {
                 </div>
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Modal de Lista de Contatos */}
+        <Dialog open={isContactListOpen} onOpenChange={setIsContactListOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Compartilhar Contatos</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Buscar contatos..."
+                  className="pl-10"
+                />
+              </div>
+              <ScrollArea className="h-[300px]">
+                <div className="space-y-2">
+                  {conversasExemplo.map((conversa) => (
+                    <div
+                      key={conversa.id}
+                      className="flex items-center gap-3 p-3 rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
+                      onClick={() => {
+                        // Lógica para enviar contato na conversa
+                        setIsContactListOpen(false);
+                      }}
+                    >
+                      <Avatar className="h-10 w-10">
+                        <AvatarFallback>{conversa.avatar}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-gray-900 dark:text-white truncate">
+                          {conversa.cliente}
+                        </p>
+                        <p className="text-sm text-gray-500 truncate">
+                          {conversa.telefone || 'Sem telefone'}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Modal de Lista de Chatbots */}
+        <Dialog open={isChatbotListOpen} onOpenChange={setIsChatbotListOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Transferir para Chatbot</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <ScrollArea className="h-[300px]">
+                <div className="space-y-2">
+                  {['Atendimento Geral', 'Suporte Técnico', 'Vendas', 'Financeiro'].map((chatbot) => (
+                    <div
+                      key={chatbot}
+                      className="flex items-center gap-3 p-3 rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
+                      onClick={() => {
+                        // Lógica para transferir para chatbot
+                        setIsChatbotListOpen(false);
+                      }}
+                    >
+                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        <BotMessageSquare className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-gray-900 dark:text-white truncate">
+                          {chatbot}
+                        </p>
+                        <p className="text-sm text-gray-500 truncate">
+                          Chatbot disponível
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            </div>
           </DialogContent>
         </Dialog>
       </div>
