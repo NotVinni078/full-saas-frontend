@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   Home, 
@@ -204,8 +205,8 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
       <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between h-20">
         {!isCollapsed && (
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-base">NE</span>
+            <div className="w-10 h-10 bg-gradient-to-r from-gray-700 to-black dark:from-gray-200 dark:to-white rounded-lg flex items-center justify-center">
+              <span className="text-white dark:text-black font-bold text-base">NE</span>
             </div>
             <h1 className="text-lg font-bold text-black dark:text-white">
               Nome da Empresa
@@ -263,12 +264,12 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                           className={cn(
                             "w-full flex items-center space-x-2 px-2 py-1.5 ml-5 rounded-lg text-left transition-colors text-xs",
                             isActive 
-                              ? "bg-blue-500 text-white" 
+                              ? "bg-gray-800 dark:bg-gray-200 text-white dark:text-black" 
                               : "text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
                           )}
                         >
-                          <ItemIcon className={cn("h-3 w-3 flex-shrink-0", isActive ? "text-white" : "text-black dark:text-white")} />
-                          <span className={cn("text-xs", isActive ? "text-white" : "text-black dark:text-white")}>{subItem.label}</span>
+                          <ItemIcon className={cn("h-3 w-3 flex-shrink-0", isActive ? "text-white dark:text-black" : "text-black dark:text-white")} />
+                          <span className={cn("text-xs", isActive ? "text-white dark:text-black" : "text-black dark:text-white")}>{subItem.label}</span>
                         </button>
                       );
                     })}
@@ -288,13 +289,13 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                 className={cn(
                   "w-full flex items-center space-x-2 px-2 py-1.5 rounded-lg text-left transition-colors",
                   isActive 
-                    ? "bg-blue-500 text-white" 
+                    ? "bg-gray-800 dark:bg-gray-200 text-white dark:text-black" 
                     : "text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800",
                   isCollapsed && "justify-center"
                 )}
               >
-                <Icon className={cn("h-3.5 w-3.5 flex-shrink-0", isActive ? "text-white" : "text-black dark:text-white")} />
-                {!isCollapsed && <span className={cn("font-medium text-xs", isActive ? "text-white" : "text-black dark:text-white")}>{singleItem.label}</span>}
+                <Icon className={cn("h-3.5 w-3.5 flex-shrink-0", isActive ? "text-white dark:text-black" : "text-black dark:text-white")} />
+                {!isCollapsed && <span className={cn("font-medium text-xs", isActive ? "text-white dark:text-black" : "text-black dark:text-white")}>{singleItem.label}</span>}
               </button>
             );
           }
@@ -305,7 +306,7 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
       <div className="p-3 border-t border-gray-200 dark:border-gray-700">
         {!isCollapsed && (
           <div className="flex items-center space-x-2 mb-2">
-            <div className="w-7 h-7 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
+            <div className="w-7 h-7 bg-gradient-to-r from-gray-700 to-black dark:from-gray-200 dark:to-white rounded-full flex items-center justify-center text-white dark:text-black font-semibold">
               <span className="text-xs">U</span>
             </div>
             <div className="flex-1 min-w-0">

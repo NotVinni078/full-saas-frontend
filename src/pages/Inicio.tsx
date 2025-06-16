@@ -50,7 +50,7 @@ const Inicio = () => {
           onLanguageChange={handleLanguageChange}
         />
         
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900">
           {currentPage.includes('dashboard') ? (
             <Dashboard />
           ) : (
