@@ -499,13 +499,12 @@ const AtendimentosOmnichannel = () => {
               </div>
 
               <div className="flex items-center gap-2">
-                {/* Ícones visíveis em telas grandes com texto completo */}
-                <div className="hidden xl:flex items-center gap-2">
+                {/* Ícones visíveis em telas grandes */}
+                <div className="hidden md:flex items-center gap-2">
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button variant="ghost" className="flex items-center gap-2">
+                      <Button variant="ghost" size="icon">
                         <RefreshCcw className="h-4 w-4" />
-                        <span className="text-sm">Transferir atendimento</span>
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -515,9 +514,8 @@ const AtendimentosOmnichannel = () => {
 
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button variant="ghost" className="flex items-center gap-2">
+                      <Button variant="ghost" size="icon">
                         <UserPlus className="h-4 w-4" />
-                        <span className="text-sm">Adicionar Participante</span>
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -527,9 +525,8 @@ const AtendimentosOmnichannel = () => {
 
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button variant="ghost" className="flex items-center gap-2">
+                      <Button variant="ghost" size="icon">
                         <ClockArrowDown className="h-4 w-4" />
-                        <span className="text-sm">Aguardando</span>
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -539,77 +536,8 @@ const AtendimentosOmnichannel = () => {
 
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button variant="ghost" className="flex items-center gap-2">
+                      <Button variant="ghost" size="icon">
                         <CircleCheckBig className="h-4 w-4" />
-                        <span className="text-sm">Finalizar</span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Finalizar Atendimento</p>
-                    </TooltipContent>
-                  </Tooltip>
-
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" className="flex items-center gap-2">
-                        <SquarePen className="h-4 w-4" />
-                        <span className="text-sm">Editar</span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Editar Contato</p>
-                    </TooltipContent>
-                  </Tooltip>
-
-                  <Button variant="ghost" className="flex items-center gap-2">
-                    <Phone className="h-4 w-4" />
-                    <span className="text-sm">Ligar</span>
-                  </Button>
-                </div>
-
-                {/* Ícones com texto abreviado em tablets */}
-                <div className="hidden md:flex xl:hidden items-center gap-2">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" className="flex items-center gap-1 px-2">
-                        <RefreshCcw className="h-4 w-4" />
-                        <span className="text-xs">Trans.</span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Transferir atendimento</p>
-                    </TooltipContent>
-                  </Tooltip>
-
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" className="flex items-center gap-1 px-2">
-                        <UserPlus className="h-4 w-4" />
-                        <span className="text-xs">Add</span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Adicionar Participante a Conversa</p>
-                    </TooltipContent>
-                  </Tooltip>
-
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" className="flex items-center gap-1 px-2">
-                        <ClockArrowDown className="h-4 w-4" />
-                        <span className="text-xs">Aguar.</span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Retornar a aguardando</p>
-                    </TooltipContent>
-                  </Tooltip>
-
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" className="flex items-center gap-1 px-2">
-                        <CircleCheckBig className="h-4 w-4" />
-                        <span className="text-xs">Fin.</span>
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -633,7 +561,7 @@ const AtendimentosOmnichannel = () => {
                   </Button>
                 </div>
 
-                {/* Menu de opções para telas pequenas - apenas ícones */}
+                {/* Menu de opções para telas pequenas */}
                 <div className="md:hidden">
                   <Sheet>
                     <SheetTrigger asChild>
