@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,7 +26,8 @@ import {
   EllipsisVertical,
   ArrowLeft,
   SmilePlus,
-  MessageSquarePlus
+  MessageSquarePlus,
+  CirclePlus
 } from 'lucide-react';
 import {
   Tooltip,
@@ -40,6 +40,19 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 interface Conversa {
   id: string;
@@ -52,6 +65,9 @@ interface Conversa {
   statusAtendimento: 'atendendo' | 'aguardando' | 'finalizado' | 'chatbot';
   isGrupo?: boolean;
   avatar: string;
+  telefone?: string;
+  email?: string;
+  endereco?: string;
 }
 
 interface Mensagem {
@@ -131,7 +147,10 @@ const conversasExemplo: Conversa[] = [
     naoLidas: 2,
     status: 'online',
     statusAtendimento: 'atendendo',
-    avatar: 'JS'
+    avatar: 'JS',
+    telefone: '(11) 99999-9999',
+    email: 'joao@email.com',
+    endereco: 'Rua das Flores, 123'
   },
   {
     id: '2',
@@ -142,7 +161,10 @@ const conversasExemplo: Conversa[] = [
     naoLidas: 1,
     status: 'offline',
     statusAtendimento: 'aguardando',
-    avatar: 'MS'
+    avatar: 'MS',
+    telefone: '(11) 88888-8888',
+    email: 'maria@email.com',
+    endereco: 'Av. Principal, 456'
   },
   {
     id: '3',
@@ -153,7 +175,10 @@ const conversasExemplo: Conversa[] = [
     naoLidas: 0,
     status: 'ausente',
     statusAtendimento: 'finalizado',
-    avatar: 'PC'
+    avatar: 'PC',
+    telefone: '(11) 77777-7777',
+    email: 'pedro@email.com',
+    endereco: 'Rua Central, 789'
   },
   {
     id: '4',
@@ -164,7 +189,10 @@ const conversasExemplo: Conversa[] = [
     naoLidas: 3,
     status: 'online',
     statusAtendimento: 'chatbot',
-    avatar: 'AO'
+    avatar: 'AO',
+    telefone: '(11) 66666-6666',
+    email: 'ana@email.com',
+    endereco: 'Praça da Liberdade, 321'
   },
   {
     id: '5',
@@ -176,7 +204,10 @@ const conversasExemplo: Conversa[] = [
     status: 'online',
     statusAtendimento: 'atendendo',
     isGrupo: true,
-    avatar: 'GV'
+    avatar: 'GV',
+    telefone: '',
+    email: '',
+    endereco: ''
   }
 ];
 
@@ -226,6 +257,9 @@ const AtendimentosOmnichannel = () => {
   const [filtroTipo, setFiltroTipo] = useState<string>('todos');
   const [busca, setBusca] = useState('');
   const [showChatMobile, setShowChatMobile] = useState(false);
+  const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
+  const [isEditContactOpen, setIsEditContactOpen] = useState(false);
+  const [selectedContact, setSelectedContact] = useState<Conversa | null>(null);
 
   const conversaAtual = conversasExemplo.find(c => c.id === conversaSelecionada);
   
@@ -267,6 +301,16 @@ const AtendimentosOmnichannel = () => {
     setConversaSelecionada('');
   };
 
+  const handleContactClick = (conversa: Conversa) => {
+    setSelectedContact(conversa);
+    setIsEditContactOpen(true);
+  };
+
+  const handleEditContact = (conversa: Conversa) => {
+    setSelectedContact(conversa);
+    setIsEditContactOpen(true);
+  };
+
   const StatusIndicator = ({ status }: { status: string }) => {
     const colors = {
       online: 'bg-green-500',
@@ -277,7 +321,7 @@ const AtendimentosOmnichannel = () => {
   };
 
   const ConversasList = () => (
-    <div className="w-full md:w-1/3 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+    <div className={`w-full ${conversaSelecionada ? 'md:w-1/3' : 'md:w-1/2 lg:w-1/3'} border-r border-gray-200 dark:border-gray-700 flex flex-col relative`}>
       {/* Header da Lista */}
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between mb-4">
@@ -396,7 +440,13 @@ const AtendimentosOmnichannel = () => {
             >
               <div className="flex items-start gap-3">
                 <div className="relative">
-                  <div className="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center text-sm font-medium">
+                  <div 
+                    className="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center text-sm font-medium cursor-pointer hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleContactClick(conversa);
+                    }}
+                  >
                     {conversa.avatar}
                   </div>
                   <div className="absolute -bottom-1 -right-1">
@@ -431,6 +481,59 @@ const AtendimentosOmnichannel = () => {
           ))}
         </div>
       </ScrollArea>
+
+      {/* Botão Flutuante */}
+      <Dialog open={isContactDialogOpen} onOpenChange={setIsContactDialogOpen}>
+        <DialogTrigger asChild>
+          <Button
+            className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-50 bg-blue-600 hover:bg-blue-700"
+            size="icon"
+          >
+            <CirclePlus className="h-6 w-6" />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Selecionar Contato</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Buscar contatos..."
+                className="pl-10"
+              />
+            </div>
+            <ScrollArea className="h-[300px]">
+              <div className="space-y-2">
+                {conversasExemplo.map((conversa) => (
+                  <div
+                    key={conversa.id}
+                    className="flex items-center gap-3 p-3 rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
+                    onClick={() => {
+                      handleConversaClick(conversa.id);
+                      setIsContactDialogOpen(false);
+                    }}
+                  >
+                    <Avatar className="h-10 w-10">
+                      <AvatarFallback>{conversa.avatar}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 dark:text-white truncate">
+                        {conversa.cliente}
+                      </p>
+                      <p className="text-sm text-gray-500 truncate">
+                        {conversa.telefone || 'Sem telefone'}
+                      </p>
+                    </div>
+                    <ChannelLogo canal={conversa.canal} />
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 
@@ -463,7 +566,10 @@ const AtendimentosOmnichannel = () => {
                 </Button>
 
                 <div className="relative">
-                  <div className="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center text-sm font-medium">
+                  <div 
+                    className="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center text-sm font-medium cursor-pointer hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
+                    onClick={() => handleContactClick(conversaAtual)}
+                  >
                     {conversaAtual.avatar}
                   </div>
                   <div className="absolute -bottom-1 -right-1">
@@ -540,7 +646,11 @@ const AtendimentosOmnichannel = () => {
 
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon">
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => handleEditContact(conversaAtual)}
+                      >
                         <SquarePen className="h-4 w-4" />
                       </Button>
                     </TooltipTrigger>
@@ -580,7 +690,11 @@ const AtendimentosOmnichannel = () => {
                           <CircleCheckBig className="h-4 w-4 mr-2" />
                           Finalizar Atendimento
                         </Button>
-                        <Button variant="outline" className="w-full justify-start">
+                        <Button 
+                          variant="outline" 
+                          className="w-full justify-start"
+                          onClick={() => handleEditContact(conversaAtual)}
+                        >
                           <SquarePen className="h-4 w-4 mr-2" />
                           Editar Contato
                         </Button>
@@ -688,6 +802,70 @@ const AtendimentosOmnichannel = () => {
           <ConversasList />
           <ChatArea />
         </div>
+
+        {/* Modal de Edição de Contato */}
+        <Dialog open={isEditContactOpen} onOpenChange={setIsEditContactOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Editar Contato</DialogTitle>
+            </DialogHeader>
+            {selectedContact && (
+              <div className="grid gap-4 py-4">
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-16 w-16">
+                    <AvatarFallback>{selectedContact.avatar}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <Input
+                      placeholder="Nome do contato"
+                      defaultValue={selectedContact.cliente}
+                      className="mb-2"
+                    />
+                    <div className="flex items-center gap-2">
+                      <ChannelLogo canal={selectedContact.canal} />
+                      <span className="text-sm text-gray-500 capitalize">{selectedContact.canal}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Telefone</label>
+                    <Input
+                      placeholder="Telefone"
+                      defaultValue={selectedContact.telefone}
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+                    <Input
+                      placeholder="Email"
+                      defaultValue={selectedContact.email}
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Endereço</label>
+                    <Input
+                      placeholder="Endereço"
+                      defaultValue={selectedContact.endereco}
+                    />
+                  </div>
+                </div>
+                
+                <div className="flex justify-end gap-2 pt-4">
+                  <Button variant="outline" onClick={() => setIsEditContactOpen(false)}>
+                    Cancelar
+                  </Button>
+                  <Button onClick={() => setIsEditContactOpen(false)}>
+                    Salvar
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </TooltipProvider>
   );
