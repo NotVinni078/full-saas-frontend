@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -317,7 +316,6 @@ const AtendimentosOmnichannel = () => {
                   className="flex items-center justify-center gap-1 w-full col-span-1 px-1"
                 >
                   <CircleCheckBig className="h-4 w-4 flex-shrink-0" />
-                  <span className="hidden lg:inline">Finalizados</span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -337,7 +335,6 @@ const AtendimentosOmnichannel = () => {
                   className="flex items-center justify-center gap-1 w-full col-span-1 px-1"
                 >
                   <UsersRound className="h-4 w-4 flex-shrink-0" />
-                  <span className="hidden lg:inline">Grupos</span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -363,7 +360,6 @@ const AtendimentosOmnichannel = () => {
                   className="flex items-center justify-center gap-1 w-full px-1"
                 >
                   <MessageSquareText className="h-4 w-4 flex-shrink-0" />
-                  <span className="hidden lg:inline">Atendendo</span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -382,7 +378,6 @@ const AtendimentosOmnichannel = () => {
                   className="flex items-center justify-center gap-1 w-full px-1"
                 >
                   <Clock9 className="h-4 w-4 flex-shrink-0" />
-                  <span className="hidden lg:inline">Aguardando</span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -401,7 +396,6 @@ const AtendimentosOmnichannel = () => {
                   className="flex items-center justify-center gap-1 w-full px-1"
                 >
                   <BotMessageSquare className="h-4 w-4 flex-shrink-0" />
-                  <span className="hidden lg:inline">Chatbot</span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
