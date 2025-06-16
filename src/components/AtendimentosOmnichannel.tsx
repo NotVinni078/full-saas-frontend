@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,7 +26,8 @@ import {
   ClockArrowDown,
   SquarePen,
   EllipsisVertical,
-  ArrowLeft
+  ArrowLeft,
+  SmilePlus
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -607,20 +609,18 @@ const AtendimentosOmnichannel = () => {
                 </div>
 
                 {/* Menu de opções adicionais apenas em telas grandes */}
-                <div className="hidden md:block">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Histórico de conversas</DropdownMenuItem>
-                      <DropdownMenuItem>Arquivar conversa</DropdownMenuItem>
-                      <DropdownMenuItem>Bloquear contato</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem>Histórico de conversas</DropdownMenuItem>
+                    <DropdownMenuItem>Arquivar conversa</DropdownMenuItem>
+                    <DropdownMenuItem>Bloquear contato</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
           </div>
@@ -676,6 +676,10 @@ const AtendimentosOmnichannel = () => {
                     className="resize-none"
                   />
                 </div>
+
+                <Button variant="ghost" size="icon">
+                  <SmilePlus className="h-4 w-4" />
+                </Button>
                 
                 <Button onClick={enviarMensagem} disabled={!novaMensagem.trim()}>
                   <Send className="h-4 w-4" />
