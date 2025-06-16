@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   Home, 
@@ -138,10 +139,10 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
       <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
         {!isCollapsed && (
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">SF</span>
             </div>
-            <h1 className="text-lg font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            <h1 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
               SaasFlow
             </h1>
           </div>
@@ -196,7 +197,7 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                         className={cn(
                           "w-full flex items-center space-x-3 px-3 py-2 ml-6 rounded-lg text-left transition-colors text-sm",
                           isActive 
-                            ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white" 
+                            ? "bg-blue-500 text-white" 
                             : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
                         )}
                       >
@@ -223,7 +224,7 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
               className={cn(
                 "w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors",
                 isActive 
-                  ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white" 
+                  ? "bg-blue-500 text-white" 
                   : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800",
                 isCollapsed && "justify-center"
               )}
@@ -239,7 +240,7 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
       <div className="p-4 border-t border-gray-200 dark:border-gray-700">
         {!isCollapsed && (
           <div className="flex items-center space-x-3 mb-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
               U
             </div>
             <div className="flex-1 min-w-0">
