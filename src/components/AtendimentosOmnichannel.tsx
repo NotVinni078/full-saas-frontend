@@ -25,7 +25,8 @@ import {
   SquarePen,
   EllipsisVertical,
   ArrowLeft,
-  SmilePlus
+  SmilePlus,
+  MessageSquarePlus
 } from 'lucide-react';
 import {
   Tooltip,
@@ -217,7 +218,7 @@ const mensagensExemplo: Mensagem[] = [
 ];
 
 const AtendimentosOmnichannel = () => {
-  const [conversaSelecionada, setConversaSelecionada] = useState<string>('1');
+  const [conversaSelecionada, setConversaSelecionada] = useState<string>('');
   const [mensagens, setMensagens] = useState<Mensagem[]>(mensagensExemplo);
   const [novaMensagem, setNovaMensagem] = useState('');
   const [filtroStatus, setFiltroStatus] = useState<string>('todos');
@@ -259,6 +260,10 @@ const AtendimentosOmnichannel = () => {
 
   const handleBackToList = () => {
     setShowChatMobile(false);
+  };
+
+  const handleCloseConversation = () => {
+    setConversaSelecionada('');
   };
 
   const StatusIndicator = ({ status }: { status: string }) => {
@@ -436,12 +441,22 @@ const AtendimentosOmnichannel = () => {
           <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                {/* Botão de voltar apenas em mobile */}
+                {/* Botão de voltar para mobile */}
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={handleBackToList}
                   className="md:hidden"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+
+                {/* Botão de fechar conversa para desktop */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleCloseConversation}
+                  className="hidden md:flex"
                 >
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
@@ -646,13 +661,12 @@ const AtendimentosOmnichannel = () => {
       ) : (
         <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-gray-800">
           <div className="text-center">
-            <MessageSquare className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <div className="w-16 h-16 bg-gray-400 rounded-full flex items-center justify-center mx-auto mb-4">
+              <MessageSquarePlus className="h-8 w-8 text-black" />
+            </div>
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              Selecione uma conversa
+              Selecione ou inicie um atendimento
             </h3>
-            <p className="text-gray-500">
-              Escolha uma conversa da lista para começar o atendimento
-            </p>
           </div>
         </div>
       )}
