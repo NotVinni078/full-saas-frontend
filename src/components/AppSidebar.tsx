@@ -202,7 +202,6 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
       // Em mobile, sempre ocupa a largura total quando visível
       "w-full md:w-64",
       // Em desktop, respeita o estado collapsed
-      "md:w-64",
       isCollapsed && "md:w-16"
     )}>
       {/* Header - matching navbar height */}
@@ -217,13 +216,14 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
             </h1>
           </div>
         )}
+        {/* Botão de toggle apenas visível no desktop */}
         <Button
           variant="ghost"
           size="sm"
           onClick={onToggleCollapse}
           className={cn(
-            "p-2", 
-            (isCollapsed && window.innerWidth >= 768) && "w-full flex justify-center"
+            "p-2 hidden md:flex", 
+            isCollapsed && "w-full justify-center"
           )}
         >
           <PanelLeft className="h-4 w-4 text-black dark:text-white" />
@@ -244,7 +244,7 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                   <button
                     className={cn(
                       "w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-800",
-                      (isCollapsed && window.innerWidth >= 768) && "justify-center",
+                      isCollapsed && "md:justify-center",
                       "text-black dark:text-white"
                     )}
                   >
@@ -298,7 +298,7 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                   isActive 
                     ? "bg-gray-800 dark:bg-gray-200 text-white dark:text-black" 
                     : "text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800",
-                  (isCollapsed && window.innerWidth >= 768) && "justify-center"
+                  isCollapsed && "md:justify-center"
                 )}
               >
                 <Icon className={cn("h-3.5 w-3.5 flex-shrink-0", isActive ? "text-white dark:text-black" : "text-black dark:text-white")} />
@@ -343,7 +343,7 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
           </div>
         )}
         
-        {(isCollapsed && window.innerWidth >= 768) && (
+        {isCollapsed && window.innerWidth >= 768 && (
           <div className="flex flex-col space-y-1">
             <button
               onClick={toggleUserStatus}

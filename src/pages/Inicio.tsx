@@ -36,17 +36,16 @@ const Inicio = () => {
 
   return (
     <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 flex w-full ${isDarkMode ? 'dark' : ''}`}>
-      {/* Sidebar com overlay em mobile */}
+      {/* Sidebar - comportamento responsivo corrigido */}
       <div className={`
-        fixed inset-y-0 left-0 z-50 
-        ${sidebarCollapsed ? '-translate-x-full' : 'translate-x-0'} 
+        fixed inset-y-0 left-0 z-50 md:relative md:z-auto
+        ${sidebarCollapsed ? '-translate-x-full md:translate-x-0' : 'translate-x-0'} 
         transition-transform duration-300 ease-in-out
-        md:relative md:translate-x-0 md:z-auto
       `}>
         <AppSidebar
           currentPage={currentPage}
           onPageChange={handlePageChange}
-          isCollapsed={false} // Sempre expandida em mobile
+          isCollapsed={sidebarCollapsed}
           onToggleCollapse={toggleSidebar}
           onLogout={handleLogout}
         />
@@ -60,13 +59,13 @@ const Inicio = () => {
         />
       )}
 
-      {/* Botão flutuante para abrir sidebar em mobile */}
+      {/* Botão discreto para abrir sidebar em mobile */}
       {sidebarCollapsed && (
         <Button
           onClick={toggleSidebar}
-          className="fixed top-4 left-4 z-50 md:hidden bg-gray-800 dark:bg-gray-200 text-white dark:text-black hover:bg-gray-700 dark:hover:bg-gray-300 shadow-lg rounded-full w-12 h-12 p-0 flex items-center justify-center"
+          className="fixed top-6 left-4 z-50 md:hidden bg-gray-600/80 dark:bg-gray-400/80 text-white dark:text-black hover:bg-gray-700/90 dark:hover:bg-gray-300/90 backdrop-blur-sm shadow-md rounded-md w-8 h-8 p-0 flex items-center justify-center border border-gray-300/20"
         >
-          <Menu className="h-6 w-6" />
+          <Menu className="h-4 w-4" />
         </Button>
       )}
       
