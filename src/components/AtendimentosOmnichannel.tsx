@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,7 +14,12 @@ import {
   MoreVertical,
   MessageSquare,
   Clock,
-  CheckCircle
+  CheckCircle,
+  CircleCheckBig,
+  UsersRound,
+  MessageSquareText,
+  Clock9,
+  BotMessageSquare
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -32,6 +36,8 @@ interface Conversa {
   timestamp: string;
   naoLidas: number;
   status: 'online' | 'offline' | 'ausente';
+  statusAtendimento: 'atendendo' | 'aguardando' | 'finalizado' | 'chatbot';
+  isGrupo?: boolean;
   avatar: string;
 }
 
@@ -68,6 +74,7 @@ const conversasExemplo: Conversa[] = [
     timestamp: '14:30',
     naoLidas: 2,
     status: 'online',
+    statusAtendimento: 'atendendo',
     avatar: 'JS'
   },
   {
@@ -78,6 +85,7 @@ const conversasExemplo: Conversa[] = [
     timestamp: '13:45',
     naoLidas: 1,
     status: 'offline',
+    statusAtendimento: 'aguardando',
     avatar: 'MS'
   },
   {
@@ -88,6 +96,7 @@ const conversasExemplo: Conversa[] = [
     timestamp: '12:20',
     naoLidas: 0,
     status: 'ausente',
+    statusAtendimento: 'finalizado',
     avatar: 'PC'
   },
   {
@@ -98,17 +107,20 @@ const conversasExemplo: Conversa[] = [
     timestamp: '11:15',
     naoLidas: 3,
     status: 'online',
+    statusAtendimento: 'chatbot',
     avatar: 'AO'
   },
   {
     id: '5',
-    cliente: 'Carlos Ferreira',
-    canal: 'webchat',
-    ultimaMensagem: 'Preciso de ajuda com meu pedido',
+    cliente: 'Grupo Vendas',
+    canal: 'whatsapp',
+    ultimaMensagem: 'Reunião amanhã às 10h',
     timestamp: '10:30',
     naoLidas: 1,
     status: 'online',
-    avatar: 'CF'
+    statusAtendimento: 'atendendo',
+    isGrupo: true,
+    avatar: 'GV'
   }
 ];
 
@@ -154,16 +166,20 @@ const AtendimentosOmnichannel = () => {
   const [conversaSelecionada, setConversaSelecionada] = useState<string>('1');
   const [mensagens, setMensagens] = useState<Mensagem[]>(mensagensExemplo);
   const [novaMensagem, setNovaMensagem] = useState('');
-  const [filtroCanal, setFiltroCanal] = useState<string>('todos');
+  const [filtroStatus, setFiltroStatus] = useState<string>('todos');
+  const [filtroTipo, setFiltroTipo] = useState<string>('todos');
   const [busca, setBusca] = useState('');
 
   const conversaAtual = conversasExemplo.find(c => c.id === conversaSelecionada);
   
   const conversasFiltradas = conversasExemplo.filter(conversa => {
-    const matchCanal = filtroCanal === 'todos' || conversa.canal === filtroCanal;
+    const matchStatus = filtroStatus === 'todos' || conversa.statusAtendimento === filtroStatus;
+    const matchTipo = filtroTipo === 'todos' || 
+                     (filtroTipo === 'grupos' && conversa.isGrupo) ||
+                     (filtroTipo === 'individuais' && !conversa.isGrupo);
     const matchBusca = conversa.cliente.toLowerCase().includes(busca.toLowerCase()) ||
                       conversa.ultimaMensagem.toLowerCase().includes(busca.toLowerCase());
-    return matchCanal && matchBusca;
+    return matchStatus && matchTipo && matchBusca;
   });
 
   const enviarMensagem = () => {
@@ -214,27 +230,75 @@ const AtendimentosOmnichannel = () => {
             />
           </div>
 
-          {/* Filtros por Canal */}
-          <div className="flex gap-2 flex-wrap">
-            <Button
-              variant={filtroCanal === 'todos' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setFiltroCanal('todos')}
-            >
-              Todos
-            </Button>
-            {Object.entries(canalIcons).map(([canal, icon]) => (
+          {/* Filtros Rápidos */}
+          <div className="space-y-2">
+            {/* Primeira linha - Finalizados e Grupos */}
+            <div className="flex gap-2">
               <Button
-                key={canal}
-                variant={filtroCanal === canal ? 'default' : 'outline'}
+                variant={filtroStatus === 'finalizado' ? 'default' : 'outline'}
                 size="sm"
-                onClick={() => setFiltroCanal(canal)}
+                onClick={() => {
+                  setFiltroStatus(filtroStatus === 'finalizado' ? 'todos' : 'finalizado');
+                  setFiltroTipo('todos');
+                }}
                 className="flex items-center gap-1"
               >
-                <span>{icon}</span>
-                <span className="capitalize">{canal}</span>
+                <CircleCheckBig className="h-4 w-4" />
+                <span>Finalizados</span>
               </Button>
-            ))}
+              <Button
+                variant={filtroTipo === 'grupos' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => {
+                  setFiltroTipo(filtroTipo === 'grupos' ? 'todos' : 'grupos');
+                  setFiltroStatus('todos');
+                }}
+                className="flex items-center gap-1"
+              >
+                <UsersRound className="h-4 w-4" />
+                <span>Grupos</span>
+              </Button>
+            </div>
+            
+            {/* Segunda linha - Atendendo, Aguardando e Chatbot */}
+            <div className="flex gap-2">
+              <Button
+                variant={filtroStatus === 'atendendo' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => {
+                  setFiltroStatus(filtroStatus === 'atendendo' ? 'todos' : 'atendendo');
+                  setFiltroTipo('todos');
+                }}
+                className="flex items-center gap-1"
+              >
+                <MessageSquareText className="h-4 w-4" />
+                <span>Atendendo</span>
+              </Button>
+              <Button
+                variant={filtroStatus === 'aguardando' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => {
+                  setFiltroStatus(filtroStatus === 'aguardando' ? 'todos' : 'aguardando');
+                  setFiltroTipo('todos');
+                }}
+                className="flex items-center gap-1"
+              >
+                <Clock9 className="h-4 w-4" />
+                <span>Aguardando</span>
+              </Button>
+              <Button
+                variant={filtroStatus === 'chatbot' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => {
+                  setFiltroStatus(filtroStatus === 'chatbot' ? 'todos' : 'chatbot');
+                  setFiltroTipo('todos');
+                }}
+                className="flex items-center gap-1"
+              >
+                <BotMessageSquare className="h-4 w-4" />
+                <span>Chatbot</span>
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -263,6 +327,7 @@ const AtendimentosOmnichannel = () => {
                     <div className="flex items-center justify-between mb-1">
                       <h3 className="font-medium text-gray-900 dark:text-white truncate">
                         {conversa.cliente}
+                        {conversa.isGrupo && <UsersRound className="inline h-3 w-3 ml-1" />}
                       </h3>
                       <div className="flex items-center gap-2">
                         <StatusIndicator status={conversa.status} />
