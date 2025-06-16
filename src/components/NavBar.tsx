@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Bell, Globe, Sun, Moon, User, ArrowLeft } from 'lucide-react';
+import { Bell, Globe, Sun, Moon, ArrowLeft } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -84,20 +84,6 @@ const NavBar = ({
             <Moon className="h-5 w-5 text-gray-600 dark:text-gray-300" />
           )}
         </Button>
-
-        {/* Perfil do usuário */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="p-2">
-              <User className="h-5 w-5 text-gray-600 dark:text-gray-300" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>Perfil</DropdownMenuItem>
-            <DropdownMenuItem>Configurações</DropdownMenuItem>
-            <DropdownMenuItem>Sair</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
     </nav>
   );
