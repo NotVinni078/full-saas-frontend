@@ -4,7 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, EyeOff, Mail, Lock, Sun, Moon, Languages } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, Sun, Moon } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface AuthFormProps {
   onAuth: () => void;
@@ -14,7 +20,7 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState('pt');
+  const [currentLanguage, setCurrentLanguage] = useState('pt-BR');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,12 +37,14 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
     document.documentElement.classList.toggle('dark');
   };
 
-  const toggleLanguage = () => {
-    setCurrentLanguage(currentLanguage === 'pt' ? 'en' : 'pt');
-  };
+  const languages = [
+    { code: 'pt-BR', name: 'Português (Brasil)', flag: '🇧🇷' },
+    { code: 'en-US', name: 'English (USA)', flag: '🇺🇸' },
+    { code: 'es-ES', name: 'Español (España)', flag: '🇪🇸' }
+  ];
 
   const texts = {
-    pt: {
+    'pt-BR': {
       welcome: 'Bem-vindo',
       loginDesc: 'Entre com suas credenciais para acessar sua conta',
       email: 'Email',
@@ -46,7 +54,7 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
       logging: 'Entrando...',
       companyName: 'NOME DA EMPRESA'
     },
-    en: {
+    'en-US': {
       welcome: 'Welcome',
       loginDesc: 'Enter your credentials to access your account',
       email: 'Email',
@@ -55,10 +63,21 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
       login: 'Login',
       logging: 'Logging in...',
       companyName: 'COMPANY NAME'
+    },
+    'es-ES': {
+      welcome: 'Bienvenido',
+      loginDesc: 'Ingresa tus credenciales para acceder a tu cuenta',
+      email: 'Correo electrónico',
+      password: 'Contraseña',
+      forgotPassword: 'Olvidé mi contraseña',
+      login: 'Iniciar sesión',
+      logging: 'Iniciando sesión...',
+      companyName: 'NOMBRE DE LA EMPRESA'
     }
   };
 
   const t = texts[currentLanguage as keyof typeof texts];
+  const currentLang = languages.find(lang => lang.code === currentLanguage);
 
   return (
     <div className={`min-h-screen flex ${isDarkMode ? 'dark' : ''}`}>
@@ -103,14 +122,30 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
                 >
                   {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
                 </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={toggleLanguage}
-                  className="h-8 w-8 dark:border-gray-600 dark:hover:bg-gray-700"
-                >
-                  <Languages className="h-4 w-4" />
-                </Button>
+                
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-8 w-8 dark:border-gray-600 dark:hover:bg-gray-700"
+                    >
+                      <span className="text-sm">{currentLang?.flag}</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48 bg-white dark:bg-gray-800 border dark:border-gray-700">
+                    {languages.map((language) => (
+                      <DropdownMenuItem
+                        key={language.code}
+                        onClick={() => setCurrentLanguage(language.code)}
+                        className="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                      >
+                        <span className="text-lg">{language.flag}</span>
+                        <span className="text-sm dark:text-white">{language.name}</span>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
               
               <CardTitle className="text-2xl text-gray-900 dark:text-white">
