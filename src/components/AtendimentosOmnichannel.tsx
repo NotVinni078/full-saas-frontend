@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +10,6 @@ import {
   Send, 
   Paperclip, 
   Phone, 
-  MoreVertical,
   MessageSquare,
   Clock,
   CheckCircle,
@@ -29,12 +27,6 @@ import {
   ArrowLeft,
   SmilePlus
 } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Tooltip,
   TooltipContent,
@@ -607,20 +599,6 @@ const AtendimentosOmnichannel = () => {
                     </SheetContent>
                   </Sheet>
                 </div>
-
-                {/* Menu de opções adicionais apenas em telas grandes */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>Histórico de conversas</DropdownMenuItem>
-                    <DropdownMenuItem>Arquivar conversa</DropdownMenuItem>
-                    <DropdownMenuItem>Bloquear contato</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
               </div>
             </div>
           </div>
