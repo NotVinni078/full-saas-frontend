@@ -83,13 +83,13 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
     <div className={`min-h-screen flex ${isDarkMode ? 'dark' : ''}`}>
       {/* Lado esquerdo - Imagem */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-purple-700"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-black"></div>
         <img 
           src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
           alt="Login Background"
           className="w-full h-full object-cover opacity-80 transition-transform duration-700 hover:scale-105"
         />
-        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="absolute inset-0 bg-black/40"></div>
         <div className="absolute bottom-8 left-8 text-white">
           <h2 className="text-3xl font-bold mb-2">Gerencie seu negócio</h2>
           <p className="text-lg opacity-90">com inteligência e eficiência</p>
@@ -101,8 +101,8 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
         <div className="w-full max-w-md">
           {/* Logo e Nome da Empresa */}
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-white font-bold text-xl">SF</span>
+            <div className="w-16 h-16 bg-black dark:bg-white rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-white dark:text-black font-bold text-xl">SF</span>
             </div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               {t.companyName}
@@ -199,7 +199,7 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
                 <div className="flex justify-end">
                   <button
                     type="button"
-                    className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+                    className="text-sm text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors"
                   >
                     {t.forgotPassword}
                   </button>
@@ -207,7 +207,7 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
 
                 <Button
                   type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  className="w-full bg-black hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-black"
                   disabled={isLoading}
                 >
                   {isLoading ? t.logging : t.login}
