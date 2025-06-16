@@ -297,44 +297,34 @@ const AtendimentosOmnichannel = () => {
         {/* Filtros Rápidos - Responsivos */}
         <div className="space-y-3">
           {/* Primeira linha - Finalizados e Grupos */}
-          <div className="grid grid-cols-3 gap-2">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={filtroStatus === 'finalizado' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => {
-                    setFiltroStatus(filtroStatus === 'finalizado' ? 'todos' : 'finalizado');
-                    setFiltroTipo('todos');
-                  }}
-                  className="flex items-center justify-center gap-1 w-full col-span-1 px-1"
-                >
-                  <CircleCheckBig className="h-4 w-4 flex-shrink-0" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Finalizados</p>
-              </TooltipContent>
-            </Tooltip>
-            <div></div>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={filtroTipo === 'grupos' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => {
-                    setFiltroTipo(filtroTipo === 'grupos' ? 'todos' : 'grupos');
-                    setFiltroStatus('todos');
-                  }}
-                  className="flex items-center justify-center gap-1 w-full col-span-1 px-1"
-                >
-                  <UsersRound className="h-4 w-4 flex-shrink-0" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Grupos</p>
-              </TooltipContent>
-            </Tooltip>
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              variant={filtroStatus === 'finalizado' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => {
+                setFiltroStatus(filtroStatus === 'finalizado' ? 'todos' : 'finalizado');
+                setFiltroTipo('todos');
+              }}
+              className="flex items-center justify-center gap-2 w-full"
+            >
+              <CircleCheckBig className="h-4 w-4 flex-shrink-0" />
+              <span className="hidden lg:inline">Finalizados</span>
+              <span className="hidden md:inline lg:hidden">Final.</span>
+            </Button>
+            
+            <Button
+              variant={filtroTipo === 'grupos' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => {
+                setFiltroTipo(filtroTipo === 'grupos' ? 'todos' : 'grupos');
+                setFiltroStatus('todos');
+              }}
+              className="flex items-center justify-center gap-2 w-full"
+            >
+              <UsersRound className="h-4 w-4 flex-shrink-0" />
+              <span className="hidden lg:inline">Grupos</span>
+              <span className="hidden md:inline lg:hidden">Grup.</span>
+            </Button>
           </div>
           
           {/* Separador */}
@@ -342,60 +332,47 @@ const AtendimentosOmnichannel = () => {
           
           {/* Segunda linha - Atendendo, Aguardando e Chatbot */}
           <div className="grid grid-cols-3 gap-2">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={filtroStatus === 'atendendo' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => {
-                    setFiltroStatus(filtroStatus === 'atendendo' ? 'todos' : 'atendendo');
-                    setFiltroTipo('todos');
-                  }}
-                  className="flex items-center justify-center gap-1 w-full px-1"
-                >
-                  <MessageSquareText className="h-4 w-4 flex-shrink-0" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Atendendo</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={filtroStatus === 'aguardando' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => {
-                    setFiltroStatus(filtroStatus === 'aguardando' ? 'todos' : 'aguardando');
-                    setFiltroTipo('todos');
-                  }}
-                  className="flex items-center justify-center gap-1 w-full px-1"
-                >
-                  <Clock9 className="h-4 w-4 flex-shrink-0" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Aguardando</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={filtroStatus === 'chatbot' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => {
-                    setFiltroStatus(filtroStatus === 'chatbot' ? 'todos' : 'chatbot');
-                    setFiltroTipo('todos');
-                  }}
-                  className="flex items-center justify-center gap-1 w-full px-1"
-                >
-                  <BotMessageSquare className="h-4 w-4 flex-shrink-0" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Chatbot</p>
-              </TooltipContent>
-            </Tooltip>
+            <Button
+              variant={filtroStatus === 'atendendo' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => {
+                setFiltroStatus(filtroStatus === 'atendendo' ? 'todos' : 'atendendo');
+                setFiltroTipo('todos');
+              }}
+              className="flex items-center justify-center gap-1 w-full"
+            >
+              <MessageSquareText className="h-4 w-4 flex-shrink-0" />
+              <span className="hidden lg:inline text-xs">Atendendo</span>
+              <span className="hidden md:inline lg:hidden text-xs">Atend.</span>
+            </Button>
+            
+            <Button
+              variant={filtroStatus === 'aguardando' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => {
+                setFiltroStatus(filtroStatus === 'aguardando' ? 'todos' : 'aguardando');
+                setFiltroTipo('todos');
+              }}
+              className="flex items-center justify-center gap-1 w-full"
+            >
+              <Clock9 className="h-4 w-4 flex-shrink-0" />
+              <span className="hidden lg:inline text-xs">Aguardando</span>
+              <span className="hidden md:inline lg:hidden text-xs">Aguard.</span>
+            </Button>
+            
+            <Button
+              variant={filtroStatus === 'chatbot' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => {
+                setFiltroStatus(filtroStatus === 'chatbot' ? 'todos' : 'chatbot');
+                setFiltroTipo('todos');
+              }}
+              className="flex items-center justify-center gap-1 w-full"
+            >
+              <BotMessageSquare className="h-4 w-4 flex-shrink-0" />
+              <span className="hidden lg:inline text-xs">Chatbot</span>
+              <span className="hidden md:inline lg:hidden text-xs">Bot</span>
+            </Button>
           </div>
         </div>
       </div>
