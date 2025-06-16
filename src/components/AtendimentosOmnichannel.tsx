@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -27,7 +28,8 @@ import {
   ArrowLeft,
   SmilePlus,
   MessageSquarePlus,
-  CirclePlus
+  CirclePlus,
+  X
 } from 'lucide-react';
 import {
   Tooltip,
@@ -68,6 +70,8 @@ interface Conversa {
   telefone?: string;
   email?: string;
   endereco?: string;
+  observacoes?: string;
+  tags?: string[];
 }
 
 interface Mensagem {
@@ -150,7 +154,9 @@ const conversasExemplo: Conversa[] = [
     avatar: 'JS',
     telefone: '(11) 99999-9999',
     email: 'joao@email.com',
-    endereco: 'Rua das Flores, 123'
+    endereco: 'Rua das Flores, 123',
+    observacoes: 'Cliente preferencial, sempre compra produtos premium',
+    tags: ['VIP', 'Premium', 'Fidelizado']
   },
   {
     id: '2',
@@ -164,7 +170,9 @@ const conversasExemplo: Conversa[] = [
     avatar: 'MS',
     telefone: '(11) 88888-8888',
     email: 'maria@email.com',
-    endereco: 'Av. Principal, 456'
+    endereco: 'Av. Principal, 456',
+    observacoes: 'Interessada em produtos para casa',
+    tags: ['Novo Cliente', 'Casa']
   },
   {
     id: '3',
@@ -178,7 +186,9 @@ const conversasExemplo: Conversa[] = [
     avatar: 'PC',
     telefone: '(11) 77777-7777',
     email: 'pedro@email.com',
-    endereco: 'Rua Central, 789'
+    endereco: 'Rua Central, 789',
+    observacoes: 'Cliente satisfeito com a compra',
+    tags: ['Satisfeito', 'Recomenda']
   },
   {
     id: '4',
@@ -192,7 +202,9 @@ const conversasExemplo: Conversa[] = [
     avatar: 'AO',
     telefone: '(11) 66666-6666',
     email: 'ana@email.com',
-    endereco: 'Praça da Liberdade, 321'
+    endereco: 'Praça da Liberdade, 321',
+    observacoes: 'Sempre pergunta sobre prazos',
+    tags: ['Ansiosa', 'Pragmática']
   },
   {
     id: '5',
@@ -207,7 +219,89 @@ const conversasExemplo: Conversa[] = [
     avatar: 'GV',
     telefone: '',
     email: '',
-    endereco: ''
+    endereco: '',
+    observacoes: 'Grupo interno da equipe de vendas',
+    tags: ['Interno', 'Vendas']
+  },
+  {
+    id: '6',
+    cliente: 'Carlos Ferreira',
+    canal: 'whatsapp',
+    ultimaMensagem: 'Preciso de mais informações sobre garantia',
+    timestamp: '09:45',
+    naoLidas: 0,
+    status: 'offline',
+    statusAtendimento: 'aguardando',
+    avatar: 'CF',
+    telefone: '(11) 55555-5555',
+    email: 'carlos@email.com',
+    endereco: 'Rua das Palmeiras, 100',
+    observacoes: 'Muito detalhista, gosta de informações completas',
+    tags: ['Detalhista', 'Garantia']
+  },
+  {
+    id: '7',
+    cliente: 'Julia Lima',
+    canal: 'instagram',
+    ultimaMensagem: 'Vocês têm desconto para estudantes?',
+    timestamp: '08:30',
+    naoLidas: 2,
+    status: 'online',
+    statusAtendimento: 'atendendo',
+    avatar: 'JL',
+    telefone: '(11) 44444-4444',
+    email: 'julia@email.com',
+    endereco: 'Av. Universitária, 200',
+    observacoes: 'Estudante universitária, interessada em descontos',
+    tags: ['Estudante', 'Desconto']
+  },
+  {
+    id: '8',
+    cliente: 'Roberto Alves',
+    canal: 'facebook',
+    ultimaMensagem: 'O produto chegou com defeito',
+    timestamp: '07:15',
+    naoLidas: 4,
+    status: 'online',
+    statusAtendimento: 'aguardando',
+    avatar: 'RA',
+    telefone: '(11) 33333-3333',
+    email: 'roberto@email.com',
+    endereco: 'Rua do Comércio, 50',
+    observacoes: 'Produto com defeito, precisa de troca urgente',
+    tags: ['Problema', 'Troca', 'Urgente']
+  },
+  {
+    id: '9',
+    cliente: 'Fernanda Costa',
+    canal: 'telegram',
+    ultimaMensagem: 'Adorei a qualidade dos produtos!',
+    timestamp: '06:50',
+    naoLidas: 0,
+    status: 'offline',
+    statusAtendimento: 'finalizado',
+    avatar: 'FC',
+    telefone: '(11) 22222-2222',
+    email: 'fernanda@email.com',
+    endereco: 'Av. dos Sonhos, 300',
+    observacoes: 'Cliente muito satisfeita, potencial para indicações',
+    tags: ['Satisfeita', 'Indicações', 'Qualidade']
+  },
+  {
+    id: '10',
+    cliente: 'Marcos Pereira',
+    canal: 'webchat',
+    ultimaMensagem: 'Gostaria de falar com um supervisor',
+    timestamp: '06:20',
+    naoLidas: 1,
+    status: 'ausente',
+    statusAtendimento: 'aguardando',
+    avatar: 'MP',
+    telefone: '(11) 11111-1111',
+    email: 'marcos@email.com',
+    endereco: 'Rua da Esperança, 400',
+    observacoes: 'Cliente insatisfeito, quer falar com supervisor',
+    tags: ['Insatisfeito', 'Supervisor', 'Escalação']
   }
 ];
 
@@ -321,7 +415,7 @@ const AtendimentosOmnichannel = () => {
   };
 
   const ConversasList = () => (
-    <div className={`w-full ${conversaSelecionada ? 'md:w-1/3' : 'md:w-1/2 lg:w-1/3'} border-r border-gray-200 dark:border-gray-700 flex flex-col relative`}>
+    <div className={`w-full ${conversaSelecionada ? 'md:w-1/3' : 'md:w-2/3 lg:w-1/2'} border-r border-gray-200 dark:border-gray-700 flex flex-col relative`}>
       {/* Header da Lista */}
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between mb-4">
@@ -482,14 +576,14 @@ const AtendimentosOmnichannel = () => {
         </div>
       </ScrollArea>
 
-      {/* Botão Flutuante */}
+      {/* Botão Flutuante - Posicionado dentro da lista de conversas */}
       <Dialog open={isContactDialogOpen} onOpenChange={setIsContactDialogOpen}>
         <DialogTrigger asChild>
           <Button
-            className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-50 bg-blue-600 hover:bg-blue-700"
+            className="absolute bottom-6 right-6 h-12 w-12 rounded-full shadow-lg z-10 bg-gray-600 hover:bg-gray-700 dark:bg-gray-500 dark:hover:bg-gray-600"
             size="icon"
           >
-            <CirclePlus className="h-6 w-6" />
+            <CirclePlus className="h-5 w-5" />
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
@@ -583,12 +677,11 @@ const AtendimentosOmnichannel = () => {
                       {conversaAtual.cliente}
                     </h3>
                     <div className="flex gap-1">
-                      <Badge variant="secondary" className="text-xs px-2 py-0.5">
-                        VIP
-                      </Badge>
-                      <Badge variant="outline" className="text-xs px-2 py-0.5">
-                        Cliente
-                      </Badge>
+                      {conversaAtual.tags?.map((tag) => (
+                        <Badge key={tag} variant="secondary" className="text-xs px-2 py-0.5">
+                          {tag}
+                        </Badge>
+                      ))}
                     </div>
                   </div>
                   <div className="text-sm text-gray-500 truncate">
@@ -805,7 +898,7 @@ const AtendimentosOmnichannel = () => {
 
         {/* Modal de Edição de Contato */}
         <Dialog open={isEditContactOpen} onOpenChange={setIsEditContactOpen}>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Editar Contato</DialogTitle>
             </DialogHeader>
@@ -850,6 +943,45 @@ const AtendimentosOmnichannel = () => {
                     <Input
                       placeholder="Endereço"
                       defaultValue={selectedContact.endereco}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Observações</label>
+                    <Textarea
+                      placeholder="Observações sobre o contato..."
+                      defaultValue={selectedContact.observacoes}
+                      className="min-h-[80px]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Tags</label>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {selectedContact.tags?.map((tag) => (
+                        <Badge key={tag} variant="secondary" className="text-xs px-2 py-1 flex items-center gap-1">
+                          {tag}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-3 w-3 p-0 hover:bg-red-100"
+                            onClick={() => {
+                              // Lógica para remover tag seria implementada aqui
+                            }}
+                          >
+                            <X className="h-2 w-2" />
+                          </Button>
+                        </Badge>
+                      ))}
+                    </div>
+                    <Input
+                      placeholder="Adicionar nova tag..."
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          // Lógica para adicionar nova tag seria implementada aqui
+                          e.currentTarget.value = '';
+                        }
+                      }}
                     />
                   </div>
                 </div>
