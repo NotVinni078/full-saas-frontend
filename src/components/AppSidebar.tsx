@@ -14,7 +14,6 @@ import {
   Tag,
   UserCog,
   Building2,
-  Announcement,
   Building,
   CreditCard,
   Package,
