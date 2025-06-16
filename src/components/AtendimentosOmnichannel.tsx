@@ -855,7 +855,7 @@ const AtendimentosOmnichannel = () => {
             </ScrollArea>
 
             {/* Input de Mensagem - Ajustado posicionamento */}
-            <div className="p-3 pl-6 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
+            <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
               <div className="flex items-end gap-2">
                 {/* Menu suspenso com opções */}
                 <DropdownMenu>
@@ -864,57 +864,58 @@ const AtendimentosOmnichannel = () => {
                       <EllipsisVertical className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-56">
-                    <DropdownMenuItem
-                      onClick={() => setIsSignatureActive(!isSignatureActive)}
-                      className="flex items-center gap-2"
-                    >
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                        isSignatureActive ? 'bg-red-100' : 'bg-green-100'
-                      }`}>
+                  <DropdownMenuContent align="start" className="w-auto p-2">
+                    <div className="flex flex-col gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setIsSignatureActive(!isSignatureActive)}
+                        className={`w-8 h-8 rounded-full ${
+                          isSignatureActive ? 'bg-red-100 hover:bg-red-200' : 'bg-green-100 hover:bg-green-200'
+                        }`}
+                      >
                         {isSignatureActive ? (
-                          <PenOff className="h-3 w-3 text-red-600" />
+                          <PenOff className="h-4 w-4 text-red-600" />
                         ) : (
-                          <PenLine className="h-3 w-3 text-green-600" />
+                          <PenLine className="h-4 w-4 text-green-600" />
                         )}
-                      </div>
-                      <span>{isSignatureActive ? 'Desativar Assinatura' : 'Ativar Assinatura'}</span>
-                    </DropdownMenuItem>
-                    
-                    <DropdownMenuItem className="flex items-center gap-2">
-                      <Zap className="h-4 w-4" />
-                      <span>Respostas Rápidas</span>
-                    </DropdownMenuItem>
-                    
-                    <DropdownMenuItem className="flex items-center gap-2">
-                      <NotebookPen className="h-4 w-4" />
-                      <span>Anotações</span>
-                    </DropdownMenuItem>
-                    
-                    <DropdownMenuItem 
-                      className="flex items-center gap-2"
-                      onClick={() => setIsContactListOpen(true)}
-                    >
-                      <IdCard className="h-4 w-4" />
-                      <span>Compartilhar Contatos</span>
-                    </DropdownMenuItem>
-                    
-                    <DropdownMenuItem 
-                      className="flex items-center gap-2"
-                      onClick={() => setIsChatbotListOpen(true)}
-                    >
-                      <BotMessageSquare className="h-4 w-4" />
-                      <span>Transferir para Chatbot</span>
-                    </DropdownMenuItem>
+                      </Button>
+                      
+                      <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200">
+                        <Zap className="h-4 w-4" />
+                      </Button>
+                      
+                      <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200">
+                        <NotebookPen className="h-4 w-4" />
+                      </Button>
+                      
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200"
+                        onClick={() => setIsContactListOpen(true)}
+                      >
+                        <IdCard className="h-4 w-4" />
+                      </Button>
+                      
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200"
+                        onClick={() => setIsChatbotListOpen(true)}
+                      >
+                        <BotMessageSquare className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </DropdownMenuContent>
                 </DropdownMenu>
 
                 <Button variant="ghost" size="icon">
-                  <Paperclip className="h-4 w-4" />
+                  <SmilePlus className="h-4 w-4" />
                 </Button>
 
                 <Button variant="ghost" size="icon">
-                  <SmilePlus className="h-4 w-4" />
+                  <Paperclip className="h-4 w-4" />
                 </Button>
                 
                 <div className="flex-1">
