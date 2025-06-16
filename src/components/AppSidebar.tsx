@@ -68,19 +68,6 @@ const menuGroups = [
     ]
   },
   {
-    id: 'atendimentos',
-    label: 'Atendimentos',
-    icon: MessageSquare,
-    items: [
-      { id: 'chat-interno', label: 'Chat Interno', icon: MessageSquare },
-      { id: 'painel-atendimentos', label: 'Painel de Atendimentos', icon: MessageSquareCode },
-      { id: 'agendamentos', label: 'Agendamentos', icon: Calendar },
-      { id: 'respostas-rapidas', label: 'Respostas Rápidas', icon: Zap },
-      { id: 'tarefas', label: 'Tarefas', icon: ListTodo },
-      { id: 'campanhas', label: 'Campanhas', icon: Megaphone },
-    ]
-  },
-  {
     id: 'gestao',
     label: 'Gestão',
     icon: Computer,
@@ -124,6 +111,13 @@ const menuGroups = [
 ];
 
 const singleItems = [
+  { id: 'atendimentos', label: 'Atendimentos', icon: MessageSquare },
+  { id: 'chat-interno', label: 'Chat Interno', icon: MessageSquare },
+  { id: 'painel-atendimentos', label: 'Painel de Atendimentos', icon: MessageSquareCode },
+  { id: 'agendamentos', label: 'Agendamentos', icon: Calendar },
+  { id: 'respostas-rapidas', label: 'Respostas Rápidas', icon: Zap },
+  { id: 'tarefas', label: 'Tarefas', icon: ListTodo },
+  { id: 'campanhas', label: 'Campanhas', icon: Megaphone },
   { id: 'chatbot', label: 'ChatBot', icon: Bot },
   { id: 'conexoes', label: 'Conexões', icon: Waypoints },
   { id: 'documentacao', label: 'Documentação', icon: FileText },
@@ -262,29 +256,32 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
               <p className="text-sm font-medium text-gray-900 dark:text-white truncate">Usuário</p>
               <p className="text-xs text-gray-500 dark:text-gray-400 truncate">usuario@exemplo.com</p>
             </div>
-            <button
-              onClick={toggleUserStatus}
-              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
-            >
-              {userStatus ? (
-                <UserCheck className="h-4 w-4 text-black dark:text-white" />
-              ) : (
-                <UserX className="h-4 w-4 text-red-600" />
-              )}
-            </button>
           </div>
         )}
         
-        <Button
-          variant="ghost"
-          onClick={onLogout}
-          className={cn(
-            "w-full text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950",
-            isCollapsed ? "justify-center p-2" : "justify-start"
-          )}
-        >
-          <LogOut className="h-4 w-4" />
-        </Button>
+        <div className="flex flex-col space-y-2">
+          <button
+            onClick={toggleUserStatus}
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded flex items-center justify-center"
+          >
+            {userStatus ? (
+              <UserCheck className="h-4 w-4 text-green-600" />
+            ) : (
+              <UserX className="h-4 w-4 text-red-600" />
+            )}
+          </button>
+          
+          <Button
+            variant="ghost"
+            onClick={onLogout}
+            className={cn(
+              "w-full text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950",
+              isCollapsed ? "justify-center p-2" : "justify-start"
+            )}
+          >
+            <LogOut className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );
