@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Bell, BellRing, Sun, Moon, CreditCard } from 'lucide-react';
+import { MessageSquare, MessagesSquare, Receipt, Sun, Moon, CreditCard } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,7 +40,7 @@ const NavBar = ({ isDarkMode, onToggleTheme, currentLanguage, onLanguageChange }
           {/* Notificações de Atendimentos */}
           <div className="relative">
             <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
+              <MessageSquare className="h-5 w-5" />
               {notifications.atendimentos > 0 && (
                 <Badge 
                   variant="destructive" 
@@ -55,7 +55,7 @@ const NavBar = ({ isDarkMode, onToggleTheme, currentLanguage, onLanguageChange }
           {/* Notificações de Chat Interno */}
           <div className="relative">
             <Button variant="ghost" size="icon" className="relative">
-              <BellRing className="h-5 w-5" />
+              <MessagesSquare className="h-5 w-5" />
               {notifications.chatInterno > 0 && (
                 <Badge 
                   variant="destructive" 
@@ -70,7 +70,7 @@ const NavBar = ({ isDarkMode, onToggleTheme, currentLanguage, onLanguageChange }
           {/* Notificações de Faturas */}
           <div className="relative">
             <Button variant="ghost" size="icon" className="relative">
-              <CreditCard className="h-5 w-5" />
+              <Receipt className="h-5 w-5" />
               {notifications.faturas > 0 && (
                 <Badge 
                   variant="destructive" 

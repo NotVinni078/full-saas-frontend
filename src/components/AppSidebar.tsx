@@ -38,7 +38,8 @@ import {
   SquareChartGantt,
   Waypoints,
   UserCheck,
-  UserX
+  UserX,
+  MessagesSquare
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -113,7 +114,7 @@ const menuGroups = [
 // Ordem correta dos itens individuais conforme solicitado
 const singleItems = [
   { id: 'atendimentos', label: 'Atendimentos', icon: MessageSquare },
-  { id: 'chat-interno', label: 'Chat Interno', icon: MessageSquare },
+  { id: 'chat-interno', label: 'Chat Interno', icon: MessagesSquare },
   { id: 'painel-atendimentos', label: 'Painel de Atendimentos', icon: MessageSquareCode },
   { id: 'agendamentos', label: 'Agendamentos', icon: Calendar },
   { id: 'respostas-rapidas', label: 'Respostas Rápidas', icon: Zap },
@@ -205,10 +206,10 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
         {!isCollapsed && (
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">SF</span>
+              <span className="text-white font-bold text-sm">NE</span>
             </div>
-            <h1 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
-              SaasFlow
+            <h1 className="text-lg font-bold text-black dark:text-white">
+              Nome da Empresa
             </h1>
           </div>
         )}
@@ -216,7 +217,7 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
           variant="ghost"
           size="sm"
           onClick={onToggleCollapse}
-          className="p-2"
+          className={cn("p-2", isCollapsed && "w-full flex justify-center")}
         >
           <PanelLeft className="h-4 w-4 text-black dark:text-white" />
         </Button>
@@ -241,8 +242,8 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                     )}
                   >
                     <div className="flex items-center space-x-2">
-                      <GroupIcon className="h-4 w-4 flex-shrink-0 text-black dark:text-white" />
-                      {!isCollapsed && <span className="font-medium text-sm text-black dark:text-white">{group.label}</span>}
+                      <GroupIcon className="h-3.5 w-3.5 flex-shrink-0 text-black dark:text-white" />
+                      {!isCollapsed && <span className="font-medium text-xs text-black dark:text-white">{group.label}</span>}
                     </div>
                     {!isCollapsed && (
                       isOpen ? <ChevronUp className="h-3 w-3 text-black dark:text-white" /> : <ChevronDown className="h-3 w-3 text-black dark:text-white" />
@@ -261,13 +262,13 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                           key={subItem.id}
                           onClick={() => onPageChange(subItem.id)}
                           className={cn(
-                            "w-full flex items-center space-x-2 px-2 py-1.5 ml-5 rounded-lg text-left transition-colors text-sm",
+                            "w-full flex items-center space-x-2 px-2 py-1.5 ml-5 rounded-lg text-left transition-colors text-xs",
                             isActive 
                               ? "bg-blue-500 text-white" 
                               : "text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
                           )}
                         >
-                          <ItemIcon className={cn("h-3.5 w-3.5 flex-shrink-0", isActive ? "text-white" : "text-black dark:text-white")} />
+                          <ItemIcon className={cn("h-3 w-3 flex-shrink-0", isActive ? "text-white" : "text-black dark:text-white")} />
                           <span className={cn("text-xs", isActive ? "text-white" : "text-black dark:text-white")}>{subItem.label}</span>
                         </button>
                       );
@@ -293,8 +294,8 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                   isCollapsed && "justify-center"
                 )}
               >
-                <Icon className={cn("h-4 w-4 flex-shrink-0", isActive ? "text-white" : "text-black dark:text-white")} />
-                {!isCollapsed && <span className={cn("font-medium text-sm", isActive ? "text-white" : "text-black dark:text-white")}>{singleItem.label}</span>}
+                <Icon className={cn("h-3.5 w-3.5 flex-shrink-0", isActive ? "text-white" : "text-black dark:text-white")} />
+                {!isCollapsed && <span className={cn("font-medium text-xs", isActive ? "text-white" : "text-black dark:text-white")}>{singleItem.label}</span>}
               </button>
             );
           }
@@ -310,34 +311,53 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-gray-900 dark:text-white truncate">Usuário</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">usuario@exemplo.com</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">Administração</p>
+            </div>
+            <div className="flex items-center space-x-1">
+              <button
+                onClick={toggleUserStatus}
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded flex items-center justify-center"
+              >
+                {userStatus ? (
+                  <UserCheck className="h-3 w-3 text-green-600" />
+                ) : (
+                  <UserX className="h-3 w-3 text-red-600" />
+                )}
+              </button>
+              
+              <Button
+                variant="ghost"
+                onClick={onLogout}
+                className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950 h-6 w-6 p-1"
+              >
+                <LogOut className="h-3 w-3" />
+              </Button>
             </div>
           </div>
         )}
         
-        <div className="flex flex-col space-y-1">
-          <button
-            onClick={toggleUserStatus}
-            className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded flex items-center justify-center"
-          >
-            {userStatus ? (
-              <UserCheck className="h-3.5 w-3.5 text-green-600" />
-            ) : (
-              <UserX className="h-3.5 w-3.5 text-red-600" />
-            )}
-          </button>
-          
-          <Button
-            variant="ghost"
-            onClick={onLogout}
-            className={cn(
-              "w-full text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950 text-xs h-7",
-              isCollapsed ? "justify-center p-1" : "justify-start"
-            )}
-          >
-            <LogOut className="h-3.5 w-3.5" />
-          </Button>
-        </div>
+        {isCollapsed && (
+          <div className="flex flex-col space-y-1">
+            <button
+              onClick={toggleUserStatus}
+              className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded flex items-center justify-center"
+            >
+              {userStatus ? (
+                <UserCheck className="h-3.5 w-3.5 text-green-600" />
+              ) : (
+                <UserX className="h-3.5 w-3.5 text-red-600" />
+              )}
+            </button>
+            
+            <Button
+              variant="ghost"
+              onClick={onLogout}
+              className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950 text-xs h-7 justify-center p-1"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
