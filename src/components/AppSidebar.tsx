@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   Home, 
@@ -88,7 +87,7 @@ const menuGroups = [
     items: [
       { id: 'gestao-usuarios', label: 'Gestão de Usuários', icon: Users },
       { id: 'gestao-setores', label: 'Gestão de Setores', icon: Building2 },
-      { id: 'anuncios', label: 'Anúncios', icon: Announcement },
+      { id: 'anuncios', label: 'Anúncios', icon: Megaphone },
       { id: 'admin-empresas', label: 'Administração de Empresas', icon: Building },
     ]
   },
