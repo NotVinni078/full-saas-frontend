@@ -110,6 +110,7 @@ const menuGroups = [
   }
 ];
 
+// Ordem correta dos itens individuais conforme solicitado
 const singleItems = [
   { id: 'atendimentos', label: 'Atendimentos', icon: MessageSquare },
   { id: 'chat-interno', label: 'Chat Interno', icon: MessageSquare },
@@ -125,7 +126,7 @@ const singleItems = [
 
 const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, onLogout }: AppSidebarProps) => {
   const [openGroups, setOpenGroups] = React.useState<string[]>(['dashboards']);
-  const [userStatus, setUserStatus] = React.useState(true); // true = online (UserCheck), false = offline (UserX)
+  const [userStatus, setUserStatus] = React.useState(true);
 
   const toggleGroup = (groupId: string) => {
     setOpenGroups(prev => 
@@ -137,6 +138,61 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
 
   const toggleUserStatus = () => {
     setUserStatus(!userStatus);
+  };
+
+  // Função para renderizar os itens na ordem correta
+  const renderMenuItems = () => {
+    const orderedItems = [];
+
+    // 1. Dashboards (grupo)
+    const dashboardsGroup = menuGroups.find(group => group.id === 'dashboards');
+    if (dashboardsGroup) {
+      orderedItems.push({ type: 'group', data: dashboardsGroup });
+    }
+
+    // 2-8. Itens individuais na ordem especificada
+    const orderedSingleItems = [
+      'atendimentos',
+      'chat-interno', 
+      'painel-atendimentos',
+      'agendamentos',
+      'respostas-rapidas',
+      'tarefas',
+      'campanhas'
+    ];
+
+    orderedSingleItems.forEach(itemId => {
+      const item = singleItems.find(single => single.id === itemId);
+      if (item) {
+        orderedItems.push({ type: 'single', data: item });
+      }
+    });
+
+    // 9-11. Grupos na ordem especificada
+    const orderedGroups = ['gestao', 'administracao', 'financeiro'];
+    orderedGroups.forEach(groupId => {
+      const group = menuGroups.find(g => g.id === groupId);
+      if (group) {
+        orderedItems.push({ type: 'group', data: group });
+      }
+    });
+
+    // 12-14. Itens individuais finais
+    const finalSingleItems = ['chatbot', 'conexoes', 'documentacao'];
+    finalSingleItems.forEach(itemId => {
+      const item = singleItems.find(single => single.id === itemId);
+      if (item) {
+        orderedItems.push({ type: 'single', data: item });
+      }
+    });
+
+    // 15. Configurações (grupo)
+    const configGroup = menuGroups.find(group => group.id === 'configuracoes');
+    if (configGroup) {
+      orderedItems.push({ type: 'group', data: configGroup });
+    }
+
+    return orderedItems;
   };
 
   return (
@@ -168,80 +224,80 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
 
       {/* Navigation */}
       <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
-        {/* Grupos de menu com submenu */}
-        {menuGroups.map((group) => {
-          const isOpen = openGroups.includes(group.id);
-          const GroupIcon = group.icon;
-          
-          return (
-            <Collapsible key={group.id} open={isOpen} onOpenChange={() => toggleGroup(group.id)}>
-              <CollapsibleTrigger asChild>
-                <button
-                  className={cn(
-                    "w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-800",
-                    isCollapsed && "justify-center",
-                    "text-black dark:text-white"
-                  )}
-                >
-                  <div className="flex items-center space-x-3">
-                    <GroupIcon className="h-5 w-5 flex-shrink-0 text-black dark:text-white" />
-                    {!isCollapsed && <span className="font-medium text-black dark:text-white">{group.label}</span>}
-                  </div>
-                  {!isCollapsed && (
-                    isOpen ? <ChevronUp className="h-4 w-4 text-black dark:text-white" /> : <ChevronDown className="h-4 w-4 text-black dark:text-white" />
-                  )}
-                </button>
-              </CollapsibleTrigger>
-              
-              {!isCollapsed && (
-                <CollapsibleContent className="space-y-1 mt-1">
-                  {group.items.map((item) => {
-                    const ItemIcon = item.icon;
-                    const isActive = currentPage === item.id;
-                    
-                    return (
-                      <button
-                        key={item.id}
-                        onClick={() => onPageChange(item.id)}
-                        className={cn(
-                          "w-full flex items-center space-x-3 px-3 py-2 ml-6 rounded-lg text-left transition-colors text-sm",
-                          isActive 
-                            ? "bg-blue-500 text-white" 
-                            : "text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
-                        )}
-                      >
-                        <ItemIcon className={cn("h-4 w-4 flex-shrink-0", isActive ? "text-white" : "text-black dark:text-white")} />
-                        <span className={isActive ? "text-white" : "text-black dark:text-white"}>{item.label}</span>
-                      </button>
-                    );
-                  })}
-                </CollapsibleContent>
-              )}
-            </Collapsible>
-          );
-        })}
-
-        {/* Itens individuais */}
-        {singleItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = currentPage === item.id;
-          
-          return (
-            <button
-              key={item.id}
-              onClick={() => onPageChange(item.id)}
-              className={cn(
-                "w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors",
-                isActive 
-                  ? "bg-blue-500 text-white" 
-                  : "text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800",
-                isCollapsed && "justify-center"
-              )}
-            >
-              <Icon className={cn("h-5 w-5 flex-shrink-0", isActive ? "text-white" : "text-black dark:text-white")} />
-              {!isCollapsed && <span className={cn("font-medium", isActive ? "text-white" : "text-black dark:text-white")}>{item.label}</span>}
-            </button>
-          );
+        {renderMenuItems().map((item, index) => {
+          if (item.type === 'group') {
+            const group = item.data;
+            const isOpen = openGroups.includes(group.id);
+            const GroupIcon = group.icon;
+            
+            return (
+              <Collapsible key={group.id} open={isOpen} onOpenChange={() => toggleGroup(group.id)}>
+                <CollapsibleTrigger asChild>
+                  <button
+                    className={cn(
+                      "w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-800",
+                      isCollapsed && "justify-center",
+                      "text-black dark:text-white"
+                    )}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <GroupIcon className="h-5 w-5 flex-shrink-0 text-black dark:text-white" />
+                      {!isCollapsed && <span className="font-medium text-black dark:text-white">{group.label}</span>}
+                    </div>
+                    {!isCollapsed && (
+                      isOpen ? <ChevronUp className="h-4 w-4 text-black dark:text-white" /> : <ChevronDown className="h-4 w-4 text-black dark:text-white" />
+                    )}
+                  </button>
+                </CollapsibleTrigger>
+                
+                {!isCollapsed && (
+                  <CollapsibleContent className="space-y-1 mt-1">
+                    {group.items.map((subItem) => {
+                      const ItemIcon = subItem.icon;
+                      const isActive = currentPage === subItem.id;
+                      
+                      return (
+                        <button
+                          key={subItem.id}
+                          onClick={() => onPageChange(subItem.id)}
+                          className={cn(
+                            "w-full flex items-center space-x-3 px-3 py-2 ml-6 rounded-lg text-left transition-colors text-sm",
+                            isActive 
+                              ? "bg-blue-500 text-white" 
+                              : "text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+                          )}
+                        >
+                          <ItemIcon className={cn("h-4 w-4 flex-shrink-0", isActive ? "text-white" : "text-black dark:text-white")} />
+                          <span className={isActive ? "text-white" : "text-black dark:text-white"}>{subItem.label}</span>
+                        </button>
+                      );
+                    })}
+                  </CollapsibleContent>
+                )}
+              </Collapsible>
+            );
+          } else {
+            const singleItem = item.data;
+            const Icon = singleItem.icon;
+            const isActive = currentPage === singleItem.id;
+            
+            return (
+              <button
+                key={singleItem.id}
+                onClick={() => onPageChange(singleItem.id)}
+                className={cn(
+                  "w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors",
+                  isActive 
+                    ? "bg-blue-500 text-white" 
+                    : "text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800",
+                  isCollapsed && "justify-center"
+                )}
+              >
+                <Icon className={cn("h-5 w-5 flex-shrink-0", isActive ? "text-white" : "text-black dark:text-white")} />
+                {!isCollapsed && <span className={cn("font-medium", isActive ? "text-white" : "text-black dark:text-white")}>{singleItem.label}</span>}
+              </button>
+            );
+          }
         })}
       </nav>
 
