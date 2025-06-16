@@ -840,8 +840,8 @@ const AtendimentosOmnichannel = () => {
               </div>
             </div>
 
-            {/* Input de Mensagem - Fixo na parte inferior */}
-            <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
+            {/* Input de Mensagem - Ajustado para alinhar com sidebar */}
+            <div className="p-4 pl-6 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
               <div className="flex items-end gap-2">
                 <Button variant="ghost" size="icon">
                   <Paperclip className="h-4 w-4" />
