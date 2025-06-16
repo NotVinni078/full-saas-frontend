@@ -14,9 +14,18 @@ interface NavBarProps {
   onToggleTheme: () => void;
   currentLanguage: string;
   onLanguageChange: (language: string) => void;
+  onToggleSidebar?: () => void;
+  isSidebarCollapsed?: boolean;
 }
 
-const NavBar = ({ isDarkMode, onToggleTheme, currentLanguage, onLanguageChange }: NavBarProps) => {
+const NavBar = ({ 
+  isDarkMode, 
+  onToggleTheme, 
+  currentLanguage, 
+  onLanguageChange,
+  onToggleSidebar,
+  isSidebarCollapsed
+}: NavBarProps) => {
   const [notifications] = useState({
     atendimentos: 3,
     chatInterno: 1,
