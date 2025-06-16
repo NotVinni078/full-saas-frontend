@@ -220,7 +220,7 @@ const AtendimentosOmnichannel = () => {
           </div>
           
           {/* Busca */}
-          <div className="relative mb-3">
+          <div className="relative mb-4">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
               placeholder="Buscar conversas..."
@@ -231,9 +231,9 @@ const AtendimentosOmnichannel = () => {
           </div>
 
           {/* Filtros Rápidos */}
-          <div className="space-y-2">
-            {/* Primeira linha - Finalizados e Grupos */}
-            <div className="flex gap-2">
+          <div className="space-y-3">
+            {/* Primeira linha - Finalizados e vazio para espaço */}
+            <div className="grid grid-cols-3 gap-2">
               <Button
                 variant={filtroStatus === 'finalizado' ? 'default' : 'outline'}
                 size="sm"
@@ -241,11 +241,12 @@ const AtendimentosOmnichannel = () => {
                   setFiltroStatus(filtroStatus === 'finalizado' ? 'todos' : 'finalizado');
                   setFiltroTipo('todos');
                 }}
-                className="flex items-center gap-1"
+                className="flex items-center justify-center gap-1 w-full"
               >
                 <CircleCheckBig className="h-4 w-4" />
                 <span>Finalizados</span>
               </Button>
+              <div></div>
               <Button
                 variant={filtroTipo === 'grupos' ? 'default' : 'outline'}
                 size="sm"
@@ -253,15 +254,18 @@ const AtendimentosOmnichannel = () => {
                   setFiltroTipo(filtroTipo === 'grupos' ? 'todos' : 'grupos');
                   setFiltroStatus('todos');
                 }}
-                className="flex items-center gap-1"
+                className="flex items-center justify-center gap-1 w-full"
               >
                 <UsersRound className="h-4 w-4" />
                 <span>Grupos</span>
               </Button>
             </div>
             
+            {/* Separador */}
+            <Separator className="my-2" />
+            
             {/* Segunda linha - Atendendo, Aguardando e Chatbot */}
-            <div className="flex gap-2">
+            <div className="grid grid-cols-3 gap-2">
               <Button
                 variant={filtroStatus === 'atendendo' ? 'default' : 'outline'}
                 size="sm"
@@ -269,7 +273,7 @@ const AtendimentosOmnichannel = () => {
                   setFiltroStatus(filtroStatus === 'atendendo' ? 'todos' : 'atendendo');
                   setFiltroTipo('todos');
                 }}
-                className="flex items-center gap-1"
+                className="flex items-center justify-center gap-1 w-full"
               >
                 <MessageSquareText className="h-4 w-4" />
                 <span>Atendendo</span>
@@ -281,7 +285,7 @@ const AtendimentosOmnichannel = () => {
                   setFiltroStatus(filtroStatus === 'aguardando' ? 'todos' : 'aguardando');
                   setFiltroTipo('todos');
                 }}
-                className="flex items-center gap-1"
+                className="flex items-center justify-center gap-1 w-full"
               >
                 <Clock9 className="h-4 w-4" />
                 <span>Aguardando</span>
@@ -293,7 +297,7 @@ const AtendimentosOmnichannel = () => {
                   setFiltroStatus(filtroStatus === 'chatbot' ? 'todos' : 'chatbot');
                   setFiltroTipo('todos');
                 }}
-                className="flex items-center gap-1"
+                className="flex items-center justify-center gap-1 w-full"
               >
                 <BotMessageSquare className="h-4 w-4" />
                 <span>Chatbot</span>
