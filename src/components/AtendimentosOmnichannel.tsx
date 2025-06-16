@@ -542,7 +542,7 @@ const AtendimentosOmnichannel = () => {
             {conversasFiltradas.map((conversa) => (
               <Card
                 key={conversa.id}
-                className={`p-3 mb-2 cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 ${
+                className={`p-3 mb-2 cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-900 ${
                   conversaSelecionada === conversa.id ? 'border-blue-500 bg-blue-50 dark:bg-blue-950' : ''
                 }`}
                 onClick={() => handleConversaClick(conversa.id)}
@@ -854,8 +854,8 @@ const AtendimentosOmnichannel = () => {
               </div>
             </ScrollArea>
 
-            {/* Input de Mensagem - Ajustado posicionamento */}
-            <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
+            {/* Input de Mensagem - Posição ajustada */}
+            <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
               <div className="flex items-end gap-2">
                 {/* Menu suspenso com opções */}
                 <DropdownMenu>
@@ -864,13 +864,13 @@ const AtendimentosOmnichannel = () => {
                       <EllipsisVertical className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-auto p-2">
+                  <DropdownMenuContent align="start" className="w-auto p-1 bg-transparent border-none shadow-none">
                     <div className="flex flex-col gap-2">
                       <Button
                         variant="ghost"
                         size="icon"
                         onClick={() => setIsSignatureActive(!isSignatureActive)}
-                        className={`w-8 h-8 rounded-full ${
+                        className={`w-8 h-8 rounded-full shadow-lg ${
                           isSignatureActive ? 'bg-red-100 hover:bg-red-200' : 'bg-green-100 hover:bg-green-200'
                         }`}
                       >
@@ -881,18 +881,18 @@ const AtendimentosOmnichannel = () => {
                         )}
                       </Button>
                       
-                      <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200">
+                      <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg">
                         <Zap className="h-4 w-4" />
                       </Button>
                       
-                      <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200">
+                      <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg">
                         <NotebookPen className="h-4 w-4" />
                       </Button>
                       
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200"
+                        className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg"
                         onClick={() => setIsContactListOpen(true)}
                       >
                         <IdCard className="h-4 w-4" />
@@ -901,7 +901,7 @@ const AtendimentosOmnichannel = () => {
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200"
+                        className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg"
                         onClick={() => setIsChatbotListOpen(true)}
                       >
                         <BotMessageSquare className="h-4 w-4" />
