@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -300,9 +301,9 @@ const AtendimentosOmnichannel = () => {
           </Button>
         </div>
 
-        {/* Filtros Rápidos */}
+        {/* Filtros Rápidos - Melhorados para telas pequenas */}
         <div className="space-y-3">
-          {/* Primeira linha - Finalizados e Grupos com espaçamento */}
+          {/* Primeira linha - Finalizados e Grupos com espaçamento responsivo */}
           <div className="grid grid-cols-3 gap-2">
             <Button
               variant={filtroStatus === 'finalizado' ? 'default' : 'outline'}
@@ -311,10 +312,10 @@ const AtendimentosOmnichannel = () => {
                 setFiltroStatus(filtroStatus === 'finalizado' ? 'todos' : 'finalizado');
                 setFiltroTipo('todos');
               }}
-              className="flex items-center justify-center gap-1 w-full col-span-1"
+              className="flex items-center justify-center gap-1 w-full col-span-1 px-1"
             >
-              <CircleCheckBig className="h-4 w-4" />
-              <span>Finalizados</span>
+              <CircleCheckBig className="h-4 w-4 flex-shrink-0" />
+              <span className="hidden sm:inline">Finalizados</span>
             </Button>
             <div></div>
             <Button
@@ -324,10 +325,10 @@ const AtendimentosOmnichannel = () => {
                 setFiltroTipo(filtroTipo === 'grupos' ? 'todos' : 'grupos');
                 setFiltroStatus('todos');
               }}
-              className="flex items-center justify-center gap-1 w-full col-span-1"
+              className="flex items-center justify-center gap-1 w-full col-span-1 px-1"
             >
-              <UsersRound className="h-4 w-4" />
-              <span>Grupos</span>
+              <UsersRound className="h-4 w-4 flex-shrink-0" />
+              <span className="hidden sm:inline">Grupos</span>
             </Button>
           </div>
           
@@ -343,10 +344,10 @@ const AtendimentosOmnichannel = () => {
                 setFiltroStatus(filtroStatus === 'atendendo' ? 'todos' : 'atendendo');
                 setFiltroTipo('todos');
               }}
-              className="flex items-center justify-center gap-1 w-full"
+              className="flex items-center justify-center gap-1 w-full px-1"
             >
-              <MessageSquareText className="h-4 w-4" />
-              <span>Atendendo</span>
+              <MessageSquareText className="h-4 w-4 flex-shrink-0" />
+              <span className="hidden sm:inline">Atendendo</span>
             </Button>
             <Button
               variant={filtroStatus === 'aguardando' ? 'default' : 'outline'}
@@ -355,10 +356,10 @@ const AtendimentosOmnichannel = () => {
                 setFiltroStatus(filtroStatus === 'aguardando' ? 'todos' : 'aguardando');
                 setFiltroTipo('todos');
               }}
-              className="flex items-center justify-center gap-1 w-full"
+              className="flex items-center justify-center gap-1 w-full px-1"
             >
-              <Clock9 className="h-4 w-4" />
-              <span>Aguardando</span>
+              <Clock9 className="h-4 w-4 flex-shrink-0" />
+              <span className="hidden sm:inline">Aguardando</span>
             </Button>
             <Button
               variant={filtroStatus === 'chatbot' ? 'default' : 'outline'}
@@ -367,10 +368,10 @@ const AtendimentosOmnichannel = () => {
                 setFiltroStatus(filtroStatus === 'chatbot' ? 'todos' : 'chatbot');
                 setFiltroTipo('todos');
               }}
-              className="flex items-center justify-center gap-1 w-full"
+              className="flex items-center justify-center gap-1 w-full px-1"
             >
-              <BotMessageSquare className="h-4 w-4" />
-              <span>Chatbot</span>
+              <BotMessageSquare className="h-4 w-4 flex-shrink-0" />
+              <span className="hidden sm:inline">Chatbot</span>
             </Button>
           </div>
         </div>
@@ -428,11 +429,11 @@ const AtendimentosOmnichannel = () => {
   );
 
   const ChatArea = () => (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col h-full">
       {conversaAtual ? (
         <>
           {/* Header do Chat */}
-          <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3 flex-1 min-w-0">
                 {/* Botão de voltar apenas em mobile */}
@@ -595,60 +596,62 @@ const AtendimentosOmnichannel = () => {
             </div>
           </div>
 
-          {/* Mensagens */}
-          <ScrollArea className="flex-1 p-4">
-            <div className="space-y-4">
-              {mensagens.map((mensagem) => (
-                <div
-                  key={mensagem.id}
-                  className={`flex ${mensagem.remetente === 'atendente' ? 'justify-end' : 'justify-start'}`}
-                >
+          {/* Mensagens - Com altura fixa para evitar espaço extra */}
+          <div className="flex-1 flex flex-col min-h-0">
+            <ScrollArea className="flex-1 p-4">
+              <div className="space-y-4">
+                {mensagens.map((mensagem) => (
                   <div
-                    className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                      mensagem.remetente === 'atendente'
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
-                    }`}
+                    key={mensagem.id}
+                    className={`flex ${mensagem.remetente === 'atendente' ? 'justify-end' : 'justify-start'}`}
                   >
-                    <p className="text-sm">{mensagem.conteudo}</p>
-                    <div className={`flex items-center justify-between mt-1 ${
-                      mensagem.remetente === 'atendente' ? 'text-blue-100' : 'text-gray-500'
-                    }`}>
-                      <span className="text-xs">{mensagem.timestamp}</span>
-                      {mensagem.remetente === 'atendente' && (
-                        <div className="ml-2">
-                          {mensagem.status === 'lida' && <CheckCircle className="h-3 w-3" />}
-                          {mensagem.status === 'entregue' && <CheckCircle className="h-3 w-3 opacity-60" />}
-                          {mensagem.status === 'enviada' && <Clock className="h-3 w-3 opacity-60" />}
-                        </div>
-                      )}
+                    <div
+                      className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                        mensagem.remetente === 'atendente'
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
+                      }`}
+                    >
+                      <p className="text-sm">{mensagem.conteudo}</p>
+                      <div className={`flex items-center justify-between mt-1 ${
+                        mensagem.remetente === 'atendente' ? 'text-blue-100' : 'text-gray-500'
+                      }`}>
+                        <span className="text-xs">{mensagem.timestamp}</span>
+                        {mensagem.remetente === 'atendente' && (
+                          <div className="ml-2">
+                            {mensagem.status === 'lida' && <CheckCircle className="h-3 w-3" />}
+                            {mensagem.status === 'entregue' && <CheckCircle className="h-3 w-3 opacity-60" />}
+                            {mensagem.status === 'enviada' && <Clock className="h-3 w-3 opacity-60" />}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </ScrollArea>
-
-          {/* Input de Mensagem */}
-          <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
-            <div className="flex items-end gap-2">
-              <Button variant="ghost" size="icon">
-                <Paperclip className="h-4 w-4" />
-              </Button>
-              
-              <div className="flex-1">
-                <Input
-                  placeholder="Digite sua mensagem..."
-                  value={novaMensagem}
-                  onChange={(e) => setNovaMensagem(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && enviarMensagem()}
-                  className="resize-none"
-                />
+                ))}
               </div>
-              
-              <Button onClick={enviarMensagem} disabled={!novaMensagem.trim()}>
-                <Send className="h-4 w-4" />
-              </Button>
+            </ScrollArea>
+
+            {/* Input de Mensagem - Fixo na parte inferior */}
+            <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
+              <div className="flex items-end gap-2">
+                <Button variant="ghost" size="icon">
+                  <Paperclip className="h-4 w-4" />
+                </Button>
+                
+                <div className="flex-1">
+                  <Input
+                    placeholder="Digite sua mensagem..."
+                    value={novaMensagem}
+                    onChange={(e) => setNovaMensagem(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && enviarMensagem()}
+                    className="resize-none"
+                  />
+                </div>
+                
+                <Button onClick={enviarMensagem} disabled={!novaMensagem.trim()}>
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
         </>
@@ -672,12 +675,12 @@ const AtendimentosOmnichannel = () => {
     <TooltipProvider>
       <div className="flex h-full bg-white dark:bg-gray-900">
         {/* Em mobile, mostra lista OU chat baseado no estado */}
-        <div className="md:hidden w-full">
+        <div className="md:hidden w-full h-full">
           {!showChatMobile ? <ConversasList /> : <ChatArea />}
         </div>
 
         {/* Em desktop, mostra ambos lado a lado */}
-        <div className="hidden md:flex w-full">
+        <div className="hidden md:flex w-full h-full">
           <ConversasList />
           <ChatArea />
         </div>

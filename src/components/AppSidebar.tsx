@@ -199,11 +199,15 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
   return (
     <div className={cn(
       "bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 h-screen relative z-50",
-      isCollapsed ? "w-16" : "w-64"
+      // Em mobile, sempre ocupa a largura total quando visível
+      "w-full md:w-64",
+      // Em desktop, respeita o estado collapsed
+      "md:w-64",
+      isCollapsed && "md:w-16"
     )}>
       {/* Header - matching navbar height */}
       <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between h-20">
-        {!isCollapsed && (
+        {(!isCollapsed || window.innerWidth < 768) && (
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-r from-gray-700 to-black dark:from-gray-200 dark:to-white rounded-lg flex items-center justify-center">
               <span className="text-white dark:text-black font-bold text-base">NE</span>
@@ -217,7 +221,10 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
           variant="ghost"
           size="sm"
           onClick={onToggleCollapse}
-          className={cn("p-2", isCollapsed && "w-full flex justify-center")}
+          className={cn(
+            "p-2", 
+            (isCollapsed && window.innerWidth >= 768) && "w-full flex justify-center"
+          )}
         >
           <PanelLeft className="h-4 w-4 text-black dark:text-white" />
         </Button>
@@ -237,21 +244,21 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                   <button
                     className={cn(
                       "w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-800",
-                      isCollapsed && "justify-center",
+                      (isCollapsed && window.innerWidth >= 768) && "justify-center",
                       "text-black dark:text-white"
                     )}
                   >
                     <div className="flex items-center space-x-2">
                       <GroupIcon className="h-3.5 w-3.5 flex-shrink-0 text-black dark:text-white" />
-                      {!isCollapsed && <span className="font-medium text-xs text-black dark:text-white">{group.label}</span>}
+                      {(!isCollapsed || window.innerWidth < 768) && <span className="font-medium text-xs text-black dark:text-white">{group.label}</span>}
                     </div>
-                    {!isCollapsed && (
+                    {(!isCollapsed || window.innerWidth < 768) && (
                       isOpen ? <ChevronUp className="h-3 w-3 text-black dark:text-white" /> : <ChevronDown className="h-3 w-3 text-black dark:text-white" />
                     )}
                   </button>
                 </CollapsibleTrigger>
                 
-                {!isCollapsed && (
+                {(!isCollapsed || window.innerWidth < 768) && (
                   <CollapsibleContent className="space-y-1 mt-1">
                     {group.items.map((subItem) => {
                       const ItemIcon = subItem.icon;
@@ -291,11 +298,11 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                   isActive 
                     ? "bg-gray-800 dark:bg-gray-200 text-white dark:text-black" 
                     : "text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800",
-                  isCollapsed && "justify-center"
+                  (isCollapsed && window.innerWidth >= 768) && "justify-center"
                 )}
               >
                 <Icon className={cn("h-3.5 w-3.5 flex-shrink-0", isActive ? "text-white dark:text-black" : "text-black dark:text-white")} />
-                {!isCollapsed && <span className={cn("font-medium text-xs", isActive ? "text-white dark:text-black" : "text-black dark:text-white")}>{singleItem.label}</span>}
+                {(!isCollapsed || window.innerWidth < 768) && <span className={cn("font-medium text-xs", isActive ? "text-white dark:text-black" : "text-black dark:text-white")}>{singleItem.label}</span>}
               </button>
             );
           }
@@ -304,7 +311,7 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
 
       {/* User section */}
       <div className="p-3 border-t border-gray-200 dark:border-gray-700">
-        {!isCollapsed && (
+        {(!isCollapsed || window.innerWidth < 768) && (
           <div className="flex items-center space-x-2 mb-2">
             <div className="w-7 h-7 bg-gradient-to-r from-gray-700 to-black dark:from-gray-200 dark:to-white rounded-full flex items-center justify-center text-white dark:text-black font-semibold">
               <span className="text-xs">U</span>
@@ -336,7 +343,7 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
           </div>
         )}
         
-        {isCollapsed && (
+        {(isCollapsed && window.innerWidth >= 768) && (
           <div className="flex flex-col space-y-1">
             <button
               onClick={toggleUserStatus}

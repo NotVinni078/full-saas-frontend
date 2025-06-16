@@ -34,20 +34,39 @@ const Inicio = () => {
 
   return (
     <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 flex w-full ${isDarkMode ? 'dark' : ''}`}>
-      <AppSidebar
-        currentPage={currentPage}
-        onPageChange={handlePageChange}
-        isCollapsed={sidebarCollapsed}
-        onToggleCollapse={toggleSidebar}
-        onLogout={handleLogout}
-      />
+      {/* Sidebar com overlay em mobile */}
+      <div className={`
+        fixed inset-y-0 left-0 z-50 
+        ${sidebarCollapsed ? '-translate-x-full' : 'translate-x-0'} 
+        transition-transform duration-300 ease-in-out
+        md:relative md:translate-x-0 md:z-auto
+      `}>
+        <AppSidebar
+          currentPage={currentPage}
+          onPageChange={handlePageChange}
+          isCollapsed={false} // Sempre expandida em mobile
+          onToggleCollapse={toggleSidebar}
+          onLogout={handleLogout}
+        />
+      </div>
+
+      {/* Overlay para fechar sidebar em mobile */}
+      {!sidebarCollapsed && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          onClick={toggleSidebar}
+        />
+      )}
       
+      {/* Conteúdo principal */}
       <div className="flex-1 flex flex-col min-w-0">
         <NavBar
           isDarkMode={isDarkMode}
           onToggleTheme={toggleTheme}
           currentLanguage={currentLanguage}
           onLanguageChange={handleLanguageChange}
+          onToggleSidebar={toggleSidebar}
+          isSidebarCollapsed={sidebarCollapsed}
         />
         
         <main className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900">
