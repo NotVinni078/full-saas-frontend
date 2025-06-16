@@ -594,83 +594,84 @@ const AtendimentosOmnichannel = () => {
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Mensagens - Ajustado para tablets */}
-            <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-              <div className="flex-1 p-4 overflow-y-auto">
-                <div className="space-y-4">
-                  {mensagens.map((mensagem) => (
+          {/* Mensagens - Ajustado para tablets */}
+          <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+            <div className="flex-1 p-4 overflow-y-auto">
+              <div className="space-y-4">
+                {mensagens.map((mensagem) => (
+                  <div
+                    key={mensagem.id}
+                    className={`flex ${mensagem.remetente === 'atendente' ? 'justify-end' : 'justify-start'}`}
+                  >
                     <div
-                      key={mensagem.id}
-                      className={`flex ${mensagem.remetente === 'atendente' ? 'justify-end' : 'justify-start'}`}
+                      className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                        mensagem.remetente === 'atendente'
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
+                      }`}
                     >
-                      <div
-                        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                          mensagem.remetente === 'atendente'
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
-                        }`}
-                      >
-                        <p className="text-sm">{mensagem.conteudo}</p>
-                        <div className={`flex items-center justify-between mt-1 ${
-                          mensagem.remetente === 'atendente' ? 'text-blue-100' : 'text-gray-500'
-                        }`}>
-                          <span className="text-xs">{mensagem.timestamp}</span>
-                          {mensagem.remetente === 'atendente' && (
-                            <div className="ml-2">
-                              {mensagem.status === 'lida' && <CheckCircle className="h-3 w-3" />}
-                              {mensagem.status === 'entregue' && <CheckCircle className="h-3 w-3 opacity-60" />}
-                              {mensagem.status === 'enviada' && <Clock className="h-3 w-3 opacity-60" />}
-                            </div>
-                          )}
-                        </div>
+                      <p className="text-sm">{mensagem.conteudo}</p>
+                      <div className={`flex items-center justify-between mt-1 ${
+                        mensagem.remetente === 'atendente' ? 'text-blue-100' : 'text-gray-500'
+                      }`}>
+                        <span className="text-xs">{mensagem.timestamp}</span>
+                        {mensagem.remetente === 'atendente' && (
+                          <div className="ml-2">
+                            {mensagem.status === 'lida' && <CheckCircle className="h-3 w-3" />}
+                            {mensagem.status === 'entregue' && <CheckCircle className="h-3 w-3 opacity-60" />}
+                            {mensagem.status === 'enviada' && <Clock className="h-3 w-3 opacity-60" />}
+                          </div>
+                        )}
                       </div>
                     </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Input de Mensagem - Fixo na parte inferior */}
-              <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
-                <div className="flex items-end gap-2">
-                  <Button variant="ghost" size="icon">
-                    <Paperclip className="h-4 w-4" />
-                  </Button>
-                  
-                  <div className="flex-1">
-                    <Input
-                      placeholder="Digite sua mensagem..."
-                      value={novaMensagem}
-                      onChange={(e) => setNovaMensagem(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && enviarMensagem()}
-                      className="resize-none"
-                    />
                   </div>
-
-                  <Button variant="ghost" size="icon">
-                    <SmilePlus className="h-4 w-4" />
-                  </Button>
-                  
-                  <Button onClick={enviarMensagem} disabled={!novaMensagem.trim()}>
-                    <Send className="h-4 w-4" />
-                  </Button>
-                </div>
+                ))}
               </div>
             </div>
-          </>
-        ) : (
-          // Placeholder apenas para desktop (telas grandes)
-          <div className="hidden lg:flex flex-1 items-center justify-center bg-gray-50 dark:bg-gray-800">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gray-400 rounded-full flex items-center justify-center mx-auto mb-4">
-                <MessageSquarePlus className="h-8 w-8 text-black" />
+
+            {/* Input de Mensagem - Fixo na parte inferior */}
+            <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
+              <div className="flex items-end gap-2">
+                <Button variant="ghost" size="icon">
+                  <Paperclip className="h-4 w-4" />
+                </Button>
+                
+                <div className="flex-1">
+                  <Input
+                    placeholder="Digite sua mensagem..."
+                    value={novaMensagem}
+                    onChange={(e) => setNovaMensagem(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && enviarMensagem()}
+                    className="resize-none"
+                  />
+                </div>
+
+                <Button variant="ghost" size="icon">
+                  <SmilePlus className="h-4 w-4" />
+                </Button>
+                
+                <Button onClick={enviarMensagem} disabled={!novaMensagem.trim()}>
+                  <Send className="h-4 w-4" />
+                </Button>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                Selecione ou inicie um atendimento
-              </h3>
             </div>
           </div>
-        )}
+        </>
+      ) : (
+        // Placeholder apenas para desktop (telas grandes)
+        <div className="hidden lg:flex flex-1 items-center justify-center bg-gray-50 dark:bg-gray-800">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-gray-400 rounded-full flex items-center justify-center mx-auto mb-4">
+              <MessageSquarePlus className="h-8 w-8 text-black" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              Selecione ou inicie um atendimento
+            </h3>
+          </div>
+        </div>
+      )}
     </div>
   );
 
