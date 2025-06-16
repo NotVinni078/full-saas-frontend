@@ -35,7 +35,7 @@ const Inicio = () => {
   };
 
   return (
-    <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 flex w-full ${isDarkMode ? 'dark' : ''}`}>
+    <div className={`h-screen bg-gray-50 dark:bg-gray-900 flex w-full overflow-hidden ${isDarkMode ? 'dark' : ''}`}>
       {/* Sidebar - comportamento responsivo corrigido */}
       <div className={`
         fixed inset-y-0 left-0 z-50 md:relative md:z-auto
@@ -59,18 +59,18 @@ const Inicio = () => {
         />
       )}
 
-      {/* Botão discreto para abrir sidebar em mobile */}
+      {/* Botão discreto para abrir sidebar em mobile - reposicionado */}
       {sidebarCollapsed && (
         <Button
           onClick={toggleSidebar}
-          className="fixed top-6 left-4 z-50 md:hidden bg-transparent text-black hover:bg-gray-100 backdrop-blur-sm shadow-md rounded-md w-8 h-8 p-0 flex items-center justify-center"
+          className="fixed bottom-20 left-4 z-50 md:hidden bg-transparent text-black hover:bg-gray-100 backdrop-blur-sm shadow-md rounded-md w-8 h-8 p-0 flex items-center justify-center"
         >
           <PanelLeft className="h-4 w-4" />
         </Button>
       )}
       
       {/* Conteúdo principal */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 h-full">
         <NavBar
           isDarkMode={isDarkMode}
           onToggleTheme={toggleTheme}
@@ -80,7 +80,7 @@ const Inicio = () => {
           isSidebarCollapsed={sidebarCollapsed}
         />
         
-        <main className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900">
+        <main className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900 min-h-0">
           {currentPage.includes('dashboard') ? (
             <Dashboard />
           ) : (
