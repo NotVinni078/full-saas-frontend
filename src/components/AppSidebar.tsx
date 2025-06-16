@@ -197,11 +197,11 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
 
   return (
     <div className={cn(
-      "bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 h-screen",
+      "bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 h-screen relative z-50",
       isCollapsed ? "w-16" : "w-64"
     )}>
-      {/* Header */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+      {/* Header - matching navbar height */}
+      <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
         {!isCollapsed && (
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
@@ -235,17 +235,17 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                 <CollapsibleTrigger asChild>
                   <button
                     className={cn(
-                      "w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-800",
+                      "w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-800",
                       isCollapsed && "justify-center",
                       "text-black dark:text-white"
                     )}
                   >
-                    <div className="flex items-center space-x-3">
-                      <GroupIcon className="h-5 w-5 flex-shrink-0 text-black dark:text-white" />
-                      {!isCollapsed && <span className="font-medium text-black dark:text-white">{group.label}</span>}
+                    <div className="flex items-center space-x-2">
+                      <GroupIcon className="h-4 w-4 flex-shrink-0 text-black dark:text-white" />
+                      {!isCollapsed && <span className="font-medium text-sm text-black dark:text-white">{group.label}</span>}
                     </div>
                     {!isCollapsed && (
-                      isOpen ? <ChevronUp className="h-4 w-4 text-black dark:text-white" /> : <ChevronDown className="h-4 w-4 text-black dark:text-white" />
+                      isOpen ? <ChevronUp className="h-3 w-3 text-black dark:text-white" /> : <ChevronDown className="h-3 w-3 text-black dark:text-white" />
                     )}
                   </button>
                 </CollapsibleTrigger>
@@ -261,14 +261,14 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                           key={subItem.id}
                           onClick={() => onPageChange(subItem.id)}
                           className={cn(
-                            "w-full flex items-center space-x-3 px-3 py-2 ml-6 rounded-lg text-left transition-colors text-sm",
+                            "w-full flex items-center space-x-2 px-2 py-1.5 ml-5 rounded-lg text-left transition-colors text-sm",
                             isActive 
                               ? "bg-blue-500 text-white" 
                               : "text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
                           )}
                         >
-                          <ItemIcon className={cn("h-4 w-4 flex-shrink-0", isActive ? "text-white" : "text-black dark:text-white")} />
-                          <span className={isActive ? "text-white" : "text-black dark:text-white"}>{subItem.label}</span>
+                          <ItemIcon className={cn("h-3.5 w-3.5 flex-shrink-0", isActive ? "text-white" : "text-black dark:text-white")} />
+                          <span className={cn("text-xs", isActive ? "text-white" : "text-black dark:text-white")}>{subItem.label}</span>
                         </button>
                       );
                     })}
@@ -286,15 +286,15 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                 key={singleItem.id}
                 onClick={() => onPageChange(singleItem.id)}
                 className={cn(
-                  "w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors",
+                  "w-full flex items-center space-x-2 px-2 py-1.5 rounded-lg text-left transition-colors",
                   isActive 
                     ? "bg-blue-500 text-white" 
                     : "text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800",
                   isCollapsed && "justify-center"
                 )}
               >
-                <Icon className={cn("h-5 w-5 flex-shrink-0", isActive ? "text-white" : "text-black dark:text-white")} />
-                {!isCollapsed && <span className={cn("font-medium", isActive ? "text-white" : "text-black dark:text-white")}>{singleItem.label}</span>}
+                <Icon className={cn("h-4 w-4 flex-shrink-0", isActive ? "text-white" : "text-black dark:text-white")} />
+                {!isCollapsed && <span className={cn("font-medium text-sm", isActive ? "text-white" : "text-black dark:text-white")}>{singleItem.label}</span>}
               </button>
             );
           }
@@ -302,28 +302,28 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
       </nav>
 
       {/* User section */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+      <div className="p-3 border-t border-gray-200 dark:border-gray-700">
         {!isCollapsed && (
-          <div className="flex items-center space-x-3 mb-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
-              U
+          <div className="flex items-center space-x-2 mb-2">
+            <div className="w-7 h-7 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
+              <span className="text-xs">U</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">Usuário</p>
+              <p className="text-xs font-medium text-gray-900 dark:text-white truncate">Usuário</p>
               <p className="text-xs text-gray-500 dark:text-gray-400 truncate">usuario@exemplo.com</p>
             </div>
           </div>
         )}
         
-        <div className="flex flex-col space-y-2">
+        <div className="flex flex-col space-y-1">
           <button
             onClick={toggleUserStatus}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded flex items-center justify-center"
+            className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded flex items-center justify-center"
           >
             {userStatus ? (
-              <UserCheck className="h-4 w-4 text-green-600" />
+              <UserCheck className="h-3.5 w-3.5 text-green-600" />
             ) : (
-              <UserX className="h-4 w-4 text-red-600" />
+              <UserX className="h-3.5 w-3.5 text-red-600" />
             )}
           </button>
           
@@ -331,11 +331,11 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
             variant="ghost"
             onClick={onLogout}
             className={cn(
-              "w-full text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950",
-              isCollapsed ? "justify-center p-2" : "justify-start"
+              "w-full text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950 text-xs h-7",
+              isCollapsed ? "justify-center p-1" : "justify-start"
             )}
           >
-            <LogOut className="h-4 w-4" />
+            <LogOut className="h-3.5 w-3.5" />
           </Button>
         </div>
       </div>
