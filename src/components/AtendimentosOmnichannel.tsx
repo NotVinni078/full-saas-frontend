@@ -415,9 +415,9 @@ const AtendimentosOmnichannel = () => {
   };
 
   const ConversasList = () => (
-    <div className={`w-full ${conversaSelecionada ? 'md:w-1/3' : 'md:w-2/3 lg:w-1/2'} border-r border-gray-200 dark:border-gray-700 flex flex-col relative`}>
+    <div className={`${conversaSelecionada ? 'md:w-1/3' : 'md:w-2/3 lg:w-1/2'} border-r border-gray-200 dark:border-gray-700 flex flex-col h-full relative`}>
       {/* Header da Lista */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Atendimentos</h2>
         </div>
@@ -521,66 +521,68 @@ const AtendimentosOmnichannel = () => {
         </div>
       </div>
 
-      {/* Lista de Conversas */}
-      <ScrollArea className="flex-1">
-        <div className="p-2">
-          {conversasFiltradas.map((conversa) => (
-            <Card
-              key={conversa.id}
-              className={`p-3 mb-2 cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 ${
-                conversaSelecionada === conversa.id ? 'border-blue-500 bg-blue-50 dark:bg-blue-950' : ''
-              }`}
-              onClick={() => handleConversaClick(conversa.id)}
-            >
-              <div className="flex items-start gap-3">
-                <div className="relative">
-                  <div 
-                    className="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center text-sm font-medium cursor-pointer hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleContactClick(conversa);
-                    }}
-                  >
-                    {conversa.avatar}
-                  </div>
-                  <div className="absolute -bottom-1 -right-1">
-                    <ChannelLogo canal={conversa.canal} />
-                  </div>
-                </div>
-                
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <h3 className="font-medium text-gray-900 dark:text-white truncate">
-                      {conversa.cliente}
-                      {conversa.isGrupo && <UsersRound className="inline h-3 w-3 ml-1" />}
-                    </h3>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-500">{conversa.timestamp}</span>
+      {/* Lista de Conversas com ScrollArea */}
+      <div className="flex-1 overflow-hidden">
+        <ScrollArea className="h-full">
+          <div className="p-2">
+            {conversasFiltradas.map((conversa) => (
+              <Card
+                key={conversa.id}
+                className={`p-3 mb-2 cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 ${
+                  conversaSelecionada === conversa.id ? 'border-blue-500 bg-blue-50 dark:bg-blue-950' : ''
+                }`}
+                onClick={() => handleConversaClick(conversa.id)}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="relative">
+                    <div 
+                      className="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center text-sm font-medium cursor-pointer hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleContactClick(conversa);
+                      }}
+                    >
+                      {conversa.avatar}
+                    </div>
+                    <div className="absolute -bottom-1 -right-1">
+                      <ChannelLogo canal={conversa.canal} />
                     </div>
                   </div>
                   
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
-                      {conversa.ultimaMensagem}
-                    </p>
-                    {conversa.naoLidas > 0 && (
-                      <Badge variant="destructive" className="ml-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
-                        {conversa.naoLidas}
-                      </Badge>
-                    )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="font-medium text-gray-900 dark:text-white truncate">
+                        {conversa.cliente}
+                        {conversa.isGrupo && <UsersRound className="inline h-3 w-3 ml-1" />}
+                      </h3>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500">{conversa.timestamp}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
+                        {conversa.ultimaMensagem}
+                      </p>
+                      {conversa.naoLidas > 0 && (
+                        <Badge variant="destructive" className="ml-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
+                          {conversa.naoLidas}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </ScrollArea>
+              </Card>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
 
-      {/* Botão Flutuante - Posicionado dentro da lista de conversas */}
+      {/* Botão Flutuante - Posicionado melhor */}
       <Dialog open={isContactDialogOpen} onOpenChange={setIsContactDialogOpen}>
         <DialogTrigger asChild>
           <Button
-            className="absolute bottom-6 right-6 h-12 w-12 rounded-full shadow-lg z-10 bg-gray-600 hover:bg-gray-700 dark:bg-gray-500 dark:hover:bg-gray-600"
+            className="absolute bottom-4 left-4 h-12 w-12 rounded-full shadow-lg z-10 bg-gray-600 hover:bg-gray-700 dark:bg-gray-500 dark:hover:bg-gray-600"
             size="icon"
           >
             <CirclePlus className="h-5 w-5" />
@@ -632,7 +634,7 @@ const AtendimentosOmnichannel = () => {
   );
 
   const ChatArea = () => (
-    <div className="flex-1 flex flex-col h-full">
+    <div className="flex-1 flex flex-col h-full min-h-0">
       {conversaAtual ? (
         <>
           {/* Header do Chat */}
@@ -803,8 +805,8 @@ const AtendimentosOmnichannel = () => {
             </div>
           </div>
 
-          {/* Mensagens - Ajustado para tablets */}
-          <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          {/* Mensagens - Container com altura fixa */}
+          <div className="flex-1 flex flex-col min-h-0">
             <div className="flex-1 p-4 overflow-y-auto">
               <div className="space-y-4">
                 {mensagens.map((mensagem) => (
@@ -884,7 +886,7 @@ const AtendimentosOmnichannel = () => {
 
   return (
     <TooltipProvider>
-      <div className="flex h-full bg-white dark:bg-gray-900">
+      <div className="flex h-screen bg-white dark:bg-gray-900 overflow-hidden">
         {/* Em mobile e tablet, mostra lista OU chat baseado no estado */}
         <div className="lg:hidden w-full h-full">
           {!showChatMobile ? <ConversasList /> : <ChatArea />}
