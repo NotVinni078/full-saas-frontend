@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -657,31 +658,32 @@ const AtendimentosOmnichannel = () => {
               </div>
             </div>
           </>
-      ) : (
-        <div className="hidden md:flex flex-1 items-center justify-center bg-gray-50 dark:bg-gray-800">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-gray-400 rounded-full flex items-center justify-center mx-auto mb-4">
-              <MessageSquarePlus className="h-8 w-8 text-black" />
+        ) : (
+          // Placeholder apenas para desktop (telas grandes)
+          <div className="hidden lg:flex flex-1 items-center justify-center bg-gray-50 dark:bg-gray-800">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gray-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                <MessageSquarePlus className="h-8 w-8 text-black" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                Selecione ou inicie um atendimento
+              </h3>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              Selecione ou inicie um atendimento
-            </h3>
           </div>
-        </div>
-      )}
+        )}
     </div>
   );
 
   return (
     <TooltipProvider>
       <div className="flex h-full bg-white dark:bg-gray-900">
-        {/* Em mobile, mostra lista OU chat baseado no estado */}
-        <div className="md:hidden w-full h-full">
+        {/* Em mobile e tablet, mostra lista OU chat baseado no estado */}
+        <div className="lg:hidden w-full h-full">
           {!showChatMobile ? <ConversasList /> : <ChatArea />}
         </div>
 
-        {/* Em desktop, mostra ambos lado a lado */}
-        <div className="hidden md:flex w-full h-full">
+        {/* Em desktop (lg+), mostra ambos lado a lado */}
+        <div className="hidden lg:flex w-full h-full">
           <ConversasList />
           <ChatArea />
         </div>
