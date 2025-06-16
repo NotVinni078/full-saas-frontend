@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -648,7 +649,7 @@ const AtendimentosOmnichannel = () => {
   );
 
   const ChatArea = () => (
-    <div className="flex-1 flex flex-col h-full min-h-0">
+    <div className="flex-1 flex flex-col h-full">
       {conversaAtual ? (
         <>
           {/* Header do Chat */}
@@ -819,10 +820,10 @@ const AtendimentosOmnichannel = () => {
             </div>
           </div>
 
-          {/* Mensagens - Container com altura controlada */}
-          <div className="flex-1 flex flex-col min-h-0">
-            <ScrollArea className="flex-1 p-4">
-              <div className="space-y-4">
+          {/* Mensagens - Container com altura fixa e scroll */}
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <ScrollArea className="h-full">
+              <div className="p-4 space-y-4">
                 {mensagens.map((mensagem) => (
                   <div
                     key={mensagem.id}
@@ -853,85 +854,85 @@ const AtendimentosOmnichannel = () => {
                 ))}
               </div>
             </ScrollArea>
+          </div>
 
-            {/* Input de Mensagem - Posição ajustada */}
-            <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
-              <div className="flex items-end gap-2">
-                {/* Menu suspenso com opções */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <EllipsisVertical className="h-4 w-4" />
+          {/* Input de Mensagem - Posição fixa na parte inferior */}
+          <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
+            <div className="flex items-end gap-2">
+              {/* Menu suspenso com opções */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <EllipsisVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-auto p-1 bg-transparent border-none shadow-none">
+                  <div className="flex flex-col gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setIsSignatureActive(!isSignatureActive)}
+                      className={`w-8 h-8 rounded-full shadow-lg ${
+                        isSignatureActive ? 'bg-red-100 hover:bg-red-200' : 'bg-green-100 hover:bg-green-200'
+                      }`}
+                    >
+                      {isSignatureActive ? (
+                        <PenOff className="h-4 w-4 text-red-600" />
+                      ) : (
+                        <PenLine className="h-4 w-4 text-green-600" />
+                      )}
                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-auto p-1 bg-transparent border-none shadow-none">
-                    <div className="flex flex-col gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setIsSignatureActive(!isSignatureActive)}
-                        className={`w-8 h-8 rounded-full shadow-lg ${
-                          isSignatureActive ? 'bg-red-100 hover:bg-red-200' : 'bg-green-100 hover:bg-green-200'
-                        }`}
-                      >
-                        {isSignatureActive ? (
-                          <PenOff className="h-4 w-4 text-red-600" />
-                        ) : (
-                          <PenLine className="h-4 w-4 text-green-600" />
-                        )}
-                      </Button>
-                      
-                      <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg">
-                        <Zap className="h-4 w-4" />
-                      </Button>
-                      
-                      <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg">
-                        <NotebookPen className="h-4 w-4" />
-                      </Button>
-                      
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg"
-                        onClick={() => setIsContactListOpen(true)}
-                      >
-                        <IdCard className="h-4 w-4" />
-                      </Button>
-                      
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg"
-                        onClick={() => setIsChatbotListOpen(true)}
-                      >
-                        <BotMessageSquare className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                    
+                    <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg">
+                      <Zap className="h-4 w-4" />
+                    </Button>
+                    
+                    <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg">
+                      <NotebookPen className="h-4 w-4" />
+                    </Button>
+                    
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg"
+                      onClick={() => setIsContactListOpen(true)}
+                    >
+                      <IdCard className="h-4 w-4" />
+                    </Button>
+                    
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg"
+                      onClick={() => setIsChatbotListOpen(true)}
+                    >
+                      <BotMessageSquare className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
-                <Button variant="ghost" size="icon">
-                  <SmilePlus className="h-4 w-4" />
-                </Button>
+              <Button variant="ghost" size="icon">
+                <SmilePlus className="h-4 w-4" />
+              </Button>
 
-                <Button variant="ghost" size="icon">
-                  <Paperclip className="h-4 w-4" />
-                </Button>
-                
-                <div className="flex-1">
-                  <Input
-                    placeholder="Digite sua mensagem..."
-                    value={novaMensagem}
-                    onChange={(e) => setNovaMensagem(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && enviarMensagem()}
-                    className="resize-none"
-                  />
-                </div>
-                
-                <Button onClick={enviarMensagem} disabled={!novaMensagem.trim()}>
-                  <Send className="h-4 w-4" />
-                </Button>
+              <Button variant="ghost" size="icon">
+                <Paperclip className="h-4 w-4" />
+              </Button>
+              
+              <div className="flex-1">
+                <Input
+                  placeholder="Digite sua mensagem..."
+                  value={novaMensagem}
+                  onChange={(e) => setNovaMensagem(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && enviarMensagem()}
+                  className="resize-none"
+                />
               </div>
+              
+              <Button onClick={enviarMensagem} disabled={!novaMensagem.trim()}>
+                <Send className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         </>
@@ -953,7 +954,7 @@ const AtendimentosOmnichannel = () => {
 
   return (
     <TooltipProvider>
-      <div className="flex h-[calc(100vh-64px)] bg-white dark:bg-gray-900 overflow-hidden">
+      <div className="flex h-full bg-white dark:bg-gray-900 overflow-hidden">
         {/* Em mobile e tablet, mostra lista OU chat baseado no estado */}
         <div className="lg:hidden w-full h-full">
           {!showChatMobile ? <ConversasList /> : <ChatArea />}
