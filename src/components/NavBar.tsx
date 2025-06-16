@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { MessageSquare, MessagesSquare, Receipt, Sun, Moon, CreditCard } from 'lucide-react';
@@ -33,7 +32,7 @@ const NavBar = ({ isDarkMode, onToggleTheme, currentLanguage, onLanguageChange }
   const currentLang = languages.find(lang => lang.code === currentLanguage);
 
   return (
-    <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+    <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 py-4 h-20">
       <div className="flex items-center justify-end space-x-4">
         {/* Notificações */}
         <div className="flex items-center space-x-3">
