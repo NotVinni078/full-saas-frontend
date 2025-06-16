@@ -625,9 +625,9 @@ const AtendimentosOmnichannel = () => {
             </div>
           </div>
 
-          {/* Mensagens - Com altura fixa para evitar espaço extra */}
-          <div className="flex-1 flex flex-col min-h-0">
-            <ScrollArea className="flex-1 p-4">
+          {/* Mensagens - Ajustado para tablets */}
+          <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+            <div className="flex-1 p-4 overflow-y-auto">
               <div className="space-y-4">
                 {mensagens.map((mensagem) => (
                   <div
@@ -658,7 +658,7 @@ const AtendimentosOmnichannel = () => {
                   </div>
                 ))}
               </div>
-            </ScrollArea>
+            </div>
 
             {/* Input de Mensagem - Fixo na parte inferior */}
             <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
