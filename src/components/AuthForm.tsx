@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Eye, EyeOff, Mail, Lock, User, Github } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, Sun, Moon, Languages } from 'lucide-react';
 
 interface AuthFormProps {
   onAuth: () => void;
@@ -14,6 +13,8 @@ interface AuthFormProps {
 const AuthForm = ({ onAuth }: AuthFormProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState('pt');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,160 +26,165 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
     }, 1500);
   };
 
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+    document.documentElement.classList.toggle('dark');
+  };
+
+  const toggleLanguage = () => {
+    setCurrentLanguage(currentLanguage === 'pt' ? 'en' : 'pt');
+  };
+
+  const texts = {
+    pt: {
+      welcome: 'Bem-vindo',
+      loginDesc: 'Entre com suas credenciais para acessar sua conta',
+      email: 'Email',
+      password: 'Senha',
+      forgotPassword: 'Esqueci minha senha',
+      login: 'Entrar',
+      logging: 'Entrando...',
+      companyName: 'NOME DA EMPRESA'
+    },
+    en: {
+      welcome: 'Welcome',
+      loginDesc: 'Enter your credentials to access your account',
+      email: 'Email',
+      password: 'Password',
+      forgotPassword: 'Forgot password',
+      login: 'Login',
+      logging: 'Logging in...',
+      companyName: 'COMPANY NAME'
+    }
+  };
+
+  const t = texts[currentLanguage as keyof typeof texts];
+
   return (
-    <div className="min-h-screen flex items-center justify-center gradient-bg p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">SaasFlow</h1>
-          <p className="text-white/80">Gerencie seu negócio com inteligência</p>
+    <div className={`min-h-screen flex ${isDarkMode ? 'dark' : ''}`}>
+      {/* Lado esquerdo - Imagem */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-purple-700"></div>
+        <img 
+          src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
+          alt="Login Background"
+          className="w-full h-full object-cover opacity-80 transition-transform duration-700 hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="absolute bottom-8 left-8 text-white">
+          <h2 className="text-3xl font-bold mb-2">Gerencie seu negócio</h2>
+          <p className="text-lg opacity-90">com inteligência e eficiência</p>
         </div>
+      </div>
 
-        <Card className="glass-effect text-white border-white/20">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl text-white">Bem-vindo</CardTitle>
-            <CardDescription className="text-white/80">
-              Entre na sua conta ou crie uma nova
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="login" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 bg-white/10">
-                <TabsTrigger value="login" className="text-white data-[state=active]:bg-white data-[state=active]:text-gray-900">
-                  Entrar
-                </TabsTrigger>
-                <TabsTrigger value="register" className="text-white data-[state=active]:bg-white data-[state=active]:text-gray-900">
-                  Cadastrar
-                </TabsTrigger>
-              </TabsList>
+      {/* Lado direito - Formulário */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+        <div className="w-full max-w-md">
+          {/* Botões de tema e idioma */}
+          <div className="flex justify-end mb-8 space-x-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={toggleTheme}
+              className="h-9 w-9"
+            >
+              {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={toggleLanguage}
+              className="h-9 w-9"
+            >
+              <Languages className="h-4 w-4" />
+            </Button>
+          </div>
 
-              <TabsContent value="login" className="space-y-4 mt-6">
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="text-white">Email</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-white/60" />
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="seu@email.com"
-                        className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/60"
-                        required
-                      />
-                    </div>
+          {/* Logo e Nome da Empresa */}
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-white font-bold text-xl">SF</span>
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              {t.companyName}
+            </h1>
+          </div>
+
+          {/* Formulário */}
+          <Card className="border-0 shadow-lg dark:bg-gray-800">
+            <CardHeader className="text-center pb-6">
+              <CardTitle className="text-2xl text-gray-900 dark:text-white">
+                {t.welcome}
+              </CardTitle>
+              <CardDescription className="text-gray-600 dark:text-gray-400">
+                {t.loginDesc}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-gray-700 dark:text-gray-300">
+                    {t.email}
+                  </Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="seu@email.com"
+                      className="pl-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      required
+                    />
                   </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="password" className="text-white">Senha</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-white/60" />
-                      <Input
-                        id="password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        className="pl-10 pr-10 bg-white/10 border-white/20 text-white placeholder:text-white/60"
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-3 text-white/60 hover:text-white"
-                      >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    </div>
-                  </div>
-
-                  <Button
-                    type="submit"
-                    className="w-full bg-white text-gray-900 hover:bg-white/90"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Entrando..." : "Entrar"}
-                  </Button>
-                </form>
-
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-white/20" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-transparent px-2 text-white/60">Ou continue com</span>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-gray-700 dark:text-gray-300">
+                    {t.password}
+                  </Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      className="pl-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
                   </div>
                 </div>
 
-                <Button variant="outline" className="w-full bg-white/10 border-white/20 text-white hover:bg-white/20">
-                  <Github className="mr-2 h-4 w-4" />
-                  GitHub
-                </Button>
-              </TabsContent>
-
-              <TabsContent value="register" className="space-y-4 mt-6">
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name" className="text-white">Nome completo</Label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-3 h-4 w-4 text-white/60" />
-                      <Input
-                        id="name"
-                        type="text"
-                        placeholder="Seu nome"
-                        className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/60"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="register-email" className="text-white">Email</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-white/60" />
-                      <Input
-                        id="register-email"
-                        type="email"
-                        placeholder="seu@email.com"
-                        className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/60"
-                        required
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="register-password" className="text-white">Senha</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-white/60" />
-                      <Input
-                        id="register-password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        className="pl-10 pr-10 bg-white/10 border-white/20 text-white placeholder:text-white/60"
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-3 text-white/60 hover:text-white"
-                      >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    </div>
-                  </div>
-
-                  <Button
-                    type="submit"
-                    className="w-full bg-white text-gray-900 hover:bg-white/90"
-                    disabled={isLoading}
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
                   >
-                    {isLoading ? "Criando conta..." : "Criar conta"}
-                  </Button>
-                </form>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
+                    {t.forgotPassword}
+                  </button>
+                </div>
 
-        <p className="text-center text-white/60 text-sm mt-6">
-          © 2024 SaasFlow. Todos os direitos reservados.
-        </p>
+                <Button
+                  type="submit"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  disabled={isLoading}
+                >
+                  {isLoading ? t.logging : t.login}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+
+          <p className="text-center text-gray-500 dark:text-gray-400 text-sm mt-8">
+            © 2024 SaasFlow. Todos os direitos reservados.
+          </p>
+        </div>
       </div>
     </div>
   );
