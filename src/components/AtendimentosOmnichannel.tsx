@@ -805,9 +805,9 @@ const AtendimentosOmnichannel = () => {
             </div>
           </div>
 
-          {/* Mensagens - Container com altura fixa */}
-          <div className="flex-1 flex flex-col min-h-0">
-            <div className="flex-1 p-4 overflow-y-auto">
+          {/* Mensagens - Container com altura controlada */}
+          <div className="flex-1 flex flex-col min-h-0 max-h-[calc(100vh-200px)]">
+            <ScrollArea className="flex-1 p-4">
               <div className="space-y-4">
                 {mensagens.map((mensagem) => (
                   <div
@@ -838,7 +838,7 @@ const AtendimentosOmnichannel = () => {
                   </div>
                 ))}
               </div>
-            </div>
+            </ScrollArea>
 
             {/* Input de Mensagem - Ajustado para alinhar com sidebar */}
             <div className="p-4 pl-6 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
@@ -886,7 +886,7 @@ const AtendimentosOmnichannel = () => {
 
   return (
     <TooltipProvider>
-      <div className="flex h-screen bg-white dark:bg-gray-900 overflow-hidden">
+      <div className="flex h-[calc(100vh-64px)] bg-white dark:bg-gray-900 overflow-hidden">
         {/* Em mobile e tablet, mostra lista OU chat baseado no estado */}
         <div className="lg:hidden w-full h-full">
           {!showChatMobile ? <ConversasList /> : <ChatArea />}
