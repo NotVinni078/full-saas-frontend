@@ -78,28 +78,8 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
       </div>
 
       {/* Lado direito - Formulário */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50 dark:bg-black transition-colors duration-300">
         <div className="w-full max-w-md">
-          {/* Botões de tema e idioma */}
-          <div className="flex justify-end mb-8 space-x-2">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={toggleTheme}
-              className="h-9 w-9"
-            >
-              {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={toggleLanguage}
-              className="h-9 w-9"
-            >
-              <Languages className="h-4 w-4" />
-            </Button>
-          </div>
-
           {/* Logo e Nome da Empresa */}
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -111,8 +91,28 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
           </div>
 
           {/* Formulário */}
-          <Card className="border-0 shadow-lg dark:bg-gray-800">
-            <CardHeader className="text-center pb-6">
+          <Card className="border-0 shadow-lg dark:bg-gray-900">
+            <CardHeader className="text-center pb-6 relative">
+              {/* Botões de tema e idioma */}
+              <div className="absolute top-4 right-4 flex space-x-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={toggleTheme}
+                  className="h-8 w-8 dark:border-gray-600 dark:hover:bg-gray-700"
+                >
+                  {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={toggleLanguage}
+                  className="h-8 w-8 dark:border-gray-600 dark:hover:bg-gray-700"
+                >
+                  <Languages className="h-4 w-4" />
+                </Button>
+              </div>
+              
               <CardTitle className="text-2xl text-gray-900 dark:text-white">
                 {t.welcome}
               </CardTitle>
@@ -132,7 +132,7 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
                       id="email"
                       type="email"
                       placeholder="seu@email.com"
-                      className="pl-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      className="pl-10 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                       required
                     />
                   </div>
@@ -148,7 +148,7 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
                       id="password"
                       type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
-                      className="pl-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      className="pl-10 pr-10 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                       required
                     />
                     <button
