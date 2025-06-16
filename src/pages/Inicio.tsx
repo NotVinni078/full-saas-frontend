@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Menu } from 'lucide-react';
+import { PanelLeft } from 'lucide-react';
 import AppSidebar from '@/components/AppSidebar';
 import NavBar from '@/components/NavBar';
 import Dashboard from '@/components/Dashboard';
@@ -63,9 +63,9 @@ const Inicio = () => {
       {sidebarCollapsed && (
         <Button
           onClick={toggleSidebar}
-          className="fixed top-6 left-4 z-50 md:hidden bg-gray-600/80 dark:bg-gray-400/80 text-white dark:text-black hover:bg-gray-700/90 dark:hover:bg-gray-300/90 backdrop-blur-sm shadow-md rounded-md w-8 h-8 p-0 flex items-center justify-center border border-gray-300/20"
+          className="fixed top-6 left-4 z-50 md:hidden bg-transparent text-black hover:bg-gray-100 backdrop-blur-sm shadow-md rounded-md w-8 h-8 p-0 flex items-center justify-center"
         >
-          <Menu className="h-4 w-4" />
+          <PanelLeft className="h-4 w-4" />
         </Button>
       )}
       

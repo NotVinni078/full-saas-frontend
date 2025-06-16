@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+
+import React from 'react';
+import { Bell, Search, Globe, Sun, Moon, User, ArrowLeft } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { MessageSquare, MessagesSquare, Receipt, Sun, Moon, CreditCard } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
 
 interface NavBarProps {
   isDarkMode: boolean;
@@ -22,116 +22,95 @@ const NavBar = ({
   isDarkMode, 
   onToggleTheme, 
   currentLanguage, 
-  onLanguageChange,
-  onToggleSidebar,
-  isSidebarCollapsed
+  onLanguageChange 
 }: NavBarProps) => {
-  const [notifications] = useState({
-    atendimentos: 3,
-    chatInterno: 1,
-    faturas: 2
-  });
+  const [isConversationOpen, setIsConversationOpen] = React.useState(false);
 
-  const languages = [
-    { code: 'pt-BR', name: 'Português (Brasil)', flag: '🇧🇷' },
-    { code: 'en-US', name: 'English (USA)', flag: '🇺🇸' },
-    { code: 'es-ES', name: 'Español (España)', flag: '🇪🇸' }
-  ];
-
-  const currentLang = languages.find(lang => lang.code === currentLanguage);
+  const handleCloseConversation = () => {
+    setIsConversationOpen(false);
+    // Aqui você pode adicionar a lógica para fechar a conversa
+  };
 
   return (
-    <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 py-4 h-20">
-      <div className="flex items-center justify-end space-x-4">
-        {/* Notificações */}
-        <div className="flex items-center space-x-3">
-          {/* Notificações de Atendimentos */}
-          <div className="relative">
-            <Button variant="ghost" size="icon" className="relative">
-              <MessageSquare className="h-5 w-5" />
-              {notifications.atendimentos > 0 && (
-                <Badge 
-                  variant="destructive" 
-                  className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
-                >
-                  {notifications.atendimentos}
-                </Badge>
-              )}
-            </Button>
-          </div>
-
-          {/* Notificações de Chat Interno */}
-          <div className="relative">
-            <Button variant="ghost" size="icon" className="relative">
-              <MessagesSquare className="h-5 w-5" />
-              {notifications.chatInterno > 0 && (
-                <Badge 
-                  variant="destructive" 
-                  className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
-                >
-                  {notifications.chatInterno}
-                </Badge>
-              )}
-            </Button>
-          </div>
-
-          {/* Notificações de Faturas */}
-          <div className="relative">
-            <Button variant="ghost" size="icon" className="relative">
-              <Receipt className="h-5 w-5" />
-              {notifications.faturas > 0 && (
-                <Badge 
-                  variant="destructive" 
-                  className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
-                >
-                  {notifications.faturas}
-                </Badge>
-              )}
-            </Button>
-          </div>
-        </div>
-
-        <div className="w-px h-6 bg-gray-300 dark:bg-gray-600"></div>
-
-        {/* Controles de tema e idioma */}
-        <div className="flex items-center space-x-2">
-          {/* Toggle de tema */}
+    <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between h-20">
+      <div className="flex items-center space-x-4">
+        {/* Botão arrow-left para fechar conversa quando aberta */}
+        {isConversationOpen && (
           <Button
             variant="ghost"
-            size="icon"
-            onClick={onToggleTheme}
-            className="h-9 w-9"
+            size="sm"
+            onClick={handleCloseConversation}
+            className="p-2"
           >
-            {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            <ArrowLeft className="h-4 w-4 text-black dark:text-white" />
           </Button>
-
-          {/* Seletor de idioma */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9"
-              >
-                <span className="text-sm">{currentLang?.flag}</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 bg-white dark:bg-gray-800 border dark:border-gray-700">
-              {languages.map((language) => (
-                <DropdownMenuItem
-                  key={language.code}
-                  onClick={() => onLanguageChange(language.code)}
-                  className="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
-                >
-                  <span className="text-lg">{language.flag}</span>
-                  <span className="text-sm dark:text-white">{language.name}</span>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+        )}
+        
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <input
+            type="text"
+            placeholder="Pesquisar..."
+            className="pl-10 pr-4 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 w-80"
+          />
         </div>
       </div>
-    </header>
+
+      <div className="flex items-center space-x-4">
+        {/* Notificações */}
+        <Button variant="ghost" size="sm" className="relative p-2">
+          <Bell className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+            3
+          </span>
+        </Button>
+
+        {/* Seletor de idioma */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm" className="p-2">
+              <Globe className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => onLanguageChange('pt-BR')}>
+              🇧🇷 Português
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onLanguageChange('en-US')}>
+              🇺🇸 English
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onLanguageChange('es-ES')}>
+              🇪🇸 Español
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Toggle de tema */}
+        <Button variant="ghost" size="sm" onClick={onToggleTheme} className="p-2">
+          {isDarkMode ? (
+            <Sun className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+          ) : (
+            <Moon className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+          )}
+        </Button>
+
+        {/* Perfil do usuário */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm" className="p-2">
+              <User className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem>Perfil</DropdownMenuItem>
+            <DropdownMenuItem>Configurações</DropdownMenuItem>
+            <DropdownMenuItem>Sair</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Removi o ícone de 3 pontinhos da versão desktop */}
+      </div>
+    </nav>
   );
 };
 
