@@ -578,11 +578,11 @@ const AtendimentosOmnichannel = () => {
         </ScrollArea>
       </div>
 
-      {/* Botão Flutuante - Posicionado melhor */}
+      {/* Botão Flutuante - Posicionado mais alto */}
       <Dialog open={isContactDialogOpen} onOpenChange={setIsContactDialogOpen}>
         <DialogTrigger asChild>
           <Button
-            className="absolute bottom-4 left-4 h-12 w-12 rounded-full shadow-lg z-10 bg-gray-600 hover:bg-gray-700 dark:bg-gray-500 dark:hover:bg-gray-600"
+            className="absolute top-20 left-4 h-12 w-12 rounded-full shadow-lg z-10 bg-gray-600 hover:bg-gray-700 dark:bg-gray-500 dark:hover:bg-gray-600"
             size="icon"
           >
             <CirclePlus className="h-5 w-5" />
