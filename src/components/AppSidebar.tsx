@@ -2,10 +2,12 @@
 import React from 'react';
 import { 
   Home, 
-  BarChart3, 
+  PanelLeft,
+  LayoutDashboard,
+  ChartColumn,
   Users, 
   Settings, 
-  MessageCircle,
+  MessageSquare,
   Calendar,
   Zap,
   ListTodo,
@@ -13,7 +15,7 @@ import {
   Contact,
   Star,
   Tag,
-  UserCog,
+  Computer,
   Building2,
   Building,
   CreditCard,
@@ -25,10 +27,18 @@ import {
   Wrench,
   Palette,
   LogOut,
-  ChevronLeft,
-  ChevronRight,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  MessageSquareCode,
+  SquareUser,
+  UserPen,
+  Network,
+  Newspaper,
+  Receipt,
+  SquareChartGantt,
+  Waypoints,
+  UserCheck,
+  UserX
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -50,20 +60,20 @@ const menuGroups = [
   {
     id: 'dashboards',
     label: 'Dashboards',
-    icon: BarChart3,
+    icon: LayoutDashboard,
     items: [
-      { id: 'dashboard-gerencial', label: 'Dashboard Gerencial', icon: BarChart3 },
-      { id: 'dashboard-admin', label: 'Dashboard Administrativo', icon: UserCog },
-      { id: 'dashboard-usuario', label: 'Dashboard Usuário', icon: Users },
+      { id: 'dashboard-gerencial', label: 'Dashboard Gerencial', icon: ChartColumn },
+      { id: 'dashboard-admin', label: 'Dashboard Administrativo', icon: ChartColumn },
+      { id: 'dashboard-usuario', label: 'Dashboard Usuário', icon: ChartColumn },
     ]
   },
   {
     id: 'atendimentos',
     label: 'Atendimentos',
-    icon: MessageCircle,
+    icon: MessageSquare,
     items: [
-      { id: 'chat-interno', label: 'Chat Interno', icon: MessageCircle },
-      { id: 'painel-atendimentos', label: 'Painel de Atendimentos', icon: Users },
+      { id: 'chat-interno', label: 'Chat Interno', icon: MessageSquare },
+      { id: 'painel-atendimentos', label: 'Painel de Atendimentos', icon: MessageSquareCode },
       { id: 'agendamentos', label: 'Agendamentos', icon: Calendar },
       { id: 'respostas-rapidas', label: 'Respostas Rápidas', icon: Zap },
       { id: 'tarefas', label: 'Tarefas', icon: ListTodo },
@@ -73,9 +83,9 @@ const menuGroups = [
   {
     id: 'gestao',
     label: 'Gestão',
-    icon: Settings,
+    icon: Computer,
     items: [
-      { id: 'gestao-contatos', label: 'Gestão de Contatos', icon: Contact },
+      { id: 'gestao-contatos', label: 'Gestão de Contatos', icon: SquareUser },
       { id: 'avaliacao', label: 'Avaliação (NPS)', icon: Star },
       { id: 'tags', label: 'Tags', icon: Tag },
     ]
@@ -83,12 +93,12 @@ const menuGroups = [
   {
     id: 'administracao',
     label: 'Administração',
-    icon: UserCog,
+    icon: UserPen,
     items: [
-      { id: 'gestao-usuarios', label: 'Gestão de Usuários', icon: Users },
-      { id: 'gestao-setores', label: 'Gestão de Setores', icon: Building2 },
-      { id: 'anuncios', label: 'Anúncios', icon: Megaphone },
-      { id: 'admin-empresas', label: 'Administração de Empresas', icon: Building },
+      { id: 'gestao-usuarios', label: 'Gestão de Usuários', icon: UserPen },
+      { id: 'gestao-setores', label: 'Gestão de Setores', icon: Network },
+      { id: 'anuncios', label: 'Anúncios', icon: Newspaper },
+      { id: 'admin-empresas', label: 'Administração de Empresas', icon: Building2 },
     ]
   },
   {
@@ -96,8 +106,8 @@ const menuGroups = [
     label: 'Financeiro',
     icon: CreditCard,
     items: [
-      { id: 'faturas', label: 'Faturas', icon: CreditCard },
-      { id: 'planos', label: 'Planos', icon: Package },
+      { id: 'faturas', label: 'Faturas', icon: Receipt },
+      { id: 'planos', label: 'Planos', icon: SquareChartGantt },
       { id: 'gestao-planos', label: 'Gestão de Planos', icon: Sliders },
     ]
   },
@@ -115,12 +125,13 @@ const menuGroups = [
 
 const singleItems = [
   { id: 'chatbot', label: 'ChatBot', icon: Bot },
-  { id: 'conexoes', label: 'Conexões', icon: Plug },
+  { id: 'conexoes', label: 'Conexões', icon: Waypoints },
   { id: 'documentacao', label: 'Documentação', icon: FileText },
 ];
 
 const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, onLogout }: AppSidebarProps) => {
   const [openGroups, setOpenGroups] = React.useState<string[]>(['dashboards']);
+  const [userStatus, setUserStatus] = React.useState(true); // true = online (UserCheck), false = offline (UserX)
 
   const toggleGroup = (groupId: string) => {
     setOpenGroups(prev => 
@@ -128,6 +139,10 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
         ? prev.filter(id => id !== groupId)
         : [...prev, groupId]
     );
+  };
+
+  const toggleUserStatus = () => {
+    setUserStatus(!userStatus);
   };
 
   return (
@@ -153,7 +168,7 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
           onClick={onToggleCollapse}
           className="p-2"
         >
-          {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          <PanelLeft className="h-4 w-4 text-black dark:text-white" />
         </Button>
       </div>
 
@@ -171,15 +186,15 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                   className={cn(
                     "w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-800",
                     isCollapsed && "justify-center",
-                    "text-gray-700 dark:text-gray-300"
+                    "text-black dark:text-white"
                   )}
                 >
                   <div className="flex items-center space-x-3">
-                    <GroupIcon className="h-5 w-5 flex-shrink-0" />
-                    {!isCollapsed && <span className="font-medium">{group.label}</span>}
+                    <GroupIcon className="h-5 w-5 flex-shrink-0 text-black dark:text-white" />
+                    {!isCollapsed && <span className="font-medium text-black dark:text-white">{group.label}</span>}
                   </div>
                   {!isCollapsed && (
-                    isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                    isOpen ? <ChevronUp className="h-4 w-4 text-black dark:text-white" /> : <ChevronDown className="h-4 w-4 text-black dark:text-white" />
                   )}
                 </button>
               </CollapsibleTrigger>
@@ -198,11 +213,11 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                           "w-full flex items-center space-x-3 px-3 py-2 ml-6 rounded-lg text-left transition-colors text-sm",
                           isActive 
                             ? "bg-blue-500 text-white" 
-                            : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                            : "text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
                         )}
                       >
-                        <ItemIcon className="h-4 w-4 flex-shrink-0" />
-                        <span>{item.label}</span>
+                        <ItemIcon className={cn("h-4 w-4 flex-shrink-0", isActive ? "text-white" : "text-black dark:text-white")} />
+                        <span className={isActive ? "text-white" : "text-black dark:text-white"}>{item.label}</span>
                       </button>
                     );
                   })}
@@ -225,12 +240,12 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                 "w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors",
                 isActive 
                   ? "bg-blue-500 text-white" 
-                  : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800",
+                  : "text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800",
                 isCollapsed && "justify-center"
               )}
             >
-              <Icon className="h-5 w-5 flex-shrink-0" />
-              {!isCollapsed && <span className="font-medium">{item.label}</span>}
+              <Icon className={cn("h-5 w-5 flex-shrink-0", isActive ? "text-white" : "text-black dark:text-white")} />
+              {!isCollapsed && <span className={cn("font-medium", isActive ? "text-white" : "text-black dark:text-white")}>{item.label}</span>}
             </button>
           );
         })}
@@ -247,6 +262,16 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
               <p className="text-sm font-medium text-gray-900 dark:text-white truncate">Usuário</p>
               <p className="text-xs text-gray-500 dark:text-gray-400 truncate">usuario@exemplo.com</p>
             </div>
+            <button
+              onClick={toggleUserStatus}
+              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
+            >
+              {userStatus ? (
+                <UserCheck className="h-4 w-4 text-black dark:text-white" />
+              ) : (
+                <UserX className="h-4 w-4 text-red-600" />
+              )}
+            </button>
           </div>
         )}
         
@@ -259,7 +284,6 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
           )}
         >
           <LogOut className="h-4 w-4" />
-          {!isCollapsed && <span className="ml-2">Sair</span>}
         </Button>
       </div>
     </div>
