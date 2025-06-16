@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +20,8 @@ import {
   UsersRound,
   MessageSquareText,
   Clock9,
-  BotMessageSquare
+  BotMessageSquare,
+  Filter
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -220,14 +222,19 @@ const AtendimentosOmnichannel = () => {
           </div>
           
           {/* Busca */}
-          <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              placeholder="Buscar conversas..."
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
-              className="pl-10"
-            />
+          <div className="flex gap-2 mb-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Buscar conversas..."
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Button variant="ghost" size="icon">
+              <Filter className="h-4 w-4" />
+            </Button>
           </div>
 
           {/* Filtros Rápidos */}
