@@ -198,20 +198,20 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
 
   return (
     <div className={cn(
-      "bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 h-screen relative z-50",
+      "bg-card border-r border-border flex flex-col transition-all duration-300 h-screen relative z-50",
       // Em mobile, sempre ocupa a largura total quando visível
       "w-full md:w-64",
       // Em desktop, respeita o estado collapsed
       isCollapsed && "md:w-16"
     )}>
       {/* Header - matching navbar height */}
-      <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between h-20">
+      <div className="px-6 py-4 border-b border-border flex items-center justify-between h-20">
         {(!isCollapsed || window.innerWidth < 768) && (
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-r from-gray-700 to-black dark:from-gray-200 dark:to-white rounded-lg flex items-center justify-center">
               <span className="text-white dark:text-black font-bold text-base">NE</span>
             </div>
-            <h1 className="text-lg font-bold text-black dark:text-white">
+            <h1 className="text-lg font-bold text-foreground">
               Nome da Empresa
             </h1>
           </div>
@@ -226,7 +226,7 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
             isCollapsed && "w-full justify-center"
           )}
         >
-          <PanelLeft className="h-4 w-4 text-black dark:text-white" />
+          <PanelLeft className="h-4 w-4 text-foreground" />
         </Button>
       </div>
 
@@ -243,17 +243,17 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                 <CollapsibleTrigger asChild>
                   <button
                     className={cn(
-                      "w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-800",
+                      "w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-left transition-colors hover:bg-accent",
                       isCollapsed && "md:justify-center",
-                      "text-black dark:text-white"
+                      "text-foreground"
                     )}
                   >
                     <div className="flex items-center space-x-2">
-                      <GroupIcon className="h-3.5 w-3.5 flex-shrink-0 text-black dark:text-white" />
-                      {(!isCollapsed || window.innerWidth < 768) && <span className="font-medium text-xs text-black dark:text-white">{group.label}</span>}
+                      <GroupIcon className="h-3.5 w-3.5 flex-shrink-0 text-foreground" />
+                      {(!isCollapsed || window.innerWidth < 768) && <span className="font-medium text-xs text-foreground">{group.label}</span>}
                     </div>
                     {(!isCollapsed || window.innerWidth < 768) && (
-                      isOpen ? <ChevronUp className="h-3 w-3 text-black dark:text-white" /> : <ChevronDown className="h-3 w-3 text-black dark:text-white" />
+                      isOpen ? <ChevronUp className="h-3 w-3 text-foreground" /> : <ChevronDown className="h-3 w-3 text-foreground" />
                     )}
                   </button>
                 </CollapsibleTrigger>
@@ -271,12 +271,12 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                           className={cn(
                             "w-full flex items-center space-x-2 px-2 py-1.5 ml-5 rounded-lg text-left transition-colors text-xs",
                             isActive 
-                              ? "bg-gray-800 dark:bg-gray-200 text-white dark:text-black" 
-                              : "text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+                              ? "bg-primary text-primary-foreground" 
+                              : "text-foreground hover:bg-accent"
                           )}
                         >
-                          <ItemIcon className={cn("h-3 w-3 flex-shrink-0", isActive ? "text-white dark:text-black" : "text-black dark:text-white")} />
-                          <span className={cn("text-xs", isActive ? "text-white dark:text-black" : "text-black dark:text-white")}>{subItem.label}</span>
+                          <ItemIcon className={cn("h-3 w-3 flex-shrink-0", isActive ? "text-primary-foreground" : "text-foreground")} />
+                          <span className={cn("text-xs", isActive ? "text-primary-foreground" : "text-foreground")}>{subItem.label}</span>
                         </button>
                       );
                     })}
@@ -296,13 +296,13 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                 className={cn(
                   "w-full flex items-center space-x-2 px-2 py-1.5 rounded-lg text-left transition-colors",
                   isActive 
-                    ? "bg-gray-800 dark:bg-gray-200 text-white dark:text-black" 
-                    : "text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800",
+                    ? "bg-primary text-primary-foreground" 
+                    : "text-foreground hover:bg-accent",
                   isCollapsed && "md:justify-center"
                 )}
               >
-                <Icon className={cn("h-3.5 w-3.5 flex-shrink-0", isActive ? "text-white dark:text-black" : "text-black dark:text-white")} />
-                {(!isCollapsed || window.innerWidth < 768) && <span className={cn("font-medium text-xs", isActive ? "text-white dark:text-black" : "text-black dark:text-white")}>{singleItem.label}</span>}
+                <Icon className={cn("h-3.5 w-3.5 flex-shrink-0", isActive ? "text-primary-foreground" : "text-foreground")} />
+                {(!isCollapsed || window.innerWidth < 768) && <span className={cn("font-medium text-xs", isActive ? "text-primary-foreground" : "text-foreground")}>{singleItem.label}</span>}
               </button>
             );
           }
@@ -310,20 +310,20 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
       </nav>
 
       {/* User section */}
-      <div className="p-3 border-t border-gray-200 dark:border-gray-700">
+      <div className="p-3 border-t border-border">
         {(!isCollapsed || window.innerWidth < 768) && (
           <div className="flex items-center space-x-2 mb-2">
             <div className="w-7 h-7 bg-gradient-to-r from-gray-700 to-black dark:from-gray-200 dark:to-white rounded-full flex items-center justify-center text-white dark:text-black font-semibold">
               <span className="text-xs">U</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-gray-900 dark:text-white truncate">Usuário</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">Administração</p>
+              <p className="text-xs font-medium text-foreground truncate">Usuário</p>
+              <p className="text-xs text-muted-foreground truncate">Administração</p>
             </div>
             <div className="flex items-center space-x-1">
               <button
                 onClick={toggleUserStatus}
-                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded flex items-center justify-center"
+                className="p-1 hover:bg-accent rounded flex items-center justify-center"
               >
                 {userStatus ? (
                   <UserCheck className="h-3 w-3 text-green-600" />
@@ -347,7 +347,7 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
           <div className="flex flex-col space-y-1">
             <button
               onClick={toggleUserStatus}
-              className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded flex items-center justify-center"
+              className="p-1.5 hover:bg-accent rounded flex items-center justify-center"
             >
               {userStatus ? (
                 <UserCheck className="h-3.5 w-3.5 text-green-600" />
