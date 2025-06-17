@@ -819,10 +819,10 @@ const AtendimentosOmnichannel = () => {
             </div>
           </div>
 
-          {/* Área de Mensagens - Calculada para deixar espaço para a barra de digitação */}
-          <div className="flex-1 bg-gray-50 dark:bg-gray-800 overflow-hidden" style={{ height: 'calc(100vh - 180px)' }}>
+          {/* Área de Mensagens - Ajustada para deixar menos espaço para a barra de digitação */}
+          <div className="flex-1 bg-gray-50 dark:bg-gray-800 overflow-hidden" style={{ height: 'calc(100vh - 220px)' }}>
             <ScrollArea className="h-full p-4">
-              <div className="space-y-4 pb-4">
+              <div className="space-y-4 pb-2">
                 {mensagens.map((mensagem) => (
                   <div
                     key={mensagem.id}
@@ -855,13 +855,13 @@ const AtendimentosOmnichannel = () => {
             </ScrollArea>
           </div>
 
-          {/* Barra de Digitação - Fixa na parte inferior com mesma altura da div referenciada */}
-          <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
+          {/* Barra de Digitação - Movida mais para cima, logo abaixo das mensagens */}
+          <div className="p-2 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
             <div className="flex items-center gap-2 max-w-full">
               {/* Menu suspenso com opções */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="flex-shrink-0">
+                  <Button variant="ghost" size="icon" className="flex-shrink-0 h-8 w-8">
                     <EllipsisVertical className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -911,11 +911,11 @@ const AtendimentosOmnichannel = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <Button variant="ghost" size="icon" className="flex-shrink-0">
+              <Button variant="ghost" size="icon" className="flex-shrink-0 h-8 w-8">
                 <SmilePlus className="h-4 w-4" />
               </Button>
 
-              <Button variant="ghost" size="icon" className="flex-shrink-0">
+              <Button variant="ghost" size="icon" className="flex-shrink-0 h-8 w-8">
                 <Paperclip className="h-4 w-4" />
               </Button>
               
@@ -925,15 +925,15 @@ const AtendimentosOmnichannel = () => {
                   value={novaMensagem}
                   onChange={(e) => setNovaMensagem(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && enviarMensagem()}
-                  className="w-full"
+                  className="w-full h-8"
                 />
               </div>
               
               <Button 
                 onClick={enviarMensagem} 
                 disabled={!novaMensagem.trim()} 
-                className="flex-shrink-0"
-                size="default"
+                className="flex-shrink-0 h-8"
+                size="sm"
               >
                 <Send className="h-4 w-4" />
               </Button>
