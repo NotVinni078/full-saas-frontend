@@ -59,11 +59,11 @@ const Inicio = () => {
         />
       )}
 
-      {/* Botão discreto para abrir sidebar em mobile - reposicionado */}
+      {/* Botão discreto para abrir sidebar em mobile - movido para a parte de cima */}
       {sidebarCollapsed && (
         <Button
           onClick={toggleSidebar}
-          className="fixed bottom-20 left-4 z-50 md:hidden bg-transparent text-black hover:bg-gray-100 backdrop-blur-sm shadow-md rounded-md w-8 h-8 p-0 flex items-center justify-center"
+          className="fixed top-20 left-4 z-50 md:hidden bg-transparent text-black hover:bg-gray-100 backdrop-blur-sm shadow-md rounded-md w-8 h-8 p-0 flex items-center justify-center"
         >
           <PanelLeft className="h-4 w-4" />
         </Button>
