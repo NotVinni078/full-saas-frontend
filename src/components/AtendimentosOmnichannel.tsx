@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -428,6 +429,113 @@ const AtendimentosOmnichannel = () => {
     return <div className={`w-3 h-3 rounded-full ${colors[status as keyof typeof colors]}`} />;
   };
 
+  const ActionIcons = ({ statusAtendimento }: { statusAtendimento: string }) => {
+    switch (statusAtendimento) {
+      case 'atendendo':
+        return (
+          <div className="flex gap-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-6 w-6">
+                  <Clock9 className="h-3 w-3" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Retornar a Aguardando</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-6 w-6">
+                  <CircleCheckBig className="h-3 w-3" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Finalizar</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        );
+      case 'aguardando':
+        return (
+          <div className="flex gap-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-6 w-6">
+                  <MessageSquare className="h-3 w-3" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Realizar Atendimento</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-6 w-6">
+                  <CircleCheckBig className="h-3 w-3" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Finalizar</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        );
+      case 'chatbot':
+        return (
+          <div className="flex gap-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-6 w-6">
+                  <MessageSquare className="h-3 w-3" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Realizar Atendimento</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-6 w-6">
+                  <CircleCheckBig className="h-3 w-3" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Finalizar</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        );
+      case 'finalizado':
+        return (
+          <div className="flex gap-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-6 w-6">
+                  <MessageSquare className="h-3 w-3" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Realizar Atendimento</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-6 w-6">
+                  <RefreshCcw className="h-3 w-3" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Transferir para outro Atendente</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
   const ConversasList = () => (
     <div className={`${conversaSelecionada ? 'md:w-1/3' : 'md:w-2/3 lg:w-1/2'} border-r border-gray-200 dark:border-gray-700 flex flex-col h-full relative`}>
       {/* Header da Lista */}
@@ -563,13 +671,23 @@ const AtendimentosOmnichannel = () => {
                     </div>
                   </div>
                   
-                  <div className="flex-1 min-w-0 flex flex-col justify-center">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-medium text-gray-900 dark:text-white truncate">
-                        {conversa.cliente}
-                        {conversa.isGrupo && <UsersRound className="inline h-3 w-3 ml-1" />}
-                      </h3>
-                      <div className="flex items-center gap-2">
+                  <div className="flex-1 min-w-0 flex flex-col">
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <h3 className="font-medium text-gray-900 dark:text-white truncate">
+                          {conversa.cliente}
+                          {conversa.isGrupo && <UsersRound className="inline h-3 w-3 ml-1" />}
+                        </h3>
+                        <div className="flex gap-1 flex-wrap">
+                          {conversa.tags?.slice(0, 2).map((tag) => (
+                            <Badge key={tag} variant="secondary" className="text-xs px-1 py-0 h-4 text-[10px]">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <ActionIcons statusAtendimento={conversa.statusAtendimento} />
                         <span className="text-xs text-gray-500">{conversa.timestamp}</span>
                       </div>
                     </div>
