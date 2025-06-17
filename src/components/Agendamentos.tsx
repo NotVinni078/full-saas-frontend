@@ -362,21 +362,21 @@ const Agendamentos = () => {
 
   return (
     <TooltipProvider>
-      <div className="p-3 sm:p-6 bg-white min-h-screen">
+      <div className="p-3 sm:p-6 bg-background dark:bg-background min-h-screen">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold text-black mb-4 sm:mb-6">
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground dark:text-foreground mb-4 sm:mb-6">
             Agendamentos ({filteredAgendamentos.length})
           </h1>
 
           {/* Barra de pesquisa */}
           <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
               placeholder="Pesquisar agendamento ou contato"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 border-gray-300"
+              className="pl-10 border-border dark:border-border bg-background dark:bg-background text-foreground dark:text-foreground"
             />
           </div>
 
@@ -384,10 +384,10 @@ const Agendamentos = () => {
             {/* Filtros */}
             <div className="flex flex-col sm:flex-row gap-4 flex-1">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="border-gray-300 bg-white min-w-40">
+                <SelectTrigger className="border-border dark:border-border bg-background dark:bg-background text-foreground dark:text-foreground min-w-40">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
-                <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
+                <SelectContent className="bg-background dark:bg-background border border-border dark:border-border shadow-lg z-50">
                   <SelectItem value="all">Todos os Status</SelectItem>
                   <SelectItem value="Agendado">Agendado</SelectItem>
                   <SelectItem value="Enviado">Enviado</SelectItem>
@@ -396,10 +396,10 @@ const Agendamentos = () => {
               </Select>
 
               <Select value={periodFilter} onValueChange={setPeriodFilter}>
-                <SelectTrigger className="border-gray-300 bg-white min-w-40">
+                <SelectTrigger className="border-border dark:border-border bg-background dark:bg-background text-foreground dark:text-foreground min-w-40">
                   <SelectValue placeholder="Período" />
                 </SelectTrigger>
-                <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
+                <SelectContent className="bg-background dark:bg-background border border-border dark:border-border shadow-lg z-50">
                   <SelectItem value="all">Todos os Períodos</SelectItem>
                   <SelectItem value="today">Hoje</SelectItem>
                   <SelectItem value="week">Esta Semana</SelectItem>
@@ -409,7 +409,7 @@ const Agendamentos = () => {
             </div>
 
             {/* Toggle de visualização */}
-            <div className="flex items-center bg-gray-100 rounded-lg p-1">
+            <div className="flex items-center bg-muted dark:bg-muted rounded-lg p-1">
               <Button
                 variant={viewMode === 'calendar' ? 'default' : 'ghost'}
                 size="sm"
@@ -417,8 +417,8 @@ const Agendamentos = () => {
                 className={cn(
                   "flex items-center gap-2",
                   viewMode === 'calendar' 
-                    ? "bg-black text-white hover:bg-gray-800" 
-                    : "text-gray-600 hover:text-black hover:bg-gray-200"
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90" 
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent dark:hover:bg-accent"
                 )}
               >
                 <CalendarIcon className="h-4 w-4" />
@@ -431,8 +431,8 @@ const Agendamentos = () => {
                 className={cn(
                   "flex items-center gap-2",
                   viewMode === 'list' 
-                    ? "bg-black text-white hover:bg-gray-800" 
-                    : "text-gray-600 hover:text-black hover:bg-gray-200"
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90" 
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent dark:hover:bg-accent"
                 )}
               >
                 <List className="h-4 w-4" />
@@ -443,12 +443,12 @@ const Agendamentos = () => {
             {/* Botão Novo Agendamento */}
             <Dialog open={isNewAgendamentoOpen} onOpenChange={setIsNewAgendamentoOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-black text-white hover:bg-gray-800">
+                <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
                   <Plus className="h-4 w-4 mr-2" />
                   Novo Agendamento
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-2xl bg-white max-h-[90vh] overflow-y-auto">
+              <DialogContent className="sm:max-w-2xl bg-background dark:bg-background border border-border dark:border-border max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Novo Agendamento</DialogTitle>
                 </DialogHeader>
@@ -735,16 +735,16 @@ const Agendamentos = () => {
 
         {/* Conteúdo Principal */}
         {viewMode === 'calendar' ? (
-          <div className="bg-white border border-gray-200 rounded-lg">
+          <div className="bg-card dark:bg-card border border-border dark:border-border rounded-lg">
             {/* Header do Calendário */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+            <div className="flex items-center justify-between p-4 border-b border-border dark:border-border">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => navigateMonth('prev')}
-                    className="border-gray-300"
+                    className="border-border dark:border-border"
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
@@ -752,7 +752,7 @@ const Agendamentos = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => navigateMonth('next')}
-                    className="border-gray-300"
+                    className="border-border dark:border-border"
                   >
                     <ChevronRight className="h-4 w-4" />
                   </Button>
@@ -768,7 +768,7 @@ const Agendamentos = () => {
                   variant="outline"
                   size="sm"
                   onClick={() => navigateYear('prev')}
-                  className="border-gray-300"
+                  className="border-border dark:border-border"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -777,7 +777,7 @@ const Agendamentos = () => {
                   variant="outline"
                   size="sm"
                   onClick={() => navigateYear('next')}
-                  className="border-gray-300"
+                  className="border-border dark:border-border"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
@@ -789,7 +789,7 @@ const Agendamentos = () => {
               {/* Cabeçalho dos dias da semana */}
               <div className="grid grid-cols-7 gap-1 mb-2">
                 {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map((day) => (
-                  <div key={day} className="p-2 text-center text-sm font-medium text-gray-500">
+                  <div key={day} className="p-2 text-center text-sm font-medium text-muted-foreground">
                     {day}
                   </div>
                 ))}
@@ -805,8 +805,8 @@ const Agendamentos = () => {
                     <div
                       key={day.toISOString()}
                       className={cn(
-                        "min-h-20 p-1 border border-gray-100 rounded",
-                        !isCurrentMonth && "bg-gray-50 text-gray-400"
+                        "min-h-20 p-1 border border-border dark:border-border rounded",
+                        !isCurrentMonth && "bg-muted dark:bg-muted text-muted-foreground"
                       )}
                     >
                       <div className="text-sm font-medium mb-1">
@@ -825,7 +825,7 @@ const Agendamentos = () => {
                             </div>
                           ))}
                           {dayAgendamentos.length > 2 && (
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-muted-foreground">
                               +{dayAgendamentos.length - 2} mais
                             </div>
                           )}
@@ -840,11 +840,11 @@ const Agendamentos = () => {
         ) : (
           <div className="space-y-4">
             {filteredAgendamentos.map((agendamento) => (
-              <div key={agendamento.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+              <div key={agendamento.id} className="bg-card dark:bg-card border border-border dark:border-border rounded-lg p-4 hover:bg-accent dark:hover:bg-accent transition-colors">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                   <div className="flex-1 space-y-2">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                      <h3 className="font-semibold text-black">{agendamento.title}</h3>
+                      <h3 className="font-semibold text-foreground dark:text-foreground">{agendamento.title}</h3>
                       <div className="flex flex-wrap gap-2">
                         <span className="px-2 py-1 bg-blue-100 text-xs rounded-full border border-blue-200">
                           {agendamento.channel}
@@ -861,7 +861,7 @@ const Agendamentos = () => {
                       </div>
                     </div>
                     
-                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                    <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
                         {format(agendamento.scheduledDate, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
@@ -877,14 +877,14 @@ const Agendamentos = () => {
                     </div>
                     
                     {agendamento.messageType === 'text' && agendamento.message && (
-                      <p className="text-sm text-gray-700 bg-gray-50 p-2 rounded line-clamp-2">
+                      <p className="text-sm text-muted-foreground bg-muted dark:bg-muted p-2 rounded line-clamp-2">
                         {agendamento.message}
                       </p>
                     )}
                     
                     <div className="flex flex-wrap gap-1">
                       {agendamento.contacts.map((contact) => (
-                        <span key={contact.id} className="px-2 py-1 bg-gray-100 text-xs rounded-full border border-gray-200">
+                        <span key={contact.id} className="px-2 py-1 bg-muted dark:bg-muted text-xs rounded-full border border-border dark:border-border">
                           {contact.name}
                         </span>
                       ))}
@@ -926,7 +926,7 @@ const Agendamentos = () => {
                           variant="outline"
                           size="sm"
                           onClick={() => handleEditAgendamento(agendamento)}
-                          className="border-gray-300"
+                          className="border-border dark:border-border"
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -942,7 +942,7 @@ const Agendamentos = () => {
 
         {/* Dialog de Editar Agendamento */}
         <Dialog open={isEditAgendamentoOpen} onOpenChange={setIsEditAgendamentoOpen}>
-          <DialogContent className="sm:max-w-2xl bg-white max-h-[90vh] overflow-y-auto">
+          <DialogContent className="sm:max-w-2xl bg-background dark:bg-background border border-border dark:border-border max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Editar Agendamento</DialogTitle>
             </DialogHeader>
