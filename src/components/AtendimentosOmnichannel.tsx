@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -597,7 +596,7 @@ const AtendimentosOmnichannel = () => {
       <Dialog open={isContactDialogOpen} onOpenChange={setIsContactDialogOpen}>
         <DialogTrigger asChild>
           <Button
-            className="absolute top-20 left-4 h-12 w-12 rounded-full shadow-lg z-10 bg-gray-600 hover:bg-gray-700 dark:bg-gray-500 dark:hover:bg-gray-600"
+            className="absolute bottom-20 left-4 h-12 w-12 rounded-full shadow-lg z-10 bg-gray-600 hover:bg-gray-700 dark:bg-gray-500 dark:hover:bg-gray-600"
             size="icon"
           >
             <CirclePlus className="h-5 w-5" />
@@ -649,7 +648,7 @@ const AtendimentosOmnichannel = () => {
   );
 
   const ChatArea = () => (
-    <div className="flex-1 flex flex-col h-full">
+    <div className="flex-1 flex flex-col h-full overflow-hidden">
       {conversaAtual ? (
         <>
           {/* Header do Chat */}
@@ -820,10 +819,10 @@ const AtendimentosOmnichannel = () => {
             </div>
           </div>
 
-          {/* Mensagens - Container com altura fixa e scroll */}
-          <div className="flex-1 min-h-0 overflow-hidden">
-            <ScrollArea className="h-full">
-              <div className="p-4 space-y-4">
+          {/* Área de Mensagens - Separada da barra de digitação */}
+          <div className="flex-1 min-h-0 bg-gray-50 dark:bg-gray-800">
+            <ScrollArea className="h-full p-4">
+              <div className="space-y-4">
                 {mensagens.map((mensagem) => (
                   <div
                     key={mensagem.id}
@@ -833,7 +832,7 @@ const AtendimentosOmnichannel = () => {
                       className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                         mensagem.remetente === 'atendente'
                           ? 'bg-blue-500 text-white'
-                          : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
+                          : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
                       }`}
                     >
                       <p className="text-sm">{mensagem.conteudo}</p>
@@ -856,13 +855,13 @@ const AtendimentosOmnichannel = () => {
             </ScrollArea>
           </div>
 
-          {/* Input de Mensagem - Posição fixa na parte inferior */}
-          <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
-            <div className="flex items-end gap-2">
+          {/* Barra de Digitação - Separada e fixa */}
+          <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-3 flex-shrink-0">
+            <div className="flex items-end gap-2 max-w-full">
               {/* Menu suspenso com opções */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
+                  <Button variant="ghost" size="icon" className="flex-shrink-0">
                     <EllipsisVertical className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -872,7 +871,7 @@ const AtendimentosOmnichannel = () => {
                       variant="ghost"
                       size="icon"
                       onClick={() => setIsSignatureActive(!isSignatureActive)}
-                      className={`w-8 h-8 rounded-full shadow-lg ${
+                      className={`w-8 h-8 rounded-full shadow-lg flex-shrink-0 ${
                         isSignatureActive ? 'bg-red-100 hover:bg-red-200' : 'bg-green-100 hover:bg-green-200'
                       }`}
                     >
@@ -883,18 +882,18 @@ const AtendimentosOmnichannel = () => {
                       )}
                     </Button>
                     
-                    <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg">
+                    <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg flex-shrink-0">
                       <Zap className="h-4 w-4" />
                     </Button>
                     
-                    <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg">
+                    <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg flex-shrink-0">
                       <NotebookPen className="h-4 w-4" />
                     </Button>
                     
                     <Button 
                       variant="ghost" 
                       size="icon" 
-                      className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg"
+                      className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg flex-shrink-0"
                       onClick={() => setIsContactListOpen(true)}
                     >
                       <IdCard className="h-4 w-4" />
@@ -903,7 +902,7 @@ const AtendimentosOmnichannel = () => {
                     <Button 
                       variant="ghost" 
                       size="icon" 
-                      className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg"
+                      className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg flex-shrink-0"
                       onClick={() => setIsChatbotListOpen(true)}
                     >
                       <BotMessageSquare className="h-4 w-4" />
@@ -912,25 +911,25 @@ const AtendimentosOmnichannel = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="flex-shrink-0">
                 <SmilePlus className="h-4 w-4" />
               </Button>
 
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="flex-shrink-0">
                 <Paperclip className="h-4 w-4" />
               </Button>
               
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <Input
                   placeholder="Digite sua mensagem..."
                   value={novaMensagem}
                   onChange={(e) => setNovaMensagem(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && enviarMensagem()}
-                  className="resize-none"
+                  className="w-full"
                 />
               </div>
               
-              <Button onClick={enviarMensagem} disabled={!novaMensagem.trim()}>
+              <Button onClick={enviarMensagem} disabled={!novaMensagem.trim()} className="flex-shrink-0">
                 <Send className="h-4 w-4" />
               </Button>
             </div>
