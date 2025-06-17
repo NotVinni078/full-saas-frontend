@@ -33,7 +33,7 @@ const Inicio = () => {
   };
 
   return (
-    <div className={`h-screen bg-gray-50 dark:bg-gray-900 flex w-full overflow-hidden ${isDarkMode ? 'dark' : ''}`}>
+    <div className={`h-screen bg-background flex w-full overflow-hidden ${isDarkMode ? 'dark' : ''}`}>
       {/* Sidebar - comportamento responsivo corrigido */}
       <div className={`
         fixed inset-y-0 left-0 z-50 md:relative md:z-auto
@@ -68,7 +68,7 @@ const Inicio = () => {
           isSidebarCollapsed={sidebarCollapsed}
         />
         
-        <main className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900 min-h-0">
+        <main className="flex-1 overflow-auto bg-background min-h-0">
           {currentPage.includes('dashboard') ? (
             <Dashboard />
           ) : (

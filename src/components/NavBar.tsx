@@ -41,7 +41,7 @@ const NavBar = ({
 
   return (
     <TooltipProvider>
-      <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between h-20">
+      <nav className="bg-card border-b border-border px-6 py-4 flex items-center justify-between h-20">
         <div className="flex items-center space-x-4">
           {/* Botão da sidebar no header */}
           {isSidebarCollapsed && onToggleSidebar && (
@@ -63,7 +63,7 @@ const NavBar = ({
               onClick={handleCloseConversation}
               className="p-2"
             >
-              <ArrowLeft className="h-4 w-4 text-black dark:text-white" />
+              <ArrowLeft className="h-4 w-4 text-foreground" />
             </Button>
           )}
         </div>
@@ -73,7 +73,7 @@ const NavBar = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="ghost" size="sm" className="relative p-2">
-                <MessageSquare className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                <MessageSquare className="h-5 w-5 text-muted-foreground" />
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   2
                 </span>
@@ -88,7 +88,7 @@ const NavBar = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="ghost" size="sm" className="relative p-2">
-                <MessagesSquare className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                <MessagesSquare className="h-5 w-5 text-muted-foreground" />
                 <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   1
                 </span>
@@ -103,7 +103,7 @@ const NavBar = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="ghost" size="sm" className="relative p-2">
-                <Receipt className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                <Receipt className="h-5 w-5 text-muted-foreground" />
                 <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   5
                 </span>
@@ -118,7 +118,7 @@ const NavBar = ({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="p-2">
-                <Globe className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                <Globe className="h-5 w-5 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -137,9 +137,9 @@ const NavBar = ({
           {/* Toggle de tema */}
           <Button variant="ghost" size="sm" onClick={onToggleTheme} className="p-2">
             {isDarkMode ? (
-              <Sun className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+              <Sun className="h-5 w-5 text-muted-foreground" />
             ) : (
-              <Moon className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+              <Moon className="h-5 w-5 text-muted-foreground" />
             )}
           </Button>
         </div>
