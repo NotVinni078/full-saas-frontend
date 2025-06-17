@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Search, MoreVertical, Phone, Video, Smile, Paperclip, Users } from 'lucide-react';
+import { Send, Search, Smile, Paperclip, Users, ArrowLeft } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -18,6 +18,7 @@ interface Message {
 interface Contact {
   id: string;
   name: string;
+  department: string;
   avatar?: string;
   status: 'online' | 'offline' | 'away';
   lastMessage?: string;
@@ -26,15 +27,17 @@ interface Contact {
 }
 
 const ChatInterno = () => {
-  const [selectedContact, setSelectedContact] = useState<string>('1');
+  const [selectedContact, setSelectedContact] = useState<string>('');
   const [message, setMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showChat, setShowChat] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const contacts: Contact[] = [
     {
       id: '1',
       name: 'João Silva',
+      department: 'Suporte Técnico',
       status: 'online',
       lastMessage: 'Oi! Como está o projeto?',
       lastMessageTime: '14:30',
@@ -43,6 +46,7 @@ const ChatInterno = () => {
     {
       id: '2',
       name: 'Maria Santos',
+      department: 'Vendas',
       status: 'away',
       lastMessage: 'Vou verificar isso',
       lastMessageTime: '13:45'
@@ -50,6 +54,7 @@ const ChatInterno = () => {
     {
       id: '3',
       name: 'Pedro Costa',
+      department: 'Desenvolvimento',
       status: 'offline',
       lastMessage: 'Obrigado pela ajuda!',
       lastMessageTime: '12:15'
@@ -57,6 +62,7 @@ const ChatInterno = () => {
     {
       id: '4',
       name: 'Ana Oliveira',
+      department: 'Marketing',
       status: 'online',
       lastMessage: 'Reunião confirmada para amanhã',
       lastMessageTime: '11:30',
@@ -65,6 +71,7 @@ const ChatInterno = () => {
     {
       id: '5',
       name: 'Carlos Lima',
+      department: 'Financeiro',
       status: 'online',
       lastMessage: 'Perfeito! Vamos em frente',
       lastMessageTime: '10:20'
@@ -113,6 +120,16 @@ const ChatInterno = () => {
   const currentMessages = messages[selectedContact] || [];
   const currentContact = contacts.find(c => c.id === selectedContact);
 
+  const handleSelectContact = (contactId: string) => {
+    setSelectedContact(contactId);
+    setShowChat(true);
+  };
+
+  const handleBackToList = () => {
+    setShowChat(false);
+    setSelectedContact('');
+  };
+
   const handleSendMessage = () => {
     if (message.trim()) {
       console.log('Enviando mensagem:', message);
@@ -151,8 +168,8 @@ const ChatInterno = () => {
 
   return (
     <div className="h-full bg-background flex">
-      {/* Lista de Contatos */}
-      <div className="w-full md:w-80 border-r border-border bg-card flex flex-col">
+      {/* Lista de Contatos - Mobile: condicional, Desktop: sempre visível */}
+      <div className={`w-full md:w-80 border-r border-border bg-card flex flex-col ${showChat ? 'hidden md:flex' : 'flex'}`}>
         {/* Header da lista */}
         <div className="p-4 border-b border-border">
           <div className="flex items-center justify-between mb-3">
@@ -166,7 +183,7 @@ const ChatInterno = () => {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar contatos..."
+              placeholder="Buscar usuário"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -180,9 +197,11 @@ const ChatInterno = () => {
             {filteredContacts.map((contact) => (
               <button
                 key={contact.id}
-                onClick={() => setSelectedContact(contact.id)}
-                className={`w-full p-3 rounded-lg text-left transition-colors hover:bg-accent ${
-                  selectedContact === contact.id ? 'bg-black text-white dark:bg-white dark:text-black' : ''
+                onClick={() => handleSelectContact(contact.id)}
+                className={`w-full p-3 rounded-lg text-left transition-colors ${
+                  selectedContact === contact.id 
+                    ? 'bg-black text-white dark:bg-white dark:text-black' 
+                    : 'hover:bg-muted'
                 }`}
               >
                 <div className="flex items-center space-x-3">
@@ -198,12 +217,19 @@ const ChatInterno = () => {
                   
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <h3 className={`font-medium text-sm truncate ${
-                        selectedContact === contact.id ? 'text-white dark:text-black' : 'text-card-foreground'
-                      }`}>
-                        {contact.name}
-                      </h3>
-                      <div className="flex items-center space-x-1">
+                      <div className="flex-1 min-w-0">
+                        <h3 className={`font-medium text-sm truncate ${
+                          selectedContact === contact.id ? 'text-white dark:text-black' : 'text-card-foreground'
+                        }`}>
+                          {contact.name}
+                        </h3>
+                        <p className={`text-xs truncate ${
+                          selectedContact === contact.id ? 'text-white/70 dark:text-black/70' : 'text-muted-foreground'
+                        }`}>
+                          {contact.department}
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-1 ml-2">
                         {contact.lastMessageTime && (
                           <span className={`text-xs ${
                             selectedContact === contact.id ? 'text-white/70 dark:text-black/70' : 'text-muted-foreground'
@@ -233,13 +259,23 @@ const ChatInterno = () => {
         </ScrollArea>
       </div>
 
-      {/* Área de Chat */}
-      <div className="flex-1 flex flex-col bg-background">
+      {/* Área de Chat - Mobile: condicional, Desktop: sempre visível */}
+      <div className={`flex-1 flex flex-col bg-background ${!showChat ? 'hidden md:flex' : 'flex'}`}>
         {currentContact ? (
           <>
             {/* Header do chat */}
-            <div className="p-4 border-b border-border bg-card flex items-center justify-between">
-              <div className="flex items-center space-x-3">
+            <div className="p-4 border-b border-border bg-card flex items-center">
+              {/* Botão voltar - apenas mobile */}
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="md:hidden mr-2"
+                onClick={handleBackToList}
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              
+              <div className="flex items-center space-x-3 flex-1">
                 <div className="relative">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={currentContact.avatar} />
@@ -251,20 +287,8 @@ const ChatInterno = () => {
                 </div>
                 <div>
                   <h3 className="font-medium text-card-foreground">{currentContact.name}</h3>
-                  <p className="text-xs text-muted-foreground">{getStatusText(currentContact.status)}</p>
+                  <p className="text-xs text-muted-foreground">{currentContact.department} • {getStatusText(currentContact.status)}</p>
                 </div>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="sm">
-                  <Phone className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="sm">
-                  <Video className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="sm">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
               </div>
             </div>
 
@@ -333,8 +357,8 @@ const ChatInterno = () => {
           <div className="flex-1 flex items-center justify-center bg-background">
             <div className="text-center">
               <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-card-foreground mb-2">Selecione um contato</h3>
-              <p className="text-muted-foreground">Escolha uma conversa para começar a chat</p>
+              <h3 className="text-lg font-medium text-card-foreground mb-2">Selecione um usuário</h3>
+              <p className="text-muted-foreground">Escolha uma conversa para começar a conversar</p>
             </div>
           </div>
         )}
