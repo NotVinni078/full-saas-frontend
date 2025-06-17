@@ -22,6 +22,8 @@ const GestaoContatos = () => {
   const [tagFilter, setTagFilter] = useState('');
   const [channelFilter, setChannelFilter] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [newContact, setNewContact] = useState({
     name: '',
     phone: '',
@@ -56,14 +58,13 @@ const GestaoContatos = () => {
       phone: '+55 11 77777-7777',
       hasWhatsApp: false,
       tags: ['Cliente'],
-      observations: 'Contato por SMS apenas'
+      observations: 'Contato por Telegram apenas'
     }
   ]);
 
   const totalContacts = contacts.length;
 
   const handleSaveContact = () => {
-    // Lógica para salvar contato
     console.log('Salvando contato:', newContact);
     setIsAddDialogOpen(false);
     setNewContact({
@@ -86,8 +87,24 @@ const GestaoContatos = () => {
     setIsAddDialogOpen(false);
   };
 
+  const handleEditContact = (contact: Contact) => {
+    setSelectedContact(contact);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleSaveEditContact = () => {
+    console.log('Salvando edição do contato:', selectedContact);
+    setIsEditDialogOpen(false);
+    setSelectedContact(null);
+  };
+
+  const handleDiscardEditContact = () => {
+    setSelectedContact(null);
+    setIsEditDialogOpen(false);
+  };
+
   const availableTags = ['Cliente', 'Lead', 'VIP', 'Interessado', 'Prospect'];
-  const availableChannels = ['WhatsApp', 'SMS', 'Email', 'Telefone'];
+  const availableChannels = ['WhatsApp', 'Telegram'];
 
   return (
     <TooltipProvider>
@@ -111,33 +128,37 @@ const GestaoContatos = () => {
 
           {/* Filtros e botão adicionar */}
           <div className="flex gap-4 items-center mb-6">
-            <Select value={tagFilter} onValueChange={setTagFilter}>
-              <SelectTrigger className="w-48 border-gray-300">
-                <SelectValue placeholder="Filtrar por Tag" />
-                <ChevronDown className="h-4 w-4" />
-              </SelectTrigger>
-              <SelectContent>
-                {availableTags.map((tag) => (
-                  <SelectItem key={tag} value={tag}>
-                    {tag}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="min-w-48">
+              <Select value={tagFilter} onValueChange={setTagFilter}>
+                <SelectTrigger className="border-gray-300 bg-white">
+                  <SelectValue placeholder="Filtrar por Tag" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
+                  <SelectItem value="todos">Todas as Tags</SelectItem>
+                  {availableTags.map((tag) => (
+                    <SelectItem key={tag} value={tag}>
+                      {tag}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-            <Select value={channelFilter} onValueChange={setChannelFilter}>
-              <SelectTrigger className="w-64 border-gray-300">
-                <SelectValue placeholder="Filtrar por Canal de atendimento" />
-                <ChevronDown className="h-4 w-4" />
-              </SelectTrigger>
-              <SelectContent>
-                {availableChannels.map((channel) => (
-                  <SelectItem key={channel} value={channel}>
-                    {channel}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="min-w-64">
+              <Select value={channelFilter} onValueChange={setChannelFilter}>
+                <SelectTrigger className="border-gray-300 bg-white">
+                  <SelectValue placeholder="Filtrar por Canal de atendimento" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
+                  <SelectItem value="todos">Todos os Canais</SelectItem>
+                  {availableChannels.map((channel) => (
+                    <SelectItem key={channel} value={channel}>
+                      {channel}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
@@ -146,7 +167,7 @@ const GestaoContatos = () => {
                   Adicionar Contato
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
+              <DialogContent className="sm:max-w-md bg-white">
                 <DialogHeader>
                   <DialogTitle>Adicionar Contato</DialogTitle>
                 </DialogHeader>
@@ -193,7 +214,7 @@ const GestaoContatos = () => {
                       <SelectTrigger className="border-gray-300">
                         <SelectValue placeholder="Selecionar tags" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-white">
                         {availableTags.map((tag) => (
                           <SelectItem key={tag} value={tag}>
                             {tag}
@@ -225,44 +246,63 @@ const GestaoContatos = () => {
           </div>
         </div>
 
+        {/* Cabeçalho da tabela */}
+        <div className="grid grid-cols-12 gap-4 p-4 bg-gray-50 border-b border-gray-200 font-medium text-gray-700">
+          <div className="col-span-1"></div> {/* Espaço para foto */}
+          <div className="col-span-3">Nome</div>
+          <div className="col-span-3">Número</div>
+          <div className="col-span-3">Tags</div>
+          <div className="col-span-2 text-center">Ações</div>
+        </div>
+
         {/* Lista de contatos */}
-        <div className="space-y-1">
+        <div className="space-y-0">
           {contacts.map((contact, index) => (
             <div key={contact.id}>
-              <div className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors">
-                <div className="flex items-center gap-4 flex-1">
-                  {/* Foto (placeholder) */}
+              <div className="grid grid-cols-12 gap-4 items-center p-4 hover:bg-gray-50 transition-colors">
+                {/* Foto */}
+                <div className="col-span-1">
                   <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
                     <span className="text-sm font-medium text-gray-600">
                       {contact.name.charAt(0)}
                     </span>
                   </div>
-                  
-                  {/* Informações do contato */}
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-medium text-black">{contact.name}</h3>
-                      {/* Tags */}
-                      <div className="flex gap-1">
-                        {contact.tags.map((tag, tagIndex) => (
-                          <span
-                            key={tagIndex}
-                            className="px-2 py-1 bg-gray-100 text-xs rounded-full border border-gray-200"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-600">{contact.phone}</p>
+                </div>
+                
+                {/* Nome */}
+                <div className="col-span-3">
+                  <h3 className="font-medium text-black">{contact.name}</h3>
+                </div>
+
+                {/* Número */}
+                <div className="col-span-3">
+                  <p className="text-sm text-gray-600">{contact.phone}</p>
+                </div>
+
+                {/* Tags */}
+                <div className="col-span-3">
+                  <div className="flex gap-1 flex-wrap">
+                    {contact.tags.map((tag, tagIndex) => (
+                      <span
+                        key={tagIndex}
+                        className="px-2 py-1 bg-gray-100 text-xs rounded-full border border-gray-200"
+                      >
+                        {tag}
+                      </span>
+                    ))}
                   </div>
                 </div>
 
                 {/* Ações */}
-                <div className="flex items-center gap-2">
+                <div className="col-span-2 flex items-center justify-center gap-2">
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 w-8 p-0"
+                        onClick={() => handleEditContact(contact)}
+                      >
                         <UserPen className="h-4 w-4" />
                       </Button>
                     </TooltipTrigger>
@@ -294,13 +334,94 @@ const GestaoContatos = () => {
                   </Tooltip>
                 </div>
               </div>
-              {/* Linha divisória suave */}
+              {/* Linha divisória */}
               {index < contacts.length - 1 && (
                 <div className="border-b border-gray-200"></div>
               )}
             </div>
           ))}
         </div>
+
+        {/* Dialog de Editar Contato */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="sm:max-w-md bg-white">
+            <DialogHeader>
+              <DialogTitle>Editar Contato</DialogTitle>
+            </DialogHeader>
+            {selectedContact && (
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium">Nome</label>
+                  <Input
+                    value={selectedContact.name}
+                    onChange={(e) => setSelectedContact({...selectedContact, name: e.target.value})}
+                    placeholder="Nome do contato"
+                    className="border-gray-300"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Número</label>
+                  <Input
+                    value={selectedContact.phone}
+                    onChange={(e) => setSelectedContact({...selectedContact, phone: e.target.value})}
+                    placeholder="Número do contato"
+                    className="border-gray-300"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Email</label>
+                  <Input
+                    value={selectedContact.email || ''}
+                    onChange={(e) => setSelectedContact({...selectedContact, email: e.target.value})}
+                    placeholder="Email do contato"
+                    className="border-gray-300"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Observações</label>
+                  <Input
+                    value={selectedContact.observations || ''}
+                    onChange={(e) => setSelectedContact({...selectedContact, observations: e.target.value})}
+                    placeholder="Observações livres"
+                    className="border-gray-300"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Tags</label>
+                  <Select>
+                    <SelectTrigger className="border-gray-300">
+                      <SelectValue placeholder="Selecionar tags" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      {availableTags.map((tag) => (
+                        <SelectItem key={tag} value={tag}>
+                          {tag}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex justify-between pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={handleDiscardEditContact}
+                    className="border-gray-300"
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Descartar
+                  </Button>
+                  <Button
+                    onClick={handleSaveEditContact}
+                    className="bg-black text-white hover:bg-gray-800"
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    Salvar
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </TooltipProvider>
   );
