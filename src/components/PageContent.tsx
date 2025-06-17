@@ -1,6 +1,7 @@
 
 import React from 'react';
 import AtendimentosOmnichannel from './AtendimentosOmnichannel';
+import GestaoContatos from './GestaoContatos';
 
 interface PageContentProps {
   page: string;
@@ -11,6 +12,9 @@ const PageContent = ({ page }: PageContentProps) => {
     switch (page) {
       case 'atendimentos':
         return <AtendimentosOmnichannel />;
+      
+      case 'gestao-contatos':
+        return <GestaoContatos />;
       
       case 'chat-interno':
         return (
