@@ -8,6 +8,7 @@ import Tarefas from './Tarefas';
 import RespostasRapidas from './RespostasRapidas';
 import ChatInterno from './ChatInterno';
 import PainelAtendimentos from './PainelAtendimentos';
+import Tags from './Tags';
 
 interface PageContentProps {
   page: string;
@@ -39,6 +40,9 @@ const PageContent = ({ page }: PageContentProps) => {
 
       case 'painel-atendimentos':
         return <PainelAtendimentos />;
+
+      case 'tags':
+        return <Tags />;
 
       case 'campanhas':
         return (

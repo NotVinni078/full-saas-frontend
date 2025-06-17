@@ -218,8 +218,8 @@ const Tarefas = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Tarefas</h1>
-          <p className="text-gray-600 mt-1 text-sm lg:text-base">Gerencie e acompanhe tarefas da equipe</p>
+          <h1 className="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white">Tarefas</h1>
+          <p className="text-gray-600 dark:text-gray-300 mt-1 text-sm lg:text-base">Gerencie e acompanhe tarefas da equipe</p>
         </div>
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -364,7 +364,7 @@ const Tarefas = () => {
               <div className="flex flex-col xl:flex-row xl:items-start justify-between gap-4">
                 <div className="flex-1 space-y-3">
                   <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                    <h3 className="font-semibold text-base lg:text-lg text-gray-900 break-words">{tarefa.titulo}</h3>
+                    <h3 className="font-semibold text-base lg:text-lg text-gray-900 dark:text-white break-words">{tarefa.titulo}</h3>
                     <Badge className={`w-fit ${getSituacaoColor(tarefa.situacao)}`}>
                       {getSituacaoIcon(tarefa.situacao)}
                       <span className="ml-1 capitalize">
@@ -374,7 +374,7 @@ const Tarefas = () => {
                     </Badge>
                   </div>
                   
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 text-sm text-gray-600">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 text-sm text-gray-600 dark:text-gray-300">
                     <div className="flex items-center gap-2 break-words">
                       <User className="h-4 w-4 flex-shrink-0" />
                       <span><strong>Criada por:</strong> {tarefa.criadoPor}</span>
@@ -386,45 +386,45 @@ const Tarefas = () => {
                   </div>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 text-sm">
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
                       <Calendar className="h-4 w-4 flex-shrink-0" />
                       <span><strong>Prazo:</strong> {format(tarefa.prazo, 'dd/MM/yyyy', { locale: ptBR })}</span>
                     </div>
                     
                     {tarefa.situacao === 'concluida' ? (
                       <>
-                        <div className="text-green-600">
+                        <div className="text-green-600 dark:text-green-400">
                           <strong>Início:</strong> {tarefa.dataInicio && format(tarefa.dataInicio, 'dd/MM/yyyy', { locale: ptBR })}
                         </div>
-                        <div className="text-green-600">
+                        <div className="text-green-600 dark:text-green-400">
                           <strong>Conclusão:</strong> {tarefa.dataConclusao && format(tarefa.dataConclusao, 'dd/MM/yyyy', { locale: ptBR })}
                         </div>
-                        <div className="text-green-600">
+                        <div className="text-green-600 dark:text-green-400">
                           <strong>Duração:</strong> {calcularDuracaoTarefa(tarefa.dataInicio, tarefa.dataConclusao)} dias
                         </div>
                       </>
                     ) : (
                       <>
                         {tarefa.dataInicio && (
-                          <div className="text-gray-600">
+                          <div className="text-gray-600 dark:text-gray-300">
                             <strong>Início:</strong> {format(tarefa.dataInicio, 'dd/MM/yyyy', { locale: ptBR })}
                           </div>
                         )}
                         
                         {tarefa.dataInicio && (
-                          <div className="text-gray-600">
+                          <div className="text-gray-600 dark:text-gray-300">
                             <strong>Dias em aberto:</strong> {calcularDiasEmAberto(tarefa.dataInicio, tarefa.situacao)}
                           </div>
                         )}
                         
                         {calcularDiasEmAtraso(tarefa.prazo, tarefa.situacao) > 0 && (
-                          <div className="text-red-600">
+                          <div className="text-red-600 dark:text-red-400">
                             <strong>Dias em atraso:</strong> {calcularDiasEmAtraso(tarefa.prazo, tarefa.situacao)}
                           </div>
                         )}
                         
                         {calcularDiasParaPrazo(tarefa.prazo, tarefa.situacao) > 0 && (
-                          <div className="text-orange-600">
+                          <div className="text-orange-600 dark:text-orange-400">
                             <strong>Dias para prazo:</strong> {calcularDiasParaPrazo(tarefa.prazo, tarefa.situacao)}
                           </div>
                         )}
@@ -455,7 +455,7 @@ const Tarefas = () => {
       {filtrarTarefas().length === 0 && (
         <Card>
           <CardContent className="p-8 text-center">
-            <div className="text-gray-500">
+            <div className="text-gray-500 dark:text-gray-400">
               <Clock className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p className="text-lg font-medium">Nenhuma tarefa encontrada</p>
               <p className="text-sm mt-1">Tente ajustar os filtros ou criar uma nova tarefa</p>
