@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface Contact {
   id: number;
@@ -122,6 +124,47 @@ const GestaoContatos = () => {
   const availableTags = ['Cliente', 'Lead', 'VIP', 'Interessado', 'Prospect'];
   const availableChannels = ['WhatsApp', 'Telegram'];
 
+  const toggleTag = (tag: string, isNewContact: boolean = true) => {
+    if (isNewContact) {
+      const tags = newContact.tags.includes(tag)
+        ? newContact.tags.filter(t => t !== tag)
+        : [...newContact.tags, tag];
+      setNewContact({ ...newContact, tags });
+    } else if (selectedContact) {
+      const tags = selectedContact.tags.includes(tag)
+        ? selectedContact.tags.filter(t => t !== tag)
+        : [...selectedContact.tags, tag];
+      setSelectedContact({ ...selectedContact, tags });
+    }
+  };
+
+  const TagSelector = ({ selectedTags, onToggleTag }: { selectedTags: string[], onToggleTag: (tag: string) => void }) => (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline" className="w-full justify-between border-gray-300">
+          {selectedTags.length > 0 ? `${selectedTags.length} tags selecionadas` : "Selecionar tags"}
+          <ChevronDown className="h-4 w-4" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-full p-0 bg-white border border-gray-300 shadow-lg">
+        <div className="p-2 space-y-2">
+          {availableTags.map((tag) => (
+            <div key={tag} className="flex items-center space-x-2">
+              <Checkbox
+                id={tag}
+                checked={selectedTags.includes(tag)}
+                onCheckedChange={() => onToggleTag(tag)}
+              />
+              <label htmlFor={tag} className="text-sm font-medium cursor-pointer">
+                {tag}
+              </label>
+            </div>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+
   return (
     <TooltipProvider>
       <div className="p-3 sm:p-6 bg-white min-h-screen">
@@ -225,19 +268,20 @@ const GestaoContatos = () => {
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium">Tags</label>
-                    <Select>
-                      <SelectTrigger className="border-gray-300">
-                        <SelectValue placeholder="Selecionar tags" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white">
-                        {availableTags.map((tag) => (
-                          <SelectItem key={tag} value={tag}>
+                    <label className="text-sm font-medium mb-2 block">Tags</label>
+                    <TagSelector 
+                      selectedTags={newContact.tags} 
+                      onToggleTag={(tag) => toggleTag(tag, true)} 
+                    />
+                    {newContact.tags.length > 0 && (
+                      <div className="flex gap-1 flex-wrap mt-2">
+                        {newContact.tags.map((tag, index) => (
+                          <span key={index} className="px-2 py-1 bg-gray-100 text-xs rounded-full border border-gray-200">
                             {tag}
-                          </SelectItem>
+                          </span>
                         ))}
-                      </SelectContent>
-                    </Select>
+                      </div>
+                    )}
                   </div>
                   <div className="flex flex-col sm:flex-row justify-between gap-3 pt-4">
                     <Button
@@ -444,19 +488,20 @@ const GestaoContatos = () => {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">Tags</label>
-                  <Select>
-                    <SelectTrigger className="border-gray-300">
-                      <SelectValue placeholder="Selecionar tags" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      {availableTags.map((tag) => (
-                        <SelectItem key={tag} value={tag}>
+                  <label className="text-sm font-medium mb-2 block">Tags</label>
+                  <TagSelector 
+                    selectedTags={selectedContact.tags} 
+                    onToggleTag={(tag) => toggleTag(tag, false)} 
+                  />
+                  {selectedContact.tags.length > 0 && (
+                    <div className="flex gap-1 flex-wrap mt-2">
+                      {selectedContact.tags.map((tag, index) => (
+                        <span key={index} className="px-2 py-1 bg-gray-100 text-xs rounded-full border border-gray-200">
                           {tag}
-                        </SelectItem>
+                        </span>
                       ))}
-                    </SelectContent>
-                  </Select>
+                    </div>
+                  )}
                 </div>
                 <div className="flex flex-col sm:flex-row justify-between gap-3 pt-4">
                   <Button

@@ -1,11 +1,13 @@
 
 import React, { useState, useMemo } from 'react';
-import { Search, Plus, UserPen, Save, X, Upload, SquarePen } from 'lucide-react';
+import { Search, Plus, UserPen, Save, X, Upload, SquarePen, ChevronDown, Key } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface User {
   id: number;
@@ -21,7 +23,10 @@ const GestaoUsuarios = () => {
   const [setorFilter, setSetorFilter] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [newUser, setNewUser] = useState({
     name: '',
     setores: [] as string[],
@@ -58,7 +63,6 @@ const GestaoUsuarios = () => {
     }
   ]);
 
-  // Filtrar usuários baseado na pesquisa e filtro de setor
   const filteredUsers = useMemo(() => {
     return users.filter(user => {
       const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -108,6 +112,28 @@ const GestaoUsuarios = () => {
     setIsEditDialogOpen(false);
   };
 
+  const handleChangePassword = (user: User) => {
+    setSelectedUser(user);
+    setIsPasswordDialogOpen(true);
+  };
+
+  const handleSavePassword = () => {
+    if (newPassword === confirmPassword) {
+      console.log('Alterando senha do usuário:', selectedUser?.name);
+      setIsPasswordDialogOpen(false);
+      setSelectedUser(null);
+      setNewPassword('');
+      setConfirmPassword('');
+    }
+  };
+
+  const handleDiscardPassword = () => {
+    setSelectedUser(null);
+    setIsPasswordDialogOpen(false);
+    setNewPassword('');
+    setConfirmPassword('');
+  };
+
   const availableSetores = ['Vendas', 'Suporte', 'Marketing', 'Financeiro', 'RH'];
   const availableCargos = ['Atendente', 'Supervisor', 'Gestor'];
   const availableCanais = ['WhatsApp', 'Telegram', 'Email', 'Chat'];
@@ -119,6 +145,43 @@ const GestaoUsuarios = () => {
       setter([...array, item]);
     }
   };
+
+  const MultiSelectDropdown = ({ 
+    options, 
+    selectedItems, 
+    onToggle, 
+    placeholder 
+  }: { 
+    options: string[], 
+    selectedItems: string[], 
+    onToggle: (item: string) => void, 
+    placeholder: string 
+  }) => (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline" className="w-full justify-between border-gray-300">
+          {selectedItems.length > 0 ? `${selectedItems.length} selecionados` : placeholder}
+          <ChevronDown className="h-4 w-4" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-full p-0 bg-white border border-gray-300 shadow-lg">
+        <div className="p-2 space-y-2">
+          {options.map((option) => (
+            <div key={option} className="flex items-center space-x-2">
+              <Checkbox
+                id={option}
+                checked={selectedItems.includes(option)}
+                onCheckedChange={() => onToggle(option)}
+              />
+              <label htmlFor={option} className="text-sm font-medium cursor-pointer">
+                {option}
+              </label>
+            </div>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
 
   return (
     <TooltipProvider>
@@ -140,7 +203,6 @@ const GestaoUsuarios = () => {
             />
           </div>
 
-          {/* Filtros e botão adicionar */}
           <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center mb-6">
             <div className="min-w-48">
               <Select value={setorFilter} onValueChange={setSetorFilter}>
@@ -170,7 +232,6 @@ const GestaoUsuarios = () => {
                   <DialogTitle>Adicionar Usuário</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
-                  {/* Foto do perfil */}
                   <div>
                     <label className="text-sm font-medium">Foto do Perfil</label>
                     <div className="flex items-center gap-4 mt-2">
@@ -199,54 +260,60 @@ const GestaoUsuarios = () => {
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium">Setores</label>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {availableSetores.map((setor) => (
-                        <Button
-                          key={setor}
-                          variant={newUser.setores.includes(setor) ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => toggleSelection(newUser.setores, setor, (setores) => setNewUser({...newUser, setores}))}
-                          className={newUser.setores.includes(setor) ? "bg-black text-white" : "border-gray-300"}
-                        >
-                          {setor}
-                        </Button>
-                      ))}
-                    </div>
+                    <label className="text-sm font-medium mb-2 block">Setores</label>
+                    <MultiSelectDropdown
+                      options={availableSetores}
+                      selectedItems={newUser.setores}
+                      onToggle={(setor) => toggleSelection(newUser.setores, setor, (setores) => setNewUser({...newUser, setores}))}
+                      placeholder="Selecionar setores"
+                    />
+                    {newUser.setores.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {newUser.setores.map((setor) => (
+                          <span key={setor} className="px-2 py-1 bg-blue-100 text-xs rounded-full border border-blue-200">
+                            {setor}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium">Cargos</label>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {availableCargos.map((cargo) => (
-                        <Button
-                          key={cargo}
-                          variant={newUser.cargos.includes(cargo) ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => toggleSelection(newUser.cargos, cargo, (cargos) => setNewUser({...newUser, cargos}))}
-                          className={newUser.cargos.includes(cargo) ? "bg-black text-white" : "border-gray-300"}
-                        >
-                          {cargo}
-                        </Button>
-                      ))}
-                    </div>
+                    <label className="text-sm font-medium mb-2 block">Cargos</label>
+                    <MultiSelectDropdown
+                      options={availableCargos}
+                      selectedItems={newUser.cargos}
+                      onToggle={(cargo) => toggleSelection(newUser.cargos, cargo, (cargos) => setNewUser({...newUser, cargos}))}
+                      placeholder="Selecionar cargos"
+                    />
+                    {newUser.cargos.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {newUser.cargos.map((cargo) => (
+                          <span key={cargo} className="px-2 py-1 bg-green-100 text-xs rounded-full border border-green-200">
+                            {cargo}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium">Canais</label>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {availableCanais.map((canal) => (
-                        <Button
-                          key={canal}
-                          variant={newUser.canais.includes(canal) ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => toggleSelection(newUser.canais, canal, (canais) => setNewUser({...newUser, canais}))}
-                          className={newUser.canais.includes(canal) ? "bg-black text-white" : "border-gray-300"}
-                        >
-                          {canal}
-                        </Button>
-                      ))}
-                    </div>
+                    <label className="text-sm font-medium mb-2 block">Canais</label>
+                    <MultiSelectDropdown
+                      options={availableCanais}
+                      selectedItems={newUser.canais}
+                      onToggle={(canal) => toggleSelection(newUser.canais, canal, (canais) => setNewUser({...newUser, canais}))}
+                      placeholder="Selecionar canais"
+                    />
+                    {newUser.canais.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {newUser.canais.map((canal) => (
+                          <span key={canal} className="px-2 py-1 bg-gray-100 text-xs rounded-full border border-gray-200">
+                            {canal}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex flex-col sm:flex-row justify-between gap-3 pt-4">
@@ -274,7 +341,6 @@ const GestaoUsuarios = () => {
 
         {/* Tabela responsiva */}
         <div className="overflow-x-auto">
-          {/* Cabeçalho da tabela - escondido em mobile */}
           <div className="hidden md:grid grid-cols-12 gap-4 p-4 bg-gray-50 border-b border-gray-200 font-medium text-gray-700 min-w-[800px]">
             <div className="col-span-1"></div>
             <div className="col-span-3">Nome</div>
@@ -284,11 +350,9 @@ const GestaoUsuarios = () => {
             <div className="col-span-2 text-center">Ações</div>
           </div>
 
-          {/* Lista de usuários */}
           <div className="space-y-4 md:space-y-0">
             {filteredUsers.map((user, index) => (
               <div key={user.id}>
-                {/* Layout mobile */}
                 <div className="md:hidden p-4 bg-white border border-gray-200 rounded-lg space-y-3">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
@@ -358,10 +422,18 @@ const GestaoUsuarios = () => {
                       </TooltipTrigger>
                       <TooltipContent><p>Editar Permissões</p></TooltipContent>
                     </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => handleChangePassword(user)}>
+                          <Key className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent><p>Alterar Senha</p></TooltipContent>
+                    </Tooltip>
                   </div>
                 </div>
 
-                {/* Layout desktop */}
                 <div className="hidden md:grid grid-cols-12 gap-4 items-center p-4 hover:bg-gray-50 transition-colors min-w-[800px]">
                   <div className="col-span-1">
                     <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden">
@@ -427,10 +499,18 @@ const GestaoUsuarios = () => {
                       </TooltipTrigger>
                       <TooltipContent><p>Editar Permissões</p></TooltipContent>
                     </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => handleChangePassword(user)}>
+                          <Key className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent><p>Alterar Senha</p></TooltipContent>
+                    </Tooltip>
                   </div>
                 </div>
 
-                {/* Linha divisória */}
                 {index < filteredUsers.length - 1 && (
                   <div className="hidden md:block border-b border-gray-200"></div>
                 )}
@@ -447,7 +527,6 @@ const GestaoUsuarios = () => {
             </DialogHeader>
             {selectedUser && (
               <div className="space-y-4">
-                {/* Foto do perfil */}
                 <div>
                   <label className="text-sm font-medium">Foto do Perfil</label>
                   <div className="flex items-center gap-4 mt-2">
@@ -476,54 +555,60 @@ const GestaoUsuarios = () => {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium">Setores</label>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {availableSetores.map((setor) => (
-                      <Button
-                        key={setor}
-                        variant={selectedUser.setores.includes(setor) ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => toggleSelection(selectedUser.setores, setor, (setores) => setSelectedUser({...selectedUser, setores}))}
-                        className={selectedUser.setores.includes(setor) ? "bg-black text-white" : "border-gray-300"}
-                      >
-                        {setor}
-                      </Button>
-                    ))}
-                  </div>
+                  <label className="text-sm font-medium mb-2 block">Setores</label>
+                  <MultiSelectDropdown
+                    options={availableSetores}
+                    selectedItems={selectedUser.setores}
+                    onToggle={(setor) => toggleSelection(selectedUser.setores, setor, (setores) => setSelectedUser({...selectedUser, setores}))}
+                    placeholder="Selecionar setores"
+                  />
+                  {selectedUser.setores.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {selectedUser.setores.map((setor) => (
+                        <span key={setor} className="px-2 py-1 bg-blue-100 text-xs rounded-full border border-blue-200">
+                          {setor}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium">Cargos</label>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {availableCargos.map((cargo) => (
-                      <Button
-                        key={cargo}
-                        variant={selectedUser.cargos.includes(cargo) ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => toggleSelection(selectedUser.cargos, cargo, (cargos) => setSelectedUser({...selectedUser, cargos}))}
-                        className={selectedUser.cargos.includes(cargo) ? "bg-black text-white" : "border-gray-300"}
-                      >
-                        {cargo}
-                      </Button>
-                    ))}
-                  </div>
+                  <label className="text-sm font-medium mb-2 block">Cargos</label>
+                  <MultiSelectDropdown
+                    options={availableCargos}
+                    selectedItems={selectedUser.cargos}
+                    onToggle={(cargo) => toggleSelection(selectedUser.cargos, cargo, (cargos) => setSelectedUser({...selectedUser, cargos}))}
+                    placeholder="Selecionar cargos"
+                  />
+                  {selectedUser.cargos.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {selectedUser.cargos.map((cargo) => (
+                        <span key={cargo} className="px-2 py-1 bg-green-100 text-xs rounded-full border border-green-200">
+                          {cargo}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium">Canais</label>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {availableCanais.map((canal) => (
-                      <Button
-                        key={canal}
-                        variant={selectedUser.canais.includes(canal) ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => toggleSelection(selectedUser.canais, canal, (canais) => setSelectedUser({...selectedUser, canais}))}
-                        className={selectedUser.canais.includes(canal) ? "bg-black text-white" : "border-gray-300"}
-                      >
-                        {canal}
-                      </Button>
-                    ))}
-                  </div>
+                  <label className="text-sm font-medium mb-2 block">Canais</label>
+                  <MultiSelectDropdown
+                    options={availableCanais}
+                    selectedItems={selectedUser.canais}
+                    onToggle={(canal) => toggleSelection(selectedUser.canais, canal, (canais) => setSelectedUser({...selectedUser, canais}))}
+                    placeholder="Selecionar canais"
+                  />
+                  {selectedUser.canais.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {selectedUser.canais.map((canal) => (
+                        <span key={canal} className="px-2 py-1 bg-gray-100 text-xs rounded-full border border-gray-200">
+                          {canal}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex flex-col sm:flex-row justify-between gap-3 pt-4">
@@ -545,6 +630,55 @@ const GestaoUsuarios = () => {
                 </div>
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Dialog de Alterar Senha */}
+        <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
+          <DialogContent className="sm:max-w-md bg-white">
+            <DialogHeader>
+              <DialogTitle>Alterar Senha - {selectedUser?.name}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">Nova Senha</label>
+                <Input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Digite a nova senha"
+                  className="border-gray-300"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Confirmar Nova Senha</label>
+                <Input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirme a nova senha"
+                  className="border-gray-300"
+                />
+              </div>
+              <div className="flex flex-col sm:flex-row justify-between gap-3 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={handleDiscardPassword}
+                  className="border-gray-300"
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={handleSavePassword}
+                  disabled={!newPassword || newPassword !== confirmPassword}
+                  className="bg-black text-white hover:bg-gray-800 disabled:opacity-50"
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  Alterar Senha
+                </Button>
+              </div>
+            </div>
           </DialogContent>
         </Dialog>
       </div>

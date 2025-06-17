@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Calendar, Plus, Search, Filter, Clock, Users, MessageSquare, Mic, Paperclip, X, Save, CalendarDays, Play, Pause } from 'lucide-react';
+import { Calendar, Plus, Search, Filter, Clock, Users, MessageSquare, Mic, Paperclip, X, Save, CalendarDays, Play, Pause, Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -8,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Agendamento {
   id: number;
@@ -30,10 +30,12 @@ interface Agendamento {
 
 const Agendamentos = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchContacts, setSearchContacts] = useState('');
   const [filtroData, setFiltroData] = useState('');
   const [filtroStatus, setFiltroStatus] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'calendario' | 'lista'>('calendario');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   
   const [novoAgendamento, setNovoAgendamento] = useState({
     contatos: [] as string[],
@@ -55,7 +57,7 @@ const Agendamentos = () => {
 
   const [isRecording, setIsRecording] = useState(false);
 
-  // Mock data
+  // Mock data expandida
   const [agendamentos] = useState<Agendamento[]>([
     {
       id: 1,
@@ -85,14 +87,59 @@ const Agendamentos = () => {
       statusTicket: 'em-atendimento',
       setor: 'Vendas',
       assinatura: false,
-      status: 'enviado'
+      status: 'pendente'
+    },
+    {
+      id: 3,
+      contatos: ['Ana Oliveira', 'Carlos Ferreira'],
+      tipo: 'texto',
+      mensagem: 'Promoção especial para clientes VIP',
+      dataEnvio: '2024-01-17',
+      horaEnvio: '10:00',
+      canal: 'Instagram',
+      statusTicket: 'finalizado',
+      setor: 'Marketing',
+      assinatura: true,
+      status: 'pendente'
+    },
+    {
+      id: 4,
+      contatos: ['Roberto Lima'],
+      tipo: 'texto',
+      mensagem: 'Confirmação de reunião',
+      dataEnvio: '2024-01-18',
+      horaEnvio: '16:00',
+      canal: 'Email',
+      statusTicket: 'aguardando',
+      setor: 'Comercial',
+      assinatura: false,
+      status: 'pendente'
+    },
+    {
+      id: 5,
+      contatos: ['Fernanda Silva', 'José Santos', 'Marina Costa'],
+      tipo: 'audio',
+      mensagem: '',
+      audioUrl: '/audio2.mp3',
+      dataEnvio: '2024-01-19',
+      horaEnvio: '11:30',
+      canal: 'Telegram',
+      recorrencia: {
+        tipo: 'semanal'
+      },
+      statusTicket: 'em-atendimento',
+      setor: 'Suporte',
+      assinatura: true,
+      status: 'pendente'
     }
   ]);
 
-  const contatos = ['João Silva', 'Maria Costa', 'Pedro Santos', 'Ana Oliveira'];
+  const contatos = ['João Silva', 'Maria Costa', 'Pedro Santos', 'Ana Oliveira', 'Carlos Ferreira', 'Roberto Lima', 'Fernanda Silva', 'José Santos', 'Marina Costa'];
   const tags = ['Cliente', 'Lead', 'VIP', 'Interessado'];
-  const canais = ['WhatsApp', 'Instagram', 'Facebook', 'Telegram'];
-  const setores = ['Atendimento', 'Vendas', 'Suporte', 'Marketing'];
+  const canais = ['WhatsApp', 'Instagram', 'Facebook', 'Telegram', 'Email'];
+  const setores = ['Atendimento', 'Vendas', 'Suporte', 'Marketing', 'Comercial'];
+
+  // ... keep existing code (tiposRecorrencia array)
   const tiposRecorrencia = [
     { value: 'diaria', label: 'Diária (todo dia)' },
     { value: 'semanal', label: 'Semanal' },
@@ -102,6 +149,10 @@ const Agendamentos = () => {
     { value: 'anual', label: 'Anual (1 vez por ano)' },
     { value: 'personalizado', label: 'Personalizado' }
   ];
+
+  const filteredContacts = contatos.filter(contato => 
+    contato.toLowerCase().includes(searchContacts.toLowerCase())
+  );
 
   const handleSaveAgendamento = () => {
     console.log('Salvando agendamento:', novoAgendamento);
@@ -123,6 +174,8 @@ const Agendamentos = () => {
       assinatura: true,
       midias: []
     });
+    setSearchContacts('');
+    setSelectedTags([]);
   };
 
   const handleDiscardAgendamento = () => {
@@ -144,6 +197,8 @@ const Agendamentos = () => {
       midias: []
     });
     setIsAddDialogOpen(false);
+    setSearchContacts('');
+    setSelectedTags([]);
   };
 
   const toggleContato = (contato: string) => {
@@ -154,10 +209,10 @@ const Agendamentos = () => {
   };
 
   const toggleTag = (tag: string) => {
-    const tags = novoAgendamento.tags.includes(tag)
-      ? novoAgendamento.tags.filter(t => t !== tag)
-      : [...novoAgendamento.tags, tag];
-    setNovoAgendamento({ ...novoAgendamento, tags });
+    const tags = selectedTags.includes(tag)
+      ? selectedTags.filter(t => t !== tag)
+      : [...selectedTags, tag];
+    setSelectedTags(tags);
   };
 
   const getStatusColor = (status: string) => {
@@ -167,6 +222,10 @@ const Agendamentos = () => {
       case 'erro': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  const handleDeleteAgendamento = (id: number) => {
+    console.log('Excluindo agendamento:', id);
   };
 
   return (
@@ -217,22 +276,22 @@ const Agendamentos = () => {
                 </SelectContent>
               </Select>
 
-              {/* Toggle de visualização */}
+              {/* Toggle de visualização com cores corretas */}
               <div className="flex bg-gray-100 rounded-lg p-1">
                 <Button
-                  variant={viewMode === 'calendario' ? 'default' : 'ghost'}
+                  variant="ghost"
                   size="sm"
                   onClick={() => setViewMode('calendario')}
-                  className={viewMode === 'calendario' ? 'bg-white shadow-sm' : ''}
+                  className={`${viewMode === 'calendario' ? 'bg-black text-white hover:bg-gray-800' : 'text-gray-600 hover:bg-gray-200'}`}
                 >
                   <Calendar className="h-4 w-4 mr-2" />
                   Calendário
                 </Button>
                 <Button
-                  variant={viewMode === 'lista' ? 'default' : 'ghost'}
+                  variant="ghost"
                   size="sm"
                   onClick={() => setViewMode('lista')}
-                  className={viewMode === 'lista' ? 'bg-white shadow-sm' : ''}
+                  className={`${viewMode === 'lista' ? 'bg-black text-white hover:bg-gray-800' : 'text-gray-600 hover:bg-gray-200'}`}
                 >
                   <Filter className="h-4 w-4 mr-2" />
                   Lista
@@ -251,39 +310,63 @@ const Agendamentos = () => {
                     <DialogTitle>Novo Agendamento</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-6">
-                    {/* Seleção de contatos */}
+                    {/* Seleção de contatos com barra de pesquisa */}
                     <div>
                       <label className="text-sm font-medium mb-2 block">Contatos</label>
                       <div className="space-y-3">
-                        <div className="flex flex-wrap gap-2">
-                          {contatos.map((contato) => (
-                            <Button
-                              key={contato}
-                              variant={novoAgendamento.contatos.includes(contato) ? "default" : "outline"}
-                              size="sm"
-                              onClick={() => toggleContato(contato)}
-                              className={novoAgendamento.contatos.includes(contato) ? "bg-black text-white" : "border-gray-300"}
-                            >
-                              {contato}
-                            </Button>
-                          ))}
-                        </div>
-                        <div>
-                          <label className="text-xs text-gray-500 mb-1 block">Ou filtrar por TAG</label>
+                        <div className="flex gap-3">
+                          <div className="flex-1">
+                            <div className="relative">
+                              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                              <Input
+                                placeholder="Pesquisar contatos"
+                                value={searchContacts}
+                                onChange={(e) => setSearchContacts(e.target.value)}
+                                className="pl-10 border-gray-300"
+                              />
+                            </div>
+                          </div>
                           <div className="flex flex-wrap gap-2">
                             {tags.map((tag) => (
                               <Button
                                 key={tag}
-                                variant={novoAgendamento.tags.includes(tag) ? "default" : "outline"}
+                                variant={selectedTags.includes(tag) ? "default" : "outline"}
                                 size="sm"
                                 onClick={() => toggleTag(tag)}
-                                className={novoAgendamento.tags.includes(tag) ? "bg-blue-600 text-white" : "border-gray-300"}
+                                className={selectedTags.includes(tag) ? "bg-blue-600 text-white" : "border-gray-300"}
                               >
                                 {tag}
                               </Button>
                             ))}
                           </div>
                         </div>
+                        
+                        <div className="max-h-32 overflow-y-auto border border-gray-300 rounded-lg p-3">
+                          <div className="grid grid-cols-2 gap-2">
+                            {filteredContacts.map((contato) => (
+                              <div key={contato} className="flex items-center space-x-2">
+                                <Checkbox
+                                  checked={novoAgendamento.contatos.includes(contato)}
+                                  onCheckedChange={() => toggleContato(contato)}
+                                />
+                                <span className="text-sm">{contato}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {novoAgendamento.contatos.length > 0 && (
+                          <div>
+                            <span className="text-sm font-medium text-gray-700">Agendamento para:</span>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                              {novoAgendamento.contatos.map((contato, index) => (
+                                <span key={index} className="px-2 py-1 bg-gray-100 text-xs rounded-full border border-gray-200">
+                                  {contato}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -571,6 +654,15 @@ const Agendamentos = () => {
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent><p>Enviar agora</p></TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="outline" size="sm" onClick={() => handleDeleteAgendamento(agendamento.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent><p>Excluir agendamento</p></TooltipContent>
                     </Tooltip>
                   </div>
                 </div>
