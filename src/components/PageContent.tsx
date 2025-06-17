@@ -3,6 +3,7 @@ import React from 'react';
 import AtendimentosOmnichannel from './AtendimentosOmnichannel';
 import GestaoContatos from './GestaoContatos';
 import GestaoUsuarios from './GestaoUsuarios';
+import Agendamentos from './Agendamentos';
 
 interface PageContentProps {
   page: string;
@@ -20,6 +21,9 @@ const PageContent = ({ page }: PageContentProps) => {
       case 'gestao-usuarios':
         return <GestaoUsuarios />;
       
+      case 'agendamentos':
+        return <Agendamentos />;
+      
       case 'chat-interno':
         return (
           <div className="p-6">
@@ -33,14 +37,6 @@ const PageContent = ({ page }: PageContentProps) => {
           <div className="p-6">
             <h1 className="text-2xl font-bold mb-4">Painel de Atendimentos</h1>
             <p className="text-gray-600">Painel para monitoramento de atendimentos.</p>
-          </div>
-        );
-
-      case 'agendamentos':
-        return (
-          <div className="p-6">
-            <h1 className="text-2xl font-bold mb-4">Agendamentos</h1>
-            <p className="text-gray-600">Sistema de agendamento de consultas e reuniões.</p>
           </div>
         );
 
