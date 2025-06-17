@@ -592,7 +592,7 @@ const AtendimentosOmnichannel = () => {
         </ScrollArea>
       </div>
 
-      {/* Botão Flutuante - Posicionado mais alto */}
+      {/* Botão Flutuante */}
       <Dialog open={isContactDialogOpen} onOpenChange={setIsContactDialogOpen}>
         <DialogTrigger asChild>
           <Button
@@ -819,124 +819,129 @@ const AtendimentosOmnichannel = () => {
             </div>
           </div>
 
-          {/* Área de Mensagens - Ajustada para deixar menos espaço para a barra de digitação */}
-          <div className="flex-1 bg-gray-50 dark:bg-gray-800 overflow-hidden" style={{ height: 'calc(100vh - 220px)' }}>
-            <ScrollArea className="h-full p-4">
-              <div className="space-y-4 pb-2">
-                {mensagens.map((mensagem) => (
-                  <div
-                    key={mensagem.id}
-                    className={`flex ${mensagem.remetente === 'atendente' ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div
-                      className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                        mensagem.remetente === 'atendente'
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                      }`}
-                    >
-                      <p className="text-sm">{mensagem.conteudo}</p>
-                      <div className={`flex items-center justify-between mt-1 ${
-                        mensagem.remetente === 'atendente' ? 'text-blue-100' : 'text-gray-500'
-                      }`}>
-                        <span className="text-xs">{mensagem.timestamp}</span>
-                        {mensagem.remetente === 'atendente' && (
-                          <div className="ml-2">
-                            {mensagem.status === 'lida' && <CheckCircle className="h-3 w-3" />}
-                            {mensagem.status === 'entregue' && <CheckCircle className="h-3 w-3 opacity-60" />}
-                            {mensagem.status === 'enviada' && <Clock className="h-3 w-3 opacity-60" />}
+          {/* Container para Mensagens e Barra de Digitação */}
+          <div className="flex-1 flex flex-col min-h-0">
+            {/* Área de Mensagens com ScrollArea */}
+            <div className="flex-1 bg-gray-50 dark:bg-gray-800 overflow-hidden">
+              <ScrollArea className="h-full">
+                <div className="p-4">
+                  <div className="space-y-4">
+                    {mensagens.map((mensagem) => (
+                      <div
+                        key={mensagem.id}
+                        className={`flex ${mensagem.remetente === 'atendente' ? 'justify-end' : 'justify-start'}`}
+                      >
+                        <div
+                          className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                            mensagem.remetente === 'atendente'
+                              ? 'bg-blue-500 text-white'
+                              : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                          }`}
+                        >
+                          <p className="text-sm">{mensagem.conteudo}</p>
+                          <div className={`flex items-center justify-between mt-1 ${
+                            mensagem.remetente === 'atendente' ? 'text-blue-100' : 'text-gray-500'
+                          }`}>
+                            <span className="text-xs">{mensagem.timestamp}</span>
+                            {mensagem.remetente === 'atendente' && (
+                              <div className="ml-2">
+                                {mensagem.status === 'lida' && <CheckCircle className="h-3 w-3" />}
+                                {mensagem.status === 'entregue' && <CheckCircle className="h-3 w-3 opacity-60" />}
+                                {mensagem.status === 'enviada' && <Clock className="h-3 w-3 opacity-60" />}
+                              </div>
+                            )}
                           </div>
-                        )}
+                        </div>
                       </div>
+                    ))}
+                  </div>
+                </div>
+              </ScrollArea>
+            </div>
+
+            {/* Barra de Digitação - ÁREA VERDE */}
+            <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
+              <div className="flex items-center gap-2 max-w-full">
+                {/* Menu suspenso com opções */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="flex-shrink-0">
+                      <EllipsisVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-auto p-1 bg-transparent border-none shadow-none">
+                    <div className="flex flex-col gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setIsSignatureActive(!isSignatureActive)}
+                        className={`w-8 h-8 rounded-full shadow-lg flex-shrink-0 ${
+                          isSignatureActive ? 'bg-red-100 hover:bg-red-200' : 'bg-green-100 hover:bg-green-200'
+                        }`}
+                      >
+                        {isSignatureActive ? (
+                          <PenOff className="h-4 w-4 text-red-600" />
+                        ) : (
+                          <PenLine className="h-4 w-4 text-green-600" />
+                        )}
+                      </Button>
+                      
+                      <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg flex-shrink-0">
+                        <Zap className="h-4 w-4" />
+                      </Button>
+                      
+                      <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg flex-shrink-0">
+                        <NotebookPen className="h-4 w-4" />
+                      </Button>
+                      
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg flex-shrink-0"
+                        onClick={() => setIsContactListOpen(true)}
+                      >
+                        <IdCard className="h-4 w-4" />
+                      </Button>
+                      
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg flex-shrink-0"
+                        onClick={() => setIsChatbotListOpen(true)}
+                      >
+                        <BotMessageSquare className="h-4 w-4" />
+                      </Button>
                     </div>
-                  </div>
-                ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                <Button variant="ghost" size="icon" className="flex-shrink-0">
+                  <SmilePlus className="h-4 w-4" />
+                </Button>
+
+                <Button variant="ghost" size="icon" className="flex-shrink-0">
+                  <Paperclip className="h-4 w-4" />
+                </Button>
+                
+                <div className="flex-1 min-w-0">
+                  <Input
+                    placeholder="Digite sua mensagem..."
+                    value={novaMensagem}
+                    onChange={(e) => setNovaMensagem(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && enviarMensagem()}
+                    className="w-full"
+                  />
+                </div>
+                
+                <Button 
+                  onClick={enviarMensagem} 
+                  disabled={!novaMensagem.trim()} 
+                  className="flex-shrink-0"
+                  size="default"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
               </div>
-            </ScrollArea>
-          </div>
-
-          {/* Barra de Digitação - Movida mais para cima, logo abaixo das mensagens */}
-          <div className="p-2 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
-            <div className="flex items-center gap-2 max-w-full">
-              {/* Menu suspenso com opções */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="flex-shrink-0 h-8 w-8">
-                    <EllipsisVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-auto p-1 bg-transparent border-none shadow-none">
-                  <div className="flex flex-col gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setIsSignatureActive(!isSignatureActive)}
-                      className={`w-8 h-8 rounded-full shadow-lg flex-shrink-0 ${
-                        isSignatureActive ? 'bg-red-100 hover:bg-red-200' : 'bg-green-100 hover:bg-green-200'
-                      }`}
-                    >
-                      {isSignatureActive ? (
-                        <PenOff className="h-4 w-4 text-red-600" />
-                      ) : (
-                        <PenLine className="h-4 w-4 text-green-600" />
-                      )}
-                    </Button>
-                    
-                    <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg flex-shrink-0">
-                      <Zap className="h-4 w-4" />
-                    </Button>
-                    
-                    <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg flex-shrink-0">
-                      <NotebookPen className="h-4 w-4" />
-                    </Button>
-                    
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg flex-shrink-0"
-                      onClick={() => setIsContactListOpen(true)}
-                    >
-                      <IdCard className="h-4 w-4" />
-                    </Button>
-                    
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg flex-shrink-0"
-                      onClick={() => setIsChatbotListOpen(true)}
-                    >
-                      <BotMessageSquare className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <Button variant="ghost" size="icon" className="flex-shrink-0 h-8 w-8">
-                <SmilePlus className="h-4 w-4" />
-              </Button>
-
-              <Button variant="ghost" size="icon" className="flex-shrink-0 h-8 w-8">
-                <Paperclip className="h-4 w-4" />
-              </Button>
-              
-              <div className="flex-1 min-w-0">
-                <Input
-                  placeholder="Digite sua mensagem..."
-                  value={novaMensagem}
-                  onChange={(e) => setNovaMensagem(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && enviarMensagem()}
-                  className="w-full h-8"
-                />
-              </div>
-              
-              <Button 
-                onClick={enviarMensagem} 
-                disabled={!novaMensagem.trim()} 
-                className="flex-shrink-0 h-8"
-                size="sm"
-              >
-                <Send className="h-4 w-4" />
-              </Button>
             </div>
           </div>
         </>
