@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Search, Smile, Paperclip, UserPlus, ArrowLeft } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -103,27 +102,67 @@ const ChatInterno = () => {
       status: 'offline',
       lastMessage: 'Relatório está pronto',
       lastMessageTime: 'Ontem'
+    },
+    {
+      id: '9',
+      name: 'Gabriel Pereira',
+      department: 'TI',
+      status: 'online',
+      lastMessage: 'Sistema funcionando perfeitamente',
+      lastMessageTime: '16:20',
+      unreadCount: 1
+    },
+    {
+      id: '10',
+      name: 'Julia Mendes',
+      department: 'Design',
+      status: 'online',
+      lastMessage: 'Mockups prontos para revisão',
+      lastMessageTime: '15:45'
+    },
+    {
+      id: '11',
+      name: 'Rafael Torres',
+      department: 'Produto',
+      status: 'away',
+      lastMessage: 'Reunião de planejamento às 17h',
+      lastMessageTime: '14:50'
+    },
+    {
+      id: '12',
+      name: 'Camila Rocha',
+      department: 'Comunicação',
+      status: 'online',
+      lastMessage: 'Post aprovado para publicação',
+      lastMessageTime: '14:25',
+      unreadCount: 2
     }
   ];
 
   const availableUsers: Contact[] = [
     {
-      id: '9',
+      id: '13',
       name: 'Ricardo Mendes',
       department: 'TI',
       status: 'online'
     },
     {
-      id: '10',
+      id: '14',
       name: 'Juliana Rocha',
       department: 'Comercial',
       status: 'online'
     },
     {
-      id: '11',
+      id: '15',
       name: 'André Barbosa',
       department: 'Logística',
       status: 'away'
+    },
+    {
+      id: '16',
+      name: 'Beatriz Silva',
+      department: 'Jurídico',
+      status: 'online'
     }
   ];
 
@@ -360,7 +399,6 @@ const ChatInterno = () => {
   const handleStartNewChat = (userId: string) => {
     console.log('Iniciando novo chat com usuário:', userId);
     setShowNewChatDialog(false);
-    // Aqui você poderia adicionar lógica para criar uma nova conversa
   };
 
   const getStatusColor = (status: string) => {
@@ -527,6 +565,16 @@ const ChatInterno = () => {
               </Button>
               
               <div className="flex items-center space-x-3 flex-1">
+                {/* Botão fechar conversa - antes da foto */}
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={handleCloseChat}
+                  className="text-muted-foreground hover:text-card-foreground"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+                
                 <div className="relative">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={currentContact.avatar} />
@@ -540,15 +588,6 @@ const ChatInterno = () => {
                   <h3 className="font-medium text-card-foreground">{currentContact.name}</h3>
                   <p className="text-xs text-muted-foreground">{currentContact.department} • {getStatusText(currentContact.status)}</p>
                 </div>
-                {/* Botão fechar conversa - ao lado da foto */}
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={handleCloseChat}
-                  className="text-muted-foreground hover:text-card-foreground"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                </Button>
               </div>
             </div>
 

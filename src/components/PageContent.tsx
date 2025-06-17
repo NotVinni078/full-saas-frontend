@@ -7,6 +7,7 @@ import Agendamentos from './Agendamentos';
 import Tarefas from './Tarefas';
 import RespostasRapidas from './RespostasRapidas';
 import ChatInterno from './ChatInterno';
+import PainelAtendimentos from './PainelAtendimentos';
 
 interface PageContentProps {
   page: string;
@@ -37,12 +38,7 @@ const PageContent = ({ page }: PageContentProps) => {
         return <ChatInterno />;
 
       case 'painel-atendimentos':
-        return (
-          <div className="p-6">
-            <h1 className="text-2xl font-bold mb-4">Painel de Atendimentos</h1>
-            <p className="text-gray-600">Painel para monitoramento de atendimentos.</p>
-          </div>
-        );
+        return <PainelAtendimentos />;
 
       case 'campanhas':
         return (
