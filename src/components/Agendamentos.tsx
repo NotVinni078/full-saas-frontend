@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Calendar, Plus, Search, Filter, Clock, Users, MessageSquare, Mic, Paperclip, X, Save, CalendarDays, Play, Pause, Trash2 } from 'lucide-react';
+import { Calendar, Plus, Search, Filter, Clock, Users, MessageSquare, Mic, Paperclip, X, Save, CalendarDays, Play, Pause, Trash2, Edit } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -7,7 +8,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 
 interface Agendamento {
   id: number;
@@ -35,11 +35,10 @@ const Agendamentos = () => {
   const [filtroStatus, setFiltroStatus] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'calendario' | 'lista'>('calendario');
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [editingAgendamento, setEditingAgendamento] = useState<Agendamento | null>(null);
   
   const [novoAgendamento, setNovoAgendamento] = useState({
     contatos: [] as string[],
-    tags: [] as string[],
     tipo: 'texto' as 'texto' | 'audio',
     mensagem: '',
     audioUrl: '',
@@ -131,15 +130,32 @@ const Agendamentos = () => {
       setor: 'Suporte',
       assinatura: true,
       status: 'pendente'
+    },
+    {
+      id: 6,
+      contatos: ['Lucas Oliveira'],
+      tipo: 'texto',
+      mensagem: 'Lembrete de pagamento',
+      dataEnvio: '2024-01-20',
+      horaEnvio: '08:00',
+      canal: 'WhatsApp',
+      statusTicket: 'aguardando',
+      setor: 'Financeiro',
+      assinatura: true,
+      status: 'pendente'
     }
   ]);
 
-  const contatos = ['João Silva', 'Maria Costa', 'Pedro Santos', 'Ana Oliveira', 'Carlos Ferreira', 'Roberto Lima', 'Fernanda Silva', 'José Santos', 'Marina Costa'];
-  const tags = ['Cliente', 'Lead', 'VIP', 'Interessado'];
+  const contatos = ['João Silva', 'Maria Costa', 'Pedro Santos', 'Ana Oliveira', 'Carlos Ferreira', 'Roberto Lima', 'Fernanda Silva', 'José Santos', 'Marina Costa', 'Lucas Oliveira'];
+  const tags = [
+    { nome: 'Cliente', contatos: ['João Silva', 'Maria Costa', 'Pedro Santos'] },
+    { nome: 'Lead', contatos: ['Ana Oliveira', 'Carlos Ferreira'] },
+    { nome: 'VIP', contatos: ['Roberto Lima', 'Fernanda Silva'] },
+    { nome: 'Interessado', contatos: ['José Santos', 'Marina Costa', 'Lucas Oliveira'] }
+  ];
   const canais = ['WhatsApp', 'Instagram', 'Facebook', 'Telegram', 'Email'];
-  const setores = ['Atendimento', 'Vendas', 'Suporte', 'Marketing', 'Comercial'];
+  const setores = ['Atendimento', 'Vendas', 'Suporte', 'Marketing', 'Comercial', 'Financeiro'];
 
-  // ... keep existing code (tiposRecorrencia array)
   const tiposRecorrencia = [
     { value: 'diaria', label: 'Diária (todo dia)' },
     { value: 'semanal', label: 'Semanal' },
@@ -157,31 +173,19 @@ const Agendamentos = () => {
   const handleSaveAgendamento = () => {
     console.log('Salvando agendamento:', novoAgendamento);
     setIsAddDialogOpen(false);
-    setNovoAgendamento({
-      contatos: [],
-      tags: [],
-      tipo: 'texto',
-      mensagem: '',
-      audioUrl: '',
-      dataEnvio: '',
-      horaEnvio: '',
-      canal: '',
-      recorrencia: false,
-      tipoRecorrencia: '',
-      diasPersonalizado: 1,
-      statusTicket: 'aguardando',
-      setor: '',
-      assinatura: true,
-      midias: []
-    });
-    setSearchContacts('');
-    setSelectedTags([]);
+    setEditingAgendamento(null);
+    resetForm();
   };
 
   const handleDiscardAgendamento = () => {
+    setIsAddDialogOpen(false);
+    setEditingAgendamento(null);
+    resetForm();
+  };
+
+  const resetForm = () => {
     setNovoAgendamento({
       contatos: [],
-      tags: [],
       tipo: 'texto',
       mensagem: '',
       audioUrl: '',
@@ -196,23 +200,56 @@ const Agendamentos = () => {
       assinatura: true,
       midias: []
     });
-    setIsAddDialogOpen(false);
     setSearchContacts('');
-    setSelectedTags([]);
   };
 
-  const toggleContato = (contato: string) => {
-    const contatos = novoAgendamento.contatos.includes(contato)
-      ? novoAgendamento.contatos.filter(c => c !== contato)
-      : [...novoAgendamento.contatos, contato];
-    setNovoAgendamento({ ...novoAgendamento, contatos });
+  const handleEditAgendamento = (agendamento: Agendamento) => {
+    setEditingAgendamento(agendamento);
+    setNovoAgendamento({
+      contatos: agendamento.contatos,
+      tipo: agendamento.tipo,
+      mensagem: agendamento.mensagem,
+      audioUrl: agendamento.audioUrl || '',
+      dataEnvio: agendamento.dataEnvio,
+      horaEnvio: agendamento.horaEnvio,
+      canal: agendamento.canal,
+      recorrencia: !!agendamento.recorrencia,
+      tipoRecorrencia: agendamento.recorrencia?.tipo || '',
+      diasPersonalizado: agendamento.recorrencia?.dias || 1,
+      statusTicket: agendamento.statusTicket,
+      setor: agendamento.setor,
+      assinatura: agendamento.assinatura,
+      midias: []
+    });
+    setIsAddDialogOpen(true);
   };
 
-  const toggleTag = (tag: string) => {
-    const tags = selectedTags.includes(tag)
-      ? selectedTags.filter(t => t !== tag)
-      : [...selectedTags, tag];
-    setSelectedTags(tags);
+  const addContatoByName = (nomeContato: string) => {
+    if (!novoAgendamento.contatos.includes(nomeContato)) {
+      setNovoAgendamento({ 
+        ...novoAgendamento, 
+        contatos: [...novoAgendamento.contatos, nomeContato] 
+      });
+    }
+    setSearchContacts('');
+  };
+
+  const addContatosByTag = (tagName: string) => {
+    const tag = tags.find(t => t.nome === tagName);
+    if (tag) {
+      const novosContatos = tag.contatos.filter(contato => !novoAgendamento.contatos.includes(contato));
+      setNovoAgendamento({ 
+        ...novoAgendamento, 
+        contatos: [...novoAgendamento.contatos, ...novosContatos] 
+      });
+    }
+  };
+
+  const removeContato = (contato: string) => {
+    setNovoAgendamento({
+      ...novoAgendamento,
+      contatos: novoAgendamento.contatos.filter(c => c !== contato)
+    });
   };
 
   const getStatusColor = (status: string) => {
@@ -226,6 +263,56 @@ const Agendamentos = () => {
 
   const handleDeleteAgendamento = (id: number) => {
     console.log('Excluindo agendamento:', id);
+  };
+
+  const getAgendamentosForDate = (date: Date) => {
+    const dateStr = date.toISOString().split('T')[0];
+    return agendamentos.filter(ag => ag.dataEnvio === dateStr);
+  };
+
+  const renderCalendar = () => {
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    
+    const days = [];
+    
+    // Dias vazios do início do mês
+    for (let i = 0; i < firstDay; i++) {
+      days.push(<div key={`empty-${i}`} className="h-24 border border-gray-200"></div>);
+    }
+    
+    // Dias do mês
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(currentYear, currentMonth, day);
+      const agendamentosDay = getAgendamentosForDate(date);
+      
+      days.push(
+        <div key={day} className="h-24 border border-gray-200 p-1 overflow-y-auto">
+          <div className="font-medium text-sm mb-1">{day}</div>
+          {agendamentosDay.map(ag => (
+            <div key={ag.id} className="text-xs bg-blue-100 text-blue-800 p-1 rounded mb-1 truncate">
+              {ag.horaEnvio} - {ag.contatos[0]}{ag.contatos.length > 1 ? ` +${ag.contatos.length - 1}` : ''}
+            </div>
+          ))}
+        </div>
+      );
+    }
+    
+    return (
+      <div className="bg-white rounded-lg border border-gray-200">
+        <div className="grid grid-cols-7 gap-0">
+          {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(day => (
+            <div key={day} className="p-2 text-center font-medium bg-gray-50 border-b border-gray-200">
+              {day}
+            </div>
+          ))}
+          {days}
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -300,14 +387,14 @@ const Agendamentos = () => {
 
               <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button className="bg-black text-white hover:bg-gray-800">
+                  <Button className="bg-black text-white hover:bg-gray-800" onClick={() => setEditingAgendamento(null)}>
                     <Plus className="h-4 w-4 mr-2" />
                     Novo Agendamento
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-2xl bg-white max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
-                    <DialogTitle>Novo Agendamento</DialogTitle>
+                    <DialogTitle>{editingAgendamento ? 'Editar Agendamento' : 'Novo Agendamento'}</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-6">
                     {/* Seleção de contatos com barra de pesquisa */}
@@ -322,35 +409,39 @@ const Agendamentos = () => {
                                 placeholder="Pesquisar contatos"
                                 value={searchContacts}
                                 onChange={(e) => setSearchContacts(e.target.value)}
+                                onKeyPress={(e) => {
+                                  if (e.key === 'Enter' && filteredContacts.length > 0) {
+                                    addContatoByName(filteredContacts[0]);
+                                  }
+                                }}
                                 className="pl-10 border-gray-300"
                               />
+                              {searchContacts && filteredContacts.length > 0 && (
+                                <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-40 overflow-y-auto">
+                                  {filteredContacts.map((contato) => (
+                                    <div
+                                      key={contato}
+                                      className="p-2 hover:bg-gray-100 cursor-pointer text-sm"
+                                      onClick={() => addContatoByName(contato)}
+                                    >
+                                      {contato}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           </div>
                           <div className="flex flex-wrap gap-2">
                             {tags.map((tag) => (
                               <Button
-                                key={tag}
-                                variant={selectedTags.includes(tag) ? "default" : "outline"}
+                                key={tag.nome}
+                                variant="outline"
                                 size="sm"
-                                onClick={() => toggleTag(tag)}
-                                className={selectedTags.includes(tag) ? "bg-blue-600 text-white" : "border-gray-300"}
+                                onClick={() => addContatosByTag(tag.nome)}
+                                className="border-gray-300"
                               >
-                                {tag}
+                                {tag.nome}
                               </Button>
-                            ))}
-                          </div>
-                        </div>
-                        
-                        <div className="max-h-32 overflow-y-auto border border-gray-300 rounded-lg p-3">
-                          <div className="grid grid-cols-2 gap-2">
-                            {filteredContacts.map((contato) => (
-                              <div key={contato} className="flex items-center space-x-2">
-                                <Checkbox
-                                  checked={novoAgendamento.contatos.includes(contato)}
-                                  onCheckedChange={() => toggleContato(contato)}
-                                />
-                                <span className="text-sm">{contato}</span>
-                              </div>
                             ))}
                           </div>
                         </div>
@@ -360,8 +451,12 @@ const Agendamentos = () => {
                             <span className="text-sm font-medium text-gray-700">Agendamento para:</span>
                             <div className="flex flex-wrap gap-2 mt-2">
                               {novoAgendamento.contatos.map((contato, index) => (
-                                <span key={index} className="px-2 py-1 bg-gray-100 text-xs rounded-full border border-gray-200">
+                                <span key={index} className="px-2 py-1 bg-gray-100 text-xs rounded-full border border-gray-200 flex items-center gap-1">
                                   {contato}
+                                  <X 
+                                    className="h-3 w-3 cursor-pointer hover:text-red-600" 
+                                    onClick={() => removeContato(contato)}
+                                  />
                                 </span>
                               ))}
                             </div>
@@ -592,12 +687,11 @@ const Agendamentos = () => {
 
         {/* Conteúdo principal */}
         {viewMode === 'calendario' ? (
-          <div className="bg-white rounded-lg border border-gray-200 p-4">
-            <div className="text-center py-20">
-              <CalendarDays className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Visualização de Calendário</h3>
-              <p className="text-gray-500">Os agendamentos serão exibidos aqui em formato de calendário</p>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-medium">Janeiro 2024</h2>
             </div>
+            {renderCalendar()}
           </div>
         ) : (
           <div className="space-y-4">
@@ -640,22 +734,13 @@ const Agendamentos = () => {
                   <div className="flex gap-2">
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button variant="outline" size="sm">
-                          <Calendar className="h-4 w-4" />
+                        <Button variant="outline" size="sm" onClick={() => handleEditAgendamento(agendamento)}>
+                          <Edit className="h-4 w-4" />
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent><p>Reagendar</p></TooltipContent>
+                      <TooltipContent><p>Editar agendamento</p></TooltipContent>
                     </Tooltip>
                     
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="outline" size="sm">
-                          <Play className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent><p>Enviar agora</p></TooltipContent>
-                    </Tooltip>
-
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button variant="outline" size="sm" onClick={() => handleDeleteAgendamento(agendamento.id)}>
@@ -663,6 +748,15 @@ const Agendamentos = () => {
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent><p>Excluir agendamento</p></TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <Play className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent><p>Enviar agora</p></TooltipContent>
                     </Tooltip>
                   </div>
                 </div>
