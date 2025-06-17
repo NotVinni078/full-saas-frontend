@@ -51,6 +51,15 @@ const PainelAtendimentos = () => {
           tempo: '8 min',
           prioridade: 'media',
           status: 'em-atendimento'
+        },
+        {
+          id: '3',
+          cliente: 'Carlos Silva',
+          canal: 'Chat',
+          assunto: 'Instalação do software',
+          tempo: '25 min',
+          prioridade: 'baixa',
+          status: 'em-atendimento'
         }
       ]
     },
@@ -103,6 +112,24 @@ const PainelAtendimentos = () => {
           tempo: '31 min',
           prioridade: 'alta',
           status: 'em-atendimento'
+        },
+        {
+          id: '7',
+          cliente: 'Rafael Santos',
+          canal: 'WhatsApp',
+          assunto: 'Erro na sincronização',
+          tempo: '18 min',
+          prioridade: 'alta',
+          status: 'em-atendimento'
+        },
+        {
+          id: '8',
+          cliente: 'Amanda Costa',
+          canal: 'Chat',
+          assunto: 'Problema de performance',
+          tempo: '42 min',
+          prioridade: 'media',
+          status: 'em-atendimento'
         }
       ]
     },
@@ -113,7 +140,7 @@ const PainelAtendimentos = () => {
       status: 'online',
       atendimentos: [
         {
-          id: '7',
+          id: '9',
           cliente: 'Rafael Torres',
           canal: 'Chat',
           assunto: 'Cancelamento de serviço',
@@ -122,11 +149,20 @@ const PainelAtendimentos = () => {
           status: 'em-atendimento'
         },
         {
-          id: '8',
+          id: '10',
           cliente: 'Camila Rocha',
           canal: 'WhatsApp',
           assunto: 'Alteração de dados',
           tempo: '3 min',
+          prioridade: 'baixa',
+          status: 'em-atendimento'
+        },
+        {
+          id: '11',
+          cliente: 'Bruno Silva',
+          canal: 'Telefone',
+          assunto: 'Dúvida sobre fatura',
+          tempo: '14 min',
           prioridade: 'baixa',
           status: 'em-atendimento'
         }
@@ -137,7 +173,35 @@ const PainelAtendimentos = () => {
       nome: 'Ricardo Mendes',
       departamento: 'Vendas',
       status: 'online',
-      atendimentos: []
+      atendimentos: [
+        {
+          id: '12',
+          cliente: 'Patricia Lima',
+          canal: 'Email',
+          assunto: 'Proposta comercial',
+          tempo: '28 min',
+          prioridade: 'alta',
+          status: 'em-atendimento'
+        },
+        {
+          id: '13',
+          cliente: 'Diego Santos',
+          canal: 'WhatsApp',
+          assunto: 'Negociação de preços',
+          tempo: '16 min',
+          prioridade: 'media',
+          status: 'em-atendimento'
+        },
+        {
+          id: '14',
+          cliente: 'Larissa Costa',
+          canal: 'Chat',
+          assunto: 'Demonstração do produto',
+          tempo: '35 min',
+          prioridade: 'alta',
+          status: 'em-atendimento'
+        }
+      ]
     },
     {
       id: '6',
@@ -146,12 +210,30 @@ const PainelAtendimentos = () => {
       status: 'offline',
       atendimentos: [
         {
-          id: '9',
+          id: '15',
           cliente: 'André Barbosa',
           canal: 'Email',
           assunto: 'Integração com API',
           tempo: '45 min',
           prioridade: 'alta',
+          status: 'em-atendimento'
+        },
+        {
+          id: '16',
+          cliente: 'Marcos Oliveira',
+          canal: 'Chat',
+          assunto: 'Configuração de servidor',
+          tempo: '52 min',
+          prioridade: 'alta',
+          status: 'em-atendimento'
+        },
+        {
+          id: '17',
+          cliente: 'Juliana Rocha',
+          canal: 'WhatsApp',
+          assunto: 'Backup de dados',
+          tempo: '29 min',
+          prioridade: 'media',
           status: 'em-atendimento'
         }
       ]
@@ -232,7 +314,7 @@ const PainelAtendimentos = () => {
       {/* Grid de Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {usuarios.map((usuario) => (
-          <Card key={usuario.id} className="flex flex-col h-fit">
+          <Card key={usuario.id} className="flex flex-col h-[500px]">
             <CardHeader className="pb-3">
               <div className="flex items-center space-x-3">
                 <div className="relative">
@@ -272,11 +354,11 @@ const PainelAtendimentos = () => {
               </div>
             </CardHeader>
 
-            <CardContent className="pt-0 flex-1">
+            <CardContent className="pt-0 flex-1 flex flex-col">
               {usuario.atendimentos.length > 0 ? (
-                <div className="space-y-3">
-                  <ScrollArea className="max-h-64">
-                    <div className="space-y-3">
+                <div className="space-y-3 flex-1 flex flex-col">
+                  <ScrollArea className="flex-1">
+                    <div className="space-y-3 pr-4">
                       {usuario.atendimentos.map((atendimento) => (
                         <div
                           key={atendimento.id}
@@ -325,16 +407,18 @@ const PainelAtendimentos = () => {
                     variant="destructive"
                     size="sm"
                     onClick={() => handleFecharTodos(usuario.id)}
-                    className="w-full"
+                    className="w-full mt-3"
                   >
                     <X className="h-4 w-4 mr-2" />
                     Fechar Todos os Atendimentos
                   </Button>
                 </div>
               ) : (
-                <div className="text-center py-8">
-                  <MessageSquare className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">Nenhum atendimento ativo</p>
+                <div className="text-center py-8 flex-1 flex items-center justify-center">
+                  <div>
+                    <MessageSquare className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground">Nenhum atendimento ativo</p>
+                  </div>
                 </div>
               )}
             </CardContent>

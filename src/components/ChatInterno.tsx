@@ -136,31 +136,65 @@ const ChatInterno = () => {
       lastMessage: 'Post aprovado para publicação',
       lastMessageTime: '14:25',
       unreadCount: 2
-    }
-  ];
-
-  const availableUsers: Contact[] = [
+    },
     {
       id: '13',
       name: 'Ricardo Mendes',
       department: 'TI',
-      status: 'online'
+      status: 'online',
+      lastMessage: 'Backup realizado com sucesso',
+      lastMessageTime: '13:10'
     },
     {
       id: '14',
       name: 'Juliana Rocha',
       department: 'Comercial',
-      status: 'online'
+      status: 'online',
+      lastMessage: 'Cliente confirmou a proposta',
+      lastMessageTime: '12:30',
+      unreadCount: 1
     },
     {
       id: '15',
       name: 'André Barbosa',
       department: 'Logística',
-      status: 'away'
+      status: 'away',
+      lastMessage: 'Entrega programada para hoje',
+      lastMessageTime: '11:45'
     },
     {
       id: '16',
       name: 'Beatriz Silva',
+      department: 'Jurídico',
+      status: 'online',
+      lastMessage: 'Contrato revisado e aprovado',
+      lastMessageTime: '10:15',
+      unreadCount: 2
+    }
+  ];
+
+  const availableUsers: Contact[] = [
+    {
+      id: '17',
+      name: 'Marcos Oliveira',
+      department: 'TI',
+      status: 'online'
+    },
+    {
+      id: '18',
+      name: 'Patricia Santos',
+      department: 'Comercial',
+      status: 'online'
+    },
+    {
+      id: '19',
+      name: 'Diego Costa',
+      department: 'Logística',
+      status: 'away'
+    },
+    {
+      id: '20',
+      name: 'Larissa Lima',
       department: 'Jurídico',
       status: 'online'
     }
@@ -425,8 +459,8 @@ const ChatInterno = () => {
 
   return (
     <div className="h-full bg-background flex">
-      {/* Lista de Contatos - Mobile: condicional, Desktop: sempre visível */}
-      <div className={`w-full md:w-80 border-r border-border bg-card flex flex-col ${showChat ? 'hidden md:flex' : 'flex'}`}>
+      {/* Lista de Contatos - Mobile: condicional, Desktop: sempre visível com largura reduzida */}
+      <div className={`w-full md:w-72 border-r border-border bg-card flex flex-col ${showChat ? 'hidden md:flex' : 'flex'}`}>
         {/* Header da lista */}
         <div className="p-4 border-b border-border">
           <div className="flex items-center justify-between mb-3">
@@ -565,12 +599,12 @@ const ChatInterno = () => {
               </Button>
               
               <div className="flex items-center space-x-3 flex-1">
-                {/* Botão fechar conversa - antes da foto */}
+                {/* Botão fechar conversa - apenas para desktop */}
                 <Button 
                   variant="ghost" 
                   size="sm"
                   onClick={handleCloseChat}
-                  className="text-muted-foreground hover:text-card-foreground"
+                  className="hidden md:flex text-muted-foreground hover:text-card-foreground"
                 >
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
