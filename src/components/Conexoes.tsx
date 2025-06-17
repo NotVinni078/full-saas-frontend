@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Plus, RotateCcw, Unplug, Trash2, Link, QrCode } from "lucide-react";
+import { Plus, RotateCcw, Unplug, Trash2, Link, QrCode, UserPlus, Check, X } from "lucide-react";
 import { EllipsisVertical } from "lucide-react";
 
 interface Conexao {
@@ -28,6 +28,7 @@ interface Setor {
 const Conexoes = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isSetoresOpen, setIsSetoresOpen] = useState(false);
   const [novaConexao, setNovaConexao] = useState({
     nome: '',
     canal: '',
@@ -48,31 +49,31 @@ const Conexoes = () => {
     {
       id: '1',
       nome: 'WhatsApp Principal',
-      canal: 'WhatsApp Web',
+      canal: 'WhatsApp',
       status: 'conectado',
       setores: ['Vendas', 'Suporte']
     },
     {
       id: '2',
       nome: 'Instagram Empresarial',
-      canal: 'Instagram',
+      canal: 'Instagram Oficial Meta',
       status: 'conectado',
       setores: ['Marketing']
     },
     {
       id: '3',
       nome: 'Facebook Business',
-      canal: 'Facebook',
+      canal: 'Facebook Oficial Meta',
       status: 'desconectado',
       setores: ['Marketing', 'Vendas']
     }
   ];
 
   const canais = [
-    'WhatsApp Web',
-    'WhatsApp Meta',
-    'Instagram',
-    'Facebook',
+    'WhatsApp',
+    'WhatsApp Oficial Meta',
+    'Instagram Oficial Meta',
+    'Facebook Oficial Meta',
     'Telegram',
     'WebChat'
   ];
@@ -107,10 +108,10 @@ const Conexoes = () => {
 
   const getLogoUrl = (canal: string) => {
     const logos: { [key: string]: string } = {
-      'WhatsApp Web': 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg',
-      'WhatsApp Meta': 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg',
-      'Instagram': 'https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png',
-      'Facebook': 'https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg',
+      'WhatsApp': 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg',
+      'WhatsApp Oficial Meta': 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg',
+      'Instagram Oficial Meta': 'https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png',
+      'Facebook Oficial Meta': 'https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg',
       'Telegram': 'https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg',
       'WebChat': 'https://cdn-icons-png.flaticon.com/512/1087/1087815.png'
     };
@@ -120,15 +121,24 @@ const Conexoes = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'conectado': return 'bg-green-500';
-      case 'desconectado': return 'bg-gray-500';
+      case 'desconectado': return 'bg-red-500';
       case 'erro': return 'bg-red-500';
       default: return 'bg-gray-500';
     }
   };
 
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'conectado': return 'Conectado';
+      case 'desconectado': return 'Desconectado';
+      case 'erro': return 'Erro';
+      default: return 'Desconhecido';
+    }
+  };
+
   const renderCanalConfig = () => {
     switch (novaConexao.canal) {
-      case 'WhatsApp Web':
+      case 'WhatsApp':
         return (
           <div className="space-y-4">
             <div className="flex flex-col items-center p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
@@ -143,7 +153,7 @@ const Conexoes = () => {
           </div>
         );
 
-      case 'WhatsApp Meta':
+      case 'WhatsApp Oficial Meta':
         return (
           <div className="space-y-4">
             <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
@@ -167,7 +177,7 @@ const Conexoes = () => {
           </div>
         );
 
-      case 'Instagram':
+      case 'Instagram Oficial Meta':
         return (
           <div className="space-y-4">
             <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
@@ -186,7 +196,7 @@ const Conexoes = () => {
           </div>
         );
 
-      case 'Facebook':
+      case 'Facebook Oficial Meta':
         return (
           <div className="space-y-4">
             <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
@@ -295,22 +305,59 @@ const Conexoes = () => {
 
               <div className="space-y-2">
                 <Label>Setores com Acesso</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  {setores.map((setor) => (
-                    <div key={setor.id} className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        id={setor.id}
-                        checked={novaConexao.setoresSelecionados.includes(setor.id)}
-                        onChange={() => handleToggleSetor(setor.id)}
-                        className="rounded border-gray-300"
-                      />
-                      <label htmlFor={setor.id} className="text-sm font-medium">
-                        {setor.nome}
-                      </label>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setIsSetoresOpen(!isSetoresOpen)}
+                    className="w-full flex items-center justify-between px-3 py-2 border border-input bg-background rounded-md text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  >
+                    <span>
+                      {novaConexao.setoresSelecionados.length === 0 
+                        ? "Selecione os setores" 
+                        : `${novaConexao.setoresSelecionados.length} setor(es) selecionado(s)`
+                      }
+                    </span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  
+                  {isSetoresOpen && (
+                    <div className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-auto">
+                      {setores.map((setor) => (
+                        <div 
+                          key={setor.id} 
+                          className="flex items-center px-3 py-2 hover:bg-accent cursor-pointer"
+                          onClick={() => handleToggleSetor(setor.id)}
+                        >
+                          <div className="flex items-center justify-center w-4 h-4 mr-2 border border-input rounded">
+                            {novaConexao.setoresSelecionados.includes(setor.id) && (
+                              <Check className="w-3 h-3 text-primary" />
+                            )}
+                          </div>
+                          <span className="text-sm">{setor.nome}</span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
                 </div>
+                
+                {novaConexao.setoresSelecionados.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {novaConexao.setoresSelecionados.map((setorId) => {
+                      const setor = setores.find(s => s.id === setorId);
+                      return setor ? (
+                        <Badge key={setorId} variant="outline" className="text-xs flex items-center gap-1">
+                          {setor.nome}
+                          <X 
+                            className="w-3 h-3 cursor-pointer hover:text-destructive" 
+                            onClick={() => handleToggleSetor(setorId)}
+                          />
+                        </Badge>
+                      ) : null;
+                    })}
+                  </div>
+                )}
               </div>
               
               <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 pt-4">
@@ -367,8 +414,11 @@ const Conexoes = () => {
                 <div className="space-y-3">
                   <div>
                     <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Status:</p>
-                    <Badge variant={conexao.status === 'conectado' ? 'default' : 'secondary'}>
-                      {conexao.status}
+                    <Badge 
+                      variant={conexao.status === 'conectado' ? 'default' : 'secondary'}
+                      className={conexao.status === 'conectado' ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600 text-white'}
+                    >
+                      {getStatusText(conexao.status)}
                     </Badge>
                   </div>
                   
