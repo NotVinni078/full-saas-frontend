@@ -5,6 +5,7 @@ import GestaoContatos from './GestaoContatos';
 import GestaoUsuarios from './GestaoUsuarios';
 import Agendamentos from './Agendamentos';
 import Tarefas from './Tarefas';
+import RespostasRapidas from './RespostasRapidas';
 
 interface PageContentProps {
   page: string;
@@ -28,6 +29,9 @@ const PageContent = ({ page }: PageContentProps) => {
       case 'tarefas':
         return <Tarefas />;
       
+      case 'respostas-rapidas':
+        return <RespostasRapidas />;
+      
       case 'chat-interno':
         return (
           <div className="p-6">
@@ -41,14 +45,6 @@ const PageContent = ({ page }: PageContentProps) => {
           <div className="p-6">
             <h1 className="text-2xl font-bold mb-4">Painel de Atendimentos</h1>
             <p className="text-gray-600">Painel para monitoramento de atendimentos.</p>
-          </div>
-        );
-
-      case 'respostas-rapidas':
-        return (
-          <div className="p-6">
-            <h1 className="text-2xl font-bold mb-4">Respostas Rápidas</h1>
-            <p className="text-gray-600">Modelos de respostas pré-definidas para agilizar o atendimento.</p>
           </div>
         );
 

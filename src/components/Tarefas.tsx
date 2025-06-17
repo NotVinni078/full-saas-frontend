@@ -176,14 +176,12 @@ const Tarefas = () => {
   };
 
   const handleCriarTarefa = () => {
-    // Aqui seria a lógica para criar uma nova tarefa
     console.log('Nova tarefa:', novaTarefa);
     setIsDialogOpen(false);
     setNovaTarefa({ titulo: '', descricao: '', atribuidoPara: '', prazo: '' });
   };
 
   const handleConcluirTarefa = (tarefaId: string) => {
-    // Aqui seria a lógica para marcar a tarefa como concluída
     console.log('Concluir tarefa:', tarefaId);
   };
 
@@ -216,22 +214,22 @@ const Tarefas = () => {
   const contadores = contarTarefasPorStatus();
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 lg:p-6 space-y-4 lg:space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Tarefas</h1>
-          <p className="text-gray-600 mt-1">Gerencie e acompanhe tarefas da equipe</p>
+          <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Tarefas</h1>
+          <p className="text-gray-600 mt-1 text-sm lg:text-base">Gerencie e acompanhe tarefas da equipe</p>
         </div>
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-black hover:bg-gray-800 text-white">
+            <Button className="bg-black hover:bg-gray-800 text-white w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
               Nova Tarefa
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className="sm:max-w-[500px] mx-4">
             <DialogHeader>
               <DialogTitle>Criar Nova Tarefa</DialogTitle>
             </DialogHeader>
@@ -283,11 +281,11 @@ const Tarefas = () => {
                 />
               </div>
               
-              <div className="flex justify-end space-x-2 pt-4">
-                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 pt-4">
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="w-full sm:w-auto">
                   Cancelar
                 </Button>
-                <Button onClick={handleCriarTarefa} className="bg-black hover:bg-gray-800 text-white">
+                <Button onClick={handleCriarTarefa} className="bg-black hover:bg-gray-800 text-white w-full sm:w-auto">
                   Criar Tarefa
                 </Button>
               </div>
@@ -297,12 +295,16 @@ const Tarefas = () => {
       </div>
 
       {/* Filtros e Contadores */}
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col lg:flex-row gap-4">
         <div className="flex flex-wrap gap-2">
           <Button
             variant={filtroAtivo === 'pendente' ? 'default' : 'outline'}
             onClick={() => setFiltroAtivo('pendente')}
-            className="text-sm"
+            className={`text-xs sm:text-sm ${
+              filtroAtivo === 'pendente' 
+                ? 'bg-black hover:bg-gray-800 text-white' 
+                : 'border-gray-300 hover:bg-gray-100'
+            }`}
           >
             <Clock className="h-4 w-4 mr-1" />
             Pendentes ({contadores.pendentes})
@@ -310,7 +312,11 @@ const Tarefas = () => {
           <Button
             variant={filtroAtivo === 'em_atraso' ? 'default' : 'outline'}
             onClick={() => setFiltroAtivo('em_atraso')}
-            className="text-sm"
+            className={`text-xs sm:text-sm ${
+              filtroAtivo === 'em_atraso' 
+                ? 'bg-black hover:bg-gray-800 text-white' 
+                : 'border-gray-300 hover:bg-gray-100'
+            }`}
           >
             <AlertTriangle className="h-4 w-4 mr-1" />
             Em Atraso ({contadores.emAtraso})
@@ -318,7 +324,11 @@ const Tarefas = () => {
           <Button
             variant={filtroAtivo === 'concluida' ? 'default' : 'outline'}
             onClick={() => setFiltroAtivo('concluida')}
-            className="text-sm"
+            className={`text-xs sm:text-sm ${
+              filtroAtivo === 'concluida' 
+                ? 'bg-black hover:bg-gray-800 text-white' 
+                : 'border-gray-300 hover:bg-gray-100'
+            }`}
           >
             <CheckCircle2 className="h-4 w-4 mr-1" />
             Concluídas ({contadores.concluidas})
@@ -326,13 +336,17 @@ const Tarefas = () => {
           <Button
             variant={filtroAtivo === 'todos' ? 'default' : 'outline'}
             onClick={() => setFiltroAtivo('todos')}
-            className="text-sm"
+            className={`text-xs sm:text-sm ${
+              filtroAtivo === 'todos' 
+                ? 'bg-black hover:bg-gray-800 text-white' 
+                : 'border-gray-300 hover:bg-gray-100'
+            }`}
           >
             Todas ({tarefas.length})
           </Button>
         </div>
         
-        <div className="flex-1 max-w-md">
+        <div className="flex-1 max-w-full lg:max-w-md">
           <Input
             placeholder="Buscar tarefas..."
             value={searchTerm}
@@ -346,11 +360,11 @@ const Tarefas = () => {
       <div className="grid gap-4">
         {filtrarTarefas().map((tarefa) => (
           <Card key={tarefa.id} className="hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <CardContent className="p-4 lg:p-6">
+              <div className="flex flex-col xl:flex-row xl:items-start justify-between gap-4">
                 <div className="flex-1 space-y-3">
                   <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                    <h3 className="font-semibold text-lg text-gray-900">{tarefa.titulo}</h3>
+                    <h3 className="font-semibold text-base lg:text-lg text-gray-900 break-words">{tarefa.titulo}</h3>
                     <Badge className={`w-fit ${getSituacaoColor(tarefa.situacao)}`}>
                       {getSituacaoIcon(tarefa.situacao)}
                       <span className="ml-1 capitalize">
@@ -360,20 +374,20 @@ const Tarefas = () => {
                     </Badge>
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-600">
-                    <div className="flex items-center gap-2">
-                      <User className="h-4 w-4" />
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 text-sm text-gray-600">
+                    <div className="flex items-center gap-2 break-words">
+                      <User className="h-4 w-4 flex-shrink-0" />
                       <span><strong>Criada por:</strong> {tarefa.criadoPor}</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <User className="h-4 w-4" />
+                    <div className="flex items-center gap-2 break-words">
+                      <User className="h-4 w-4 flex-shrink-0" />
                       <span><strong>Atribuída para:</strong> {tarefa.atribuidoPara}</span>
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 text-sm">
                     <div className="flex items-center gap-2 text-gray-600">
-                      <Calendar className="h-4 w-4" />
+                      <Calendar className="h-4 w-4 flex-shrink-0" />
                       <span><strong>Prazo:</strong> {format(tarefa.prazo, 'dd/MM/yyyy', { locale: ptBR })}</span>
                     </div>
                     
@@ -421,10 +435,10 @@ const Tarefas = () => {
                 
                 {/* Botão de Concluir para tarefas Em Atraso e Pendentes */}
                 {(tarefa.situacao === 'pendente' || tarefa.situacao === 'em_atraso') && (
-                  <div className="flex justify-end">
+                  <div className="flex justify-end xl:justify-start">
                     <Button
                       onClick={() => handleConcluirTarefa(tarefa.id)}
-                      className="bg-green-600 hover:bg-green-700 text-white"
+                      className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
                       size="sm"
                     >
                       <Check className="h-4 w-4 mr-2" />
