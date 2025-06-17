@@ -1,4 +1,6 @@
+
 import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Home, 
   PanelLeft,
@@ -62,9 +64,9 @@ const menuGroups = [
     label: 'Dashboards',
     icon: LayoutDashboard,
     items: [
-      { id: 'dashboard-gerencial', label: 'Dashboard de Infraestrutura', icon: ChartColumn },
-      { id: 'dashboard-admin', label: 'Dashboard Administrativo', icon: ChartColumn },
-      { id: 'dashboard-usuario', label: 'Dashboard Usuário', icon: ChartColumn },
+      { id: 'dashboard-gerencial', label: 'Dashboard de Infraestrutura', icon: ChartColumn, route: '/dashboard-gerencial' },
+      { id: 'dashboard-admin', label: 'Dashboard Administrativo', icon: ChartColumn, route: '/dashboard-admin' },
+      { id: 'dashboard-usuario', label: 'Dashboard Usuário', icon: ChartColumn, route: '/dashboard-usuario' },
     ]
   },
   {
@@ -72,9 +74,9 @@ const menuGroups = [
     label: 'Gestão',
     icon: Computer,
     items: [
-      { id: 'gestao-contatos', label: 'Gestão de Contatos', icon: SquareUser },
-      { id: 'avaliacao', label: 'Avaliação (NPS)', icon: Star },
-      { id: 'tags', label: 'Tags', icon: Tag },
+      { id: 'gestao-contatos', label: 'Gestão de Contatos', icon: SquareUser, route: '/gestao-contatos' },
+      { id: 'avaliacao', label: 'Avaliação (NPS)', icon: Star, route: '/avaliacao' },
+      { id: 'tags', label: 'Tags', icon: Tag, route: '/tags' },
     ]
   },
   {
@@ -82,10 +84,10 @@ const menuGroups = [
     label: 'Administração',
     icon: UserPen,
     items: [
-      { id: 'gestao-usuarios', label: 'Gestão de Usuários', icon: UserPen },
-      { id: 'gestao-setores', label: 'Gestão de Setores', icon: Network },
-      { id: 'anuncios', label: 'Anúncios', icon: Newspaper },
-      { id: 'admin-empresas', label: 'Administração de Empresas', icon: Building2 },
+      { id: 'gestao-usuarios', label: 'Gestão de Usuários', icon: UserPen, route: '/gestao-usuarios' },
+      { id: 'gestao-setores', label: 'Gestão de Setores', icon: Network, route: '/gestao-setores' },
+      { id: 'anuncios', label: 'Anúncios', icon: Newspaper, route: '/inicio' },
+      { id: 'admin-empresas', label: 'Administração de Empresas', icon: Building2, route: '/admin-empresas' },
     ]
   },
   {
@@ -93,9 +95,9 @@ const menuGroups = [
     label: 'Financeiro',
     icon: CreditCard,
     items: [
-      { id: 'faturas', label: 'Faturas', icon: Receipt },
-      { id: 'planos', label: 'Planos', icon: SquareChartGantt },
-      { id: 'gestao-planos', label: 'Gestão de Planos', icon: Sliders },
+      { id: 'faturas', label: 'Faturas', icon: Receipt, route: '/faturas' },
+      { id: 'planos', label: 'Planos', icon: SquareChartGantt, route: '/planos' },
+      { id: 'gestao-planos', label: 'Gestão de Planos', icon: Sliders, route: '/gestao-planos' },
     ]
   },
   {
@@ -103,28 +105,29 @@ const menuGroups = [
     label: 'Configurações',
     icon: Settings,
     items: [
-      { id: 'ajustes', label: 'Ajustes', icon: Wrench },
-      { id: 'gerenciar-marca', label: 'Gerenciar Marca', icon: Palette },
-      { id: 'integracoes', label: 'Integrações', icon: Plug },
+      { id: 'ajustes', label: 'Ajustes', icon: Wrench, route: '/ajustes' },
+      { id: 'gerenciar-marca', label: 'Gerenciar Marca', icon: Palette, route: '/gerenciar-marca' },
+      { id: 'integracoes', label: 'Integrações', icon: Plug, route: '/integracoes' },
     ]
   }
 ];
 
-// Ordem correta dos itens individuais conforme solicitado
 const singleItems = [
-  { id: 'atendimentos', label: 'Atendimentos', icon: MessageSquare },
-  { id: 'chat-interno', label: 'Chat Interno', icon: MessagesSquare },
-  { id: 'painel-atendimentos', label: 'Painel de Atendimentos', icon: MessageSquareCode },
-  { id: 'agendamentos', label: 'Agendamentos', icon: Calendar },
-  { id: 'respostas-rapidas', label: 'Respostas Rápidas', icon: Zap },
-  { id: 'tarefas', label: 'Tarefas', icon: ListTodo },
-  { id: 'campanhas', label: 'Campanhas', icon: Megaphone },
-  { id: 'chatbot', label: 'ChatBot', icon: Bot },
-  { id: 'conexoes', label: 'Conexões', icon: Waypoints },
-  { id: 'documentacao', label: 'Documentação', icon: FileText },
+  { id: 'atendimentos', label: 'Atendimentos', icon: MessageSquare, route: '/atendimentos' },
+  { id: 'chat-interno', label: 'Chat Interno', icon: MessagesSquare, route: '/chat-interno' },
+  { id: 'painel-atendimentos', label: 'Painel de Atendimentos', icon: MessageSquareCode, route: '/painel-atendimentos' },
+  { id: 'agendamentos', label: 'Agendamentos', icon: Calendar, route: '/agendamentos' },
+  { id: 'respostas-rapidas', label: 'Respostas Rápidas', icon: Zap, route: '/respostas-rapidas' },
+  { id: 'tarefas', label: 'Tarefas', icon: ListTodo, route: '/tarefas' },
+  { id: 'campanhas', label: 'Campanhas', icon: Megaphone, route: '/campanhas' },
+  { id: 'chatbot', label: 'ChatBot', icon: Bot, route: '/chatbot' },
+  { id: 'conexoes', label: 'Conexões', icon: Waypoints, route: '/conexoes' },
+  { id: 'documentacao', label: 'Documentação', icon: FileText, route: '/documentacao' },
 ];
 
 const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, onLogout }: AppSidebarProps) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [openGroups, setOpenGroups] = React.useState<string[]>(['dashboards']);
   const [userStatus, setUserStatus] = React.useState(true);
 
@@ -138,6 +141,11 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
 
   const toggleUserStatus = () => {
     setUserStatus(!userStatus);
+  };
+
+  const handleNavigation = (route: string, pageId: string) => {
+    navigate(route);
+    onPageChange(pageId);
   };
 
   // Função para renderizar os itens na ordem correta
@@ -261,12 +269,12 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                   <CollapsibleContent className="space-y-1 mt-1">
                     {group.items.map((subItem) => {
                       const ItemIcon = subItem.icon;
-                      const isActive = currentPage === subItem.id;
+                      const isActive = location.pathname === subItem.route;
                       
                       return (
                         <button
                           key={subItem.id}
-                          onClick={() => onPageChange(subItem.id)}
+                          onClick={() => handleNavigation(subItem.route, subItem.id)}
                           className={cn(
                             "w-full flex items-center space-x-2 px-2 py-1.5 ml-5 rounded-lg text-left transition-colors text-xs",
                             isActive 
@@ -286,12 +294,12 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
           } else {
             const singleItem = item.data;
             const Icon = singleItem.icon;
-            const isActive = currentPage === singleItem.id;
+            const isActive = location.pathname === singleItem.route;
             
             return (
               <button
                 key={singleItem.id}
-                onClick={() => onPageChange(singleItem.id)}
+                onClick={() => handleNavigation(singleItem.route, singleItem.id)}
                 className={cn(
                   "w-full flex items-center space-x-2 px-2 py-1.5 rounded-lg text-left transition-colors",
                   isActive 

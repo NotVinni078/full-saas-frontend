@@ -6,7 +6,21 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
-import Inicio from "./pages/Inicio";
+import Anuncios from "./pages/Anuncios";
+import Atendimentos from "./pages/Atendimentos";
+import ChatInterno from "./pages/ChatInterno";
+import PainelAtendimentos from "./pages/PainelAtendimentos";
+import Agendamentos from "./pages/Agendamentos";
+import RespostasRapidas from "./pages/RespostasRapidas";
+import Tarefas from "./pages/Tarefas";
+import Campanhas from "./pages/Campanhas";
+import GestaoContatos from "./pages/GestaoContatos";
+import Tags from "./pages/Tags";
+import GestaoUsuarios from "./pages/GestaoUsuarios";
+import Conexoes from "./pages/Conexoes";
+import DashboardGerencial from "./pages/DashboardGerencial";
+import DashboardAdmin from "./pages/DashboardAdmin";
+import DashboardUsuario from "./pages/DashboardUsuario";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,7 +34,21 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
-          <Route path="/inicio" element={<Inicio />} />
+          <Route path="/inicio" element={<Anuncios />} />
+          <Route path="/atendimentos" element={<Atendimentos />} />
+          <Route path="/chat-interno" element={<ChatInterno />} />
+          <Route path="/painel-atendimentos" element={<PainelAtendimentos />} />
+          <Route path="/agendamentos" element={<Agendamentos />} />
+          <Route path="/respostas-rapidas" element={<RespostasRapidas />} />
+          <Route path="/tarefas" element={<Tarefas />} />
+          <Route path="/campanhas" element={<Campanhas />} />
+          <Route path="/gestao-contatos" element={<GestaoContatos />} />
+          <Route path="/tags" element={<Tags />} />
+          <Route path="/gestao-usuarios" element={<GestaoUsuarios />} />
+          <Route path="/conexoes" element={<Conexoes />} />
+          <Route path="/dashboard-gerencial" element={<DashboardGerencial />} />
+          <Route path="/dashboard-admin" element={<DashboardAdmin />} />
+          <Route path="/dashboard-usuario" element={<DashboardUsuario />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
