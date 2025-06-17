@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,7 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Plus, Edit, Trash2, Tag, UserPlus } from "lucide-react";
+import { EllipsisVertical } from "lucide-react";
 
 interface TagInterface {
   id: string;
@@ -261,31 +262,59 @@ const Tags = () => {
                         <span className="font-medium">{tag.quantidadeContatos}</span>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center justify-center gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleAdicionarContatos(tag)}
-                            className="h-8 w-8 p-0 hover:bg-green-100 hover:text-green-600"
-                          >
-                            <UserPlus className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEditarTag(tag)}
-                            className="h-8 w-8 p-0 hover:bg-blue-100 hover:text-blue-600"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleExcluirTag(tag.id)}
-                            className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                        <div className="flex items-center justify-center">
+                          {/* Desktop actions */}
+                          <div className="hidden sm:flex items-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleAdicionarContatos(tag)}
+                              className="h-8 w-8 p-0 hover:bg-green-100 hover:text-green-600"
+                            >
+                              <UserPlus className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditarTag(tag)}
+                              className="h-8 w-8 p-0 hover:bg-blue-100 hover:text-blue-600"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleExcluirTag(tag.id)}
+                              className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+
+                          {/* Mobile dropdown */}
+                          <div className="sm:hidden">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <EllipsisVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-48">
+                                <DropdownMenuItem onClick={() => handleAdicionarContatos(tag)}>
+                                  <UserPlus className="h-4 w-4 mr-2" />
+                                  Adicionar contatos
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleEditarTag(tag)}>
+                                  <Edit className="h-4 w-4 mr-2" />
+                                  Editar tag
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleExcluirTag(tag.id)}>
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Excluir tag
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
                         </div>
                       </TableCell>
                     </TableRow>

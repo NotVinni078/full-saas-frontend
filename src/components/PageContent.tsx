@@ -9,6 +9,7 @@ import RespostasRapidas from './RespostasRapidas';
 import ChatInterno from './ChatInterno';
 import PainelAtendimentos from './PainelAtendimentos';
 import Tags from './Tags';
+import Conexoes from './Conexoes';
 
 interface PageContentProps {
   page: string;
@@ -43,6 +44,9 @@ const PageContent = ({ page }: PageContentProps) => {
 
       case 'tags':
         return <Tags />;
+
+      case 'conexoes':
+        return <Conexoes />;
 
       case 'campanhas':
         return (
