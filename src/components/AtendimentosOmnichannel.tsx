@@ -463,7 +463,7 @@ const AtendimentosOmnichannel = () => {
                 setFiltroStatus(filtroStatus === 'finalizado' ? 'todos' : 'finalizado');
                 setFiltroTipo('todos');
               }}
-              className="flex items-center justify-center gap-2 w-full"
+              className="flex items-center justify-center gap-2 w-full h-12"
             >
               <CircleCheckBig className="h-4 w-4 flex-shrink-0" />
               <span className="hidden lg:inline">Finalizados</span>
@@ -477,7 +477,7 @@ const AtendimentosOmnichannel = () => {
                 setFiltroTipo(filtroTipo === 'grupos' ? 'todos' : 'grupos');
                 setFiltroStatus('todos');
               }}
-              className="flex items-center justify-center gap-2 w-full"
+              className="flex items-center justify-center gap-2 w-full h-12"
             >
               <UsersRound className="h-4 w-4 flex-shrink-0" />
               <span className="hidden lg:inline">Grupos</span>
@@ -497,7 +497,7 @@ const AtendimentosOmnichannel = () => {
                 setFiltroStatus(filtroStatus === 'atendendo' ? 'todos' : 'atendendo');
                 setFiltroTipo('todos');
               }}
-              className="flex items-center justify-center gap-1 w-full"
+              className="flex items-center justify-center gap-1 w-full h-12"
             >
               <MessageSquareText className="h-4 w-4 flex-shrink-0" />
               <span className="hidden lg:inline text-xs">Atendendo</span>
@@ -511,7 +511,7 @@ const AtendimentosOmnichannel = () => {
                 setFiltroStatus(filtroStatus === 'aguardando' ? 'todos' : 'aguardando');
                 setFiltroTipo('todos');
               }}
-              className="flex items-center justify-center gap-1 w-full"
+              className="flex items-center justify-center gap-1 w-full h-12"
             >
               <Clock9 className="h-4 w-4 flex-shrink-0" />
               <span className="hidden lg:inline text-xs">Aguardando</span>
@@ -525,7 +525,7 @@ const AtendimentosOmnichannel = () => {
                 setFiltroStatus(filtroStatus === 'chatbot' ? 'todos' : 'chatbot');
                 setFiltroTipo('todos');
               }}
-              className="flex items-center justify-center gap-1 w-full"
+              className="flex items-center justify-center gap-1 w-full h-12"
             >
               <BotMessageSquare className="h-4 w-4 flex-shrink-0" />
               <span className="hidden lg:inline text-xs">Chatbot</span>
@@ -542,15 +542,15 @@ const AtendimentosOmnichannel = () => {
             {conversasFiltradas.map((conversa) => (
               <Card
                 key={conversa.id}
-                className={`p-3 mb-2 cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-900 ${
+                className={`p-4 mb-2 cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-900 min-h-[80px] ${
                   conversaSelecionada === conversa.id ? 'border-blue-500 bg-blue-50 dark:bg-blue-950' : ''
                 }`}
                 onClick={() => handleConversaClick(conversa.id)}
               >
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-3 h-full">
                   <div className="relative">
                     <div 
-                      className="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center text-sm font-medium cursor-pointer hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
+                      className="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center text-sm font-medium cursor-pointer hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleContactClick(conversa);
@@ -563,8 +563,8 @@ const AtendimentosOmnichannel = () => {
                     </div>
                   </div>
                   
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
+                  <div className="flex-1 min-w-0 flex flex-col justify-center">
+                    <div className="flex items-center justify-between mb-2">
                       <h3 className="font-medium text-gray-900 dark:text-white truncate">
                         {conversa.cliente}
                         {conversa.isGrupo && <UsersRound className="inline h-3 w-3 ml-1" />}

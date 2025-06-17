@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Globe, Sun, Moon, ArrowLeft, MessageSquare, MessagesSquare, Receipt } from 'lucide-react';
+import { Globe, Sun, Moon, ArrowLeft, MessageSquare, MessagesSquare, Receipt, PanelLeft } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -28,7 +28,9 @@ const NavBar = ({
   isDarkMode, 
   onToggleTheme, 
   currentLanguage, 
-  onLanguageChange 
+  onLanguageChange,
+  onToggleSidebar,
+  isSidebarCollapsed
 }: NavBarProps) => {
   const [isConversationOpen, setIsConversationOpen] = React.useState(false);
 
@@ -41,6 +43,18 @@ const NavBar = ({
     <TooltipProvider>
       <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between h-20">
         <div className="flex items-center space-x-4">
+          {/* Botão da sidebar no header */}
+          {isSidebarCollapsed && onToggleSidebar && (
+            <Button
+              onClick={onToggleSidebar}
+              variant="ghost"
+              size="sm"
+              className="md:hidden p-2"
+            >
+              <PanelLeft className="h-4 w-4" />
+            </Button>
+          )}
+
           {/* Botão arrow-left para fechar conversa quando aberta */}
           {isConversationOpen && (
             <Button
