@@ -57,24 +57,10 @@
   body {
     @apply bg-background text-foreground;
   }
-  
-  /* Garantir que todos os elementos herdem o background correto */
-  .dark body,
-  .dark #root,
-  .dark main,
-  .dark div:not([class*="bg-"]):not([style*="background"]) {
-    background-color: hsl(0 0% 0%);
-  }
 }
 
 @layer components {
   .card-hover {
     @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
-  }
-  
-  /* Garantir que cards no modo escuro sejam pretos */
-  .dark .card-hover,
-  .dark [class*="card"] {
-    background-color: hsl(0 0% 0%) !important;
   }
 }

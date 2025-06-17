@@ -205,13 +205,13 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
       isCollapsed && "md:w-16"
     )}>
       {/* Header - matching navbar height */}
-      <div className="px-6 py-4 border-b border-border flex items-center justify-between h-20">
+      <div className="px-6 py-4 border-b border-border flex items-center justify-between h-20 bg-card">
         {(!isCollapsed || window.innerWidth < 768) && (
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-r from-gray-700 to-black dark:from-gray-200 dark:to-white rounded-lg flex items-center justify-center">
               <span className="text-white dark:text-black font-bold text-base">NE</span>
             </div>
-            <h1 className="text-lg font-bold text-foreground">
+            <h1 className="text-lg font-bold text-card-foreground">
               Nome da Empresa
             </h1>
           </div>
@@ -226,12 +226,12 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
             isCollapsed && "w-full justify-center"
           )}
         >
-          <PanelLeft className="h-4 w-4 text-foreground" />
+          <PanelLeft className="h-4 w-4 text-card-foreground" />
         </Button>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
+      <nav className="flex-1 p-2 space-y-1 overflow-y-auto bg-card">
         {renderMenuItems().map((item, index) => {
           if (item.type === 'group') {
             const group = item.data;
@@ -245,15 +245,15 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                     className={cn(
                       "w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-left transition-colors hover:bg-accent",
                       isCollapsed && "md:justify-center",
-                      "text-foreground"
+                      "text-card-foreground"
                     )}
                   >
                     <div className="flex items-center space-x-2">
-                      <GroupIcon className="h-3.5 w-3.5 flex-shrink-0 text-foreground" />
-                      {(!isCollapsed || window.innerWidth < 768) && <span className="font-medium text-xs text-foreground">{group.label}</span>}
+                      <GroupIcon className="h-3.5 w-3.5 flex-shrink-0 text-card-foreground" />
+                      {(!isCollapsed || window.innerWidth < 768) && <span className="font-medium text-xs text-card-foreground">{group.label}</span>}
                     </div>
                     {(!isCollapsed || window.innerWidth < 768) && (
-                      isOpen ? <ChevronUp className="h-3 w-3 text-foreground" /> : <ChevronDown className="h-3 w-3 text-foreground" />
+                      isOpen ? <ChevronUp className="h-3 w-3 text-card-foreground" /> : <ChevronDown className="h-3 w-3 text-card-foreground" />
                     )}
                   </button>
                 </CollapsibleTrigger>
@@ -272,11 +272,11 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                             "w-full flex items-center space-x-2 px-2 py-1.5 ml-5 rounded-lg text-left transition-colors text-xs",
                             isActive 
                               ? "bg-primary text-primary-foreground" 
-                              : "text-foreground hover:bg-accent"
+                              : "text-card-foreground hover:bg-accent"
                           )}
                         >
-                          <ItemIcon className={cn("h-3 w-3 flex-shrink-0", isActive ? "text-primary-foreground" : "text-foreground")} />
-                          <span className={cn("text-xs", isActive ? "text-primary-foreground" : "text-foreground")}>{subItem.label}</span>
+                          <ItemIcon className={cn("h-3 w-3 flex-shrink-0", isActive ? "text-primary-foreground" : "text-card-foreground")} />
+                          <span className={cn("text-xs", isActive ? "text-primary-foreground" : "text-card-foreground")}>{subItem.label}</span>
                         </button>
                       );
                     })}
@@ -297,12 +297,12 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                   "w-full flex items-center space-x-2 px-2 py-1.5 rounded-lg text-left transition-colors",
                   isActive 
                     ? "bg-primary text-primary-foreground" 
-                    : "text-foreground hover:bg-accent",
+                    : "text-card-foreground hover:bg-accent",
                   isCollapsed && "md:justify-center"
                 )}
               >
-                <Icon className={cn("h-3.5 w-3.5 flex-shrink-0", isActive ? "text-primary-foreground" : "text-foreground")} />
-                {(!isCollapsed || window.innerWidth < 768) && <span className={cn("font-medium text-xs", isActive ? "text-primary-foreground" : "text-foreground")}>{singleItem.label}</span>}
+                <Icon className={cn("h-3.5 w-3.5 flex-shrink-0", isActive ? "text-primary-foreground" : "text-card-foreground")} />
+                {(!isCollapsed || window.innerWidth < 768) && <span className={cn("font-medium text-xs", isActive ? "text-primary-foreground" : "text-card-foreground")}>{singleItem.label}</span>}
               </button>
             );
           }
@@ -310,14 +310,14 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
       </nav>
 
       {/* User section */}
-      <div className="p-3 border-t border-border">
+      <div className="p-3 border-t border-border bg-card">
         {(!isCollapsed || window.innerWidth < 768) && (
           <div className="flex items-center space-x-2 mb-2">
             <div className="w-7 h-7 bg-gradient-to-r from-gray-700 to-black dark:from-gray-200 dark:to-white rounded-full flex items-center justify-center text-white dark:text-black font-semibold">
               <span className="text-xs">U</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-foreground truncate">Usuário</p>
+              <p className="text-xs font-medium text-card-foreground truncate">Usuário</p>
               <p className="text-xs text-muted-foreground truncate">Administração</p>
             </div>
             <div className="flex items-center space-x-1">
