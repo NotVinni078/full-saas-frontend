@@ -1,9 +1,14 @@
 
 import React from 'react';
 import GestaoUsuarios from '@/components/GestaoUsuarios';
+import SidebarLayout from '@/components/SidebarLayout';
 
 const GestaoUsuariosPage = () => {
-  return <GestaoUsuarios />;
+  return (
+    <SidebarLayout>
+      <GestaoUsuarios />
+    </SidebarLayout>
+  );
 };
 
 export default GestaoUsuariosPage;
