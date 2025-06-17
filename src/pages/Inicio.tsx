@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import AppSidebar from '@/components/AppSidebar';
 import NavBar from '@/components/NavBar';
@@ -69,7 +70,7 @@ const Inicio = () => {
         
         <main className="flex-1 overflow-auto bg-background min-h-0">
           {currentPage.includes('dashboard') ? (
-            <Dashboard />
+            <Dashboard currentPage={currentPage} />
           ) : (
             <PageContent page={currentPage} />
           )}

@@ -1,5 +1,6 @@
 
 import React from 'react';
+import InfrastructureDashboard from './InfrastructureDashboard';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +14,17 @@ import {
   Plus
 } from 'lucide-react';
 
-const Dashboard = () => {
+interface DashboardProps {
+  currentPage?: string;
+}
+
+const Dashboard = ({ currentPage }: DashboardProps) => {
+  // Se for o dashboard de infraestrutura, renderiza o componente específico
+  if (currentPage === 'dashboard-gerencial') {
+    return <InfrastructureDashboard />;
+  }
+
+  // Caso contrário, renderiza o dashboard padrão
   const stats = [
     {
       title: "Receita Total",

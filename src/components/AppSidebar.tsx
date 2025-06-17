@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   Home, 
@@ -63,7 +62,7 @@ const menuGroups = [
     label: 'Dashboards',
     icon: LayoutDashboard,
     items: [
-      { id: 'dashboard-gerencial', label: 'Dashboard Gerencial', icon: ChartColumn },
+      { id: 'dashboard-gerencial', label: 'Dashboard de Infraestrutura', icon: ChartColumn },
       { id: 'dashboard-admin', label: 'Dashboard Administrativo', icon: ChartColumn },
       { id: 'dashboard-usuario', label: 'Dashboard Usuário', icon: ChartColumn },
     ]
