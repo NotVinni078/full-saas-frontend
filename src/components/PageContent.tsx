@@ -2,6 +2,7 @@
 import React from 'react';
 import AtendimentosOmnichannel from './AtendimentosOmnichannel';
 import GestaoContatos from './GestaoContatos';
+import GestaoUsuarios from './GestaoUsuarios';
 
 interface PageContentProps {
   page: string;
@@ -15,6 +16,9 @@ const PageContent = ({ page }: PageContentProps) => {
       
       case 'gestao-contatos':
         return <GestaoContatos />;
+      
+      case 'gestao-usuarios':
+        return <GestaoUsuarios />;
       
       case 'chat-interno':
         return (
