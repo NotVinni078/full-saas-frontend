@@ -134,7 +134,7 @@ const RespostasRapidas = () => {
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-white hover:bg-gray-100 text-black w-full sm:w-auto">
+            <Button className="bg-black hover:bg-gray-800 text-white w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
               Criar Resposta Rápida
             </Button>
@@ -194,7 +194,7 @@ const RespostasRapidas = () => {
                   </Label>
                 </div>
                 
-                <Button onClick={handleCriarResposta} className="bg-white hover:bg-gray-100 text-black w-full sm:w-auto">
+                <Button onClick={handleCriarResposta} className="bg-black hover:bg-gray-800 text-white w-full sm:w-auto">
                   Salvar
                 </Button>
               </div>
@@ -223,7 +223,7 @@ const RespostasRapidas = () => {
           onClick={() => setFiltroAtivo('minhas')}
           className={`text-xs sm:text-sm ${
             filtroAtivo === 'minhas' 
-              ? 'bg-white hover:bg-gray-100 text-black' 
+              ? 'bg-black hover:bg-gray-800 text-white' 
               : 'border-gray-600 text-gray-300 hover:bg-gray-800'
           }`}
         >
@@ -235,7 +235,7 @@ const RespostasRapidas = () => {
           onClick={() => setFiltroAtivo('todas')}
           className={`text-xs sm:text-sm ${
             filtroAtivo === 'todas' 
-              ? 'bg-white hover:bg-gray-100 text-black' 
+              ? 'bg-black hover:bg-gray-800 text-white' 
               : 'border-gray-600 text-gray-300 hover:bg-gray-800'
           }`}
         >
