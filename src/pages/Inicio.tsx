@@ -33,7 +33,7 @@ const Inicio = () => {
   };
 
   return (
-    <div className={`h-screen bg-background flex w-full overflow-hidden ${isDarkMode ? 'dark' : ''}`}>
+    <div className={`h-screen bg-background dark:bg-background flex w-full overflow-hidden ${isDarkMode ? 'dark' : ''}`}>
       {/* Sidebar - comportamento responsivo corrigido */}
       <div className={`
         fixed inset-y-0 left-0 z-50 md:relative md:z-auto
@@ -58,7 +58,7 @@ const Inicio = () => {
       )}
       
       {/* Conteúdo principal */}
-      <div className="flex-1 flex flex-col min-w-0 h-full">
+      <div className="flex-1 flex flex-col min-w-0 h-full bg-background dark:bg-background">
         <NavBar
           isDarkMode={isDarkMode}
           onToggleTheme={toggleTheme}
@@ -68,7 +68,7 @@ const Inicio = () => {
           isSidebarCollapsed={sidebarCollapsed}
         />
         
-        <main className="flex-1 overflow-auto bg-background min-h-0">
+        <main className="flex-1 overflow-auto bg-background dark:bg-background min-h-0">
           {currentPage.includes('dashboard') ? (
             <Dashboard />
           ) : (
