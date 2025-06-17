@@ -12,6 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 interface User {
   id: number;
   name: string;
+  email: string;
   setores: string[];
   cargos: string[];
   canais: string[];
@@ -29,6 +30,8 @@ const GestaoUsuarios = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [newUser, setNewUser] = useState({
     name: '',
+    email: '',
+    password: '',
     setores: [] as string[],
     cargos: [] as string[],
     canais: [] as string[],
@@ -40,6 +43,7 @@ const GestaoUsuarios = () => {
     {
       id: 1,
       name: 'Ana Silva',
+      email: 'ana.silva@empresa.com',
       setores: ['Vendas'],
       cargos: ['Gestor'],
       canais: ['WhatsApp', 'Email'],
@@ -48,6 +52,7 @@ const GestaoUsuarios = () => {
     {
       id: 2,
       name: 'Carlos Santos',
+      email: 'carlos.santos@empresa.com',
       setores: ['Suporte', 'Vendas'],
       cargos: ['Atendente'],
       canais: ['WhatsApp', 'Telegram', 'Email'],
@@ -56,6 +61,7 @@ const GestaoUsuarios = () => {
     {
       id: 3,
       name: 'Maria Costa',
+      email: 'maria.costa@empresa.com',
       setores: ['Marketing'],
       cargos: ['Supervisor'],
       canais: ['Email', 'WhatsApp'],
@@ -65,7 +71,8 @@ const GestaoUsuarios = () => {
 
   const filteredUsers = useMemo(() => {
     return users.filter(user => {
-      const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           user.email.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesSetor = setorFilter === '' || setorFilter === 'todos' || user.setores.includes(setorFilter);
       return matchesSearch && matchesSetor;
     });
@@ -78,6 +85,8 @@ const GestaoUsuarios = () => {
     setIsAddDialogOpen(false);
     setNewUser({
       name: '',
+      email: '',
+      password: '',
       setores: [],
       cargos: [],
       canais: [],
@@ -88,6 +97,8 @@ const GestaoUsuarios = () => {
   const handleDiscardUser = () => {
     setNewUser({
       name: '',
+      email: '',
+      password: '',
       setores: [],
       cargos: [],
       canais: [],
@@ -196,7 +207,7 @@ const GestaoUsuarios = () => {
           <div className="relative mb-4">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
-              placeholder="Pesquisar usuário"
+              placeholder="Pesquisar usuário por nome ou email"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 border-gray-300"
@@ -255,6 +266,28 @@ const GestaoUsuarios = () => {
                       value={newUser.name}
                       onChange={(e) => setNewUser({...newUser, name: e.target.value})}
                       placeholder="Nome do usuário"
+                      className="border-gray-300"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium">Login (Email)</label>
+                    <Input
+                      type="email"
+                      value={newUser.email}
+                      onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                      placeholder="email@empresa.com"
+                      className="border-gray-300"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium">Senha</label>
+                    <Input
+                      type="password"
+                      value={newUser.password}
+                      onChange={(e) => setNewUser({...newUser, password: e.target.value})}
+                      placeholder="Senha do usuário"
                       className="border-gray-300"
                     />
                   </div>
@@ -343,9 +376,10 @@ const GestaoUsuarios = () => {
         <div className="overflow-x-auto">
           <div className="hidden md:grid grid-cols-12 gap-4 p-4 bg-gray-50 border-b border-gray-200 font-medium text-gray-700 min-w-[800px]">
             <div className="col-span-1"></div>
-            <div className="col-span-3">Nome</div>
+            <div className="col-span-2">Nome</div>
+            <div className="col-span-2">Email</div>
             <div className="col-span-2">Setores</div>
-            <div className="col-span-2">Cargos</div>
+            <div className="col-span-1">Cargos</div>
             <div className="col-span-2">Canais</div>
             <div className="col-span-2 text-center">Ações</div>
           </div>
@@ -366,6 +400,7 @@ const GestaoUsuarios = () => {
                     </div>
                     <div className="flex-1">
                       <h3 className="font-medium text-black">{user.name}</h3>
+                      <p className="text-sm text-gray-500">{user.email}</p>
                     </div>
                   </div>
                   
@@ -447,8 +482,12 @@ const GestaoUsuarios = () => {
                     </div>
                   </div>
                   
-                  <div className="col-span-3">
+                  <div className="col-span-2">
                     <h3 className="font-medium text-black">{user.name}</h3>
+                  </div>
+
+                  <div className="col-span-2">
+                    <p className="text-sm text-gray-600">{user.email}</p>
                   </div>
 
                   <div className="col-span-2">
@@ -461,7 +500,7 @@ const GestaoUsuarios = () => {
                     </div>
                   </div>
 
-                  <div className="col-span-2">
+                  <div className="col-span-1">
                     <div className="flex gap-1 flex-wrap">
                       {user.cargos.map((cargo, cargoIndex) => (
                         <span key={cargoIndex} className="px-2 py-1 bg-green-100 text-xs rounded-full border border-green-200">
@@ -550,6 +589,17 @@ const GestaoUsuarios = () => {
                     value={selectedUser.name}
                     onChange={(e) => setSelectedUser({...selectedUser, name: e.target.value})}
                     placeholder="Nome do usuário"
+                    className="border-gray-300"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium">Login (Email)</label>
+                  <Input
+                    type="email"
+                    value={selectedUser.email}
+                    onChange={(e) => setSelectedUser({...selectedUser, email: e.target.value})}
+                    placeholder="email@empresa.com"
                     className="border-gray-300"
                   />
                 </div>

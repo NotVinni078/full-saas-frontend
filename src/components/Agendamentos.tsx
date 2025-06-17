@@ -1,319 +1,364 @@
-
-import React, { useState } from 'react';
-import { Calendar, Plus, Search, Filter, Clock, Users, MessageSquare, Mic, Paperclip, X, Save, CalendarDays, Play, Pause, Trash2, Edit } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Search, Plus, Calendar as CalendarIcon, List, Trash2, Edit, ChevronLeft, ChevronRight, Send, X, Save, Paperclip, Mic, Tag, Clock, Users, Hash, RefreshCw } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Switch } from "@/components/ui/switch";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth } from "date-fns";
+import { ptBR } from "date-fns/locale";
+
+interface Contact {
+  id: number;
+  name: string;
+  phone: string;
+  tags: string[];
+}
 
 interface Agendamento {
   id: number;
-  contatos: string[];
-  tipo: 'texto' | 'audio';
-  mensagem: string;
+  title: string;
+  contacts: Contact[];
+  messageType: 'text' | 'audio';
+  message?: string;
   audioUrl?: string;
-  dataEnvio: string;
-  horaEnvio: string;
-  canal: string;
-  recorrencia?: {
-    tipo: 'diaria' | 'semanal' | 'mensal' | 'trimestral' | 'semestral' | 'anual' | 'personalizado';
-    dias?: number;
-  };
-  statusTicket: 'finalizado' | 'aguardando' | 'em-atendimento';
-  setor: string;
-  assinatura: boolean;
-  status: 'pendente' | 'enviado' | 'erro';
+  includeSignature: boolean;
+  hasAttachments: boolean;
+  scheduledDate: Date;
+  scheduledTime: string;
+  hasRecurrence: boolean;
+  recurrenceType?: 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'semiannual' | 'annual' | 'custom';
+  customDays?: number;
+  channel: 'WhatsApp' | 'Instagram' | 'Facebook' | 'Telegram';
+  ticketStatus: 'Finalizado' | 'Aguardando' | 'Em Atendimento';
+  sector: string;
+  status: 'Agendado' | 'Enviado' | 'Cancelado';
 }
 
 const Agendamentos = () => {
+  const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchContacts, setSearchContacts] = useState('');
-  const [filtroData, setFiltroData] = useState('');
-  const [filtroStatus, setFiltroStatus] = useState('');
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<'calendario' | 'lista'>('calendario');
-  const [editingAgendamento, setEditingAgendamento] = useState<Agendamento | null>(null);
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [periodFilter, setPeriodFilter] = useState('all');
+  const [isNewAgendamentoOpen, setIsNewAgendamentoOpen] = useState(false);
+  const [selectedAgendamento, setSelectedAgendamento] = useState<Agendamento | null>(null);
+  const [isEditAgendamentoOpen, setIsEditAgendamentoOpen] = useState(false);
   
-  const [novoAgendamento, setNovoAgendamento] = useState({
-    contatos: [] as string[],
-    tipo: 'texto' as 'texto' | 'audio',
-    mensagem: '',
-    audioUrl: '',
-    dataEnvio: '',
-    horaEnvio: '',
-    canal: '',
-    recorrencia: false,
-    tipoRecorrencia: '',
-    diasPersonalizado: 1,
-    statusTicket: 'aguardando',
-    setor: '',
-    assinatura: true,
-    midias: [] as string[]
-  });
+  // Estados do calendário
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth();
 
-  const [isRecording, setIsRecording] = useState(false);
+  // Estados do formulário
+  const [contactSearch, setContactSearch] = useState('');
+  const [selectedContacts, setSelectedContacts] = useState<Contact[]>([]);
+  const [selectedTag, setSelectedTag] = useState('');
+  const [messageType, setMessageType] = useState<'text' | 'audio'>('text');
+  const [messageText, setMessageText] = useState('');
+  const [includeSignature, setIncludeSignature] = useState(false);
+  const [hasAttachments, setHasAttachments] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date>();
+  const [selectedTime, setSelectedTime] = useState('');
+  const [hasRecurrence, setHasRecurrence] = useState(false);
+  const [recurrenceType, setRecurrenceType] = useState<'daily' | 'weekly' | 'monthly' | 'quarterly' | 'semiannual' | 'annual' | 'custom'>('daily');
+  const [customDays, setCustomDays] = useState<number>(1);
+  const [selectedChannel, setSelectedChannel] = useState<'WhatsApp' | 'Instagram' | 'Facebook' | 'Telegram'>('WhatsApp');
+  const [ticketStatus, setTicketStatus] = useState<'Finalizado' | 'Aguardando' | 'Em Atendimento'>('Aguardando');
+  const [selectedSector, setSelectedSector] = useState('');
 
-  // Mock data expandida
-  const [agendamentos] = useState<Agendamento[]>([
+  // Mock data
+  const mockContacts: Contact[] = [
+    { id: 1, name: 'João Silva', phone: '(11) 99999-0001', tags: ['Cliente VIP', 'São Paulo'] },
+    { id: 2, name: 'Maria Santos', phone: '(11) 99999-0002', tags: ['Prospect', 'Rio de Janeiro'] },
+    { id: 3, name: 'Pedro Costa', phone: '(11) 99999-0003', tags: ['Cliente VIP', 'Belo Horizonte'] },
+    { id: 4, name: 'Ana Oliveira', phone: '(11) 99999-0004', tags: ['Prospect', 'São Paulo'] },
+    { id: 5, name: 'Carlos Pereira', phone: '(11) 99999-0005', tags: ['Cliente Ativo', 'Curitiba'] },
+  ];
+
+  const availableTags = ['Cliente VIP', 'Prospect', 'Cliente Ativo', 'São Paulo', 'Rio de Janeiro', 'Belo Horizonte', 'Curitiba'];
+  const availableSectors = ['Vendas', 'Suporte', 'Marketing', 'Financeiro'];
+
+  const mockAgendamentos: Agendamento[] = [
     {
       id: 1,
-      contatos: ['João Silva', 'Maria Costa'],
-      tipo: 'texto',
-      mensagem: 'Lembrando sobre sua consulta amanhã',
-      dataEnvio: '2024-01-15',
-      horaEnvio: '09:00',
-      canal: 'WhatsApp',
-      statusTicket: 'aguardando',
-      setor: 'Atendimento',
-      assinatura: true,
-      status: 'pendente'
+      title: 'Promoção Black Friday',
+      contacts: [mockContacts[0], mockContacts[2]],
+      messageType: 'text',
+      message: 'Não perca! Black Friday com até 50% de desconto em todos os produtos!',
+      includeSignature: true,
+      hasAttachments: true,
+      scheduledDate: new Date(2024, 11, 15, 9, 0),
+      scheduledTime: '09:00',
+      hasRecurrence: false,
+      channel: 'WhatsApp',
+      ticketStatus: 'Aguardando',
+      sector: 'Marketing',
+      status: 'Agendado'
     },
     {
       id: 2,
-      contatos: ['Pedro Santos'],
-      tipo: 'audio',
-      mensagem: '',
-      audioUrl: '/audio1.mp3',
-      dataEnvio: '2024-01-16',
-      horaEnvio: '14:30',
-      canal: 'WhatsApp',
-      recorrencia: {
-        tipo: 'mensal'
-      },
-      statusTicket: 'em-atendimento',
-      setor: 'Vendas',
-      assinatura: false,
-      status: 'pendente'
+      title: 'Lembrete de Pagamento',
+      contacts: [mockContacts[1]],
+      messageType: 'text',
+      message: 'Olá! Este é um lembrete sobre o vencimento da sua fatura.',
+      includeSignature: false,
+      hasAttachments: false,
+      scheduledDate: new Date(2024, 11, 20, 14, 30),
+      scheduledTime: '14:30',
+      hasRecurrence: true,
+      recurrenceType: 'monthly',
+      channel: 'WhatsApp',
+      ticketStatus: 'Em Atendimento',
+      sector: 'Financeiro',
+      status: 'Agendado'
     },
     {
       id: 3,
-      contatos: ['Ana Oliveira', 'Carlos Ferreira'],
-      tipo: 'texto',
-      mensagem: 'Promoção especial para clientes VIP',
-      dataEnvio: '2024-01-17',
-      horaEnvio: '10:00',
-      canal: 'Instagram',
-      statusTicket: 'finalizado',
-      setor: 'Marketing',
-      assinatura: true,
-      status: 'pendente'
+      title: 'Pesquisa de Satisfação',
+      contacts: [mockContacts[3], mockContacts[4]],
+      messageType: 'text',
+      message: 'Como foi sua experiência conosco? Gostaríamos do seu feedback!',
+      includeSignature: true,
+      hasAttachments: false,
+      scheduledDate: new Date(2024, 11, 18, 16, 0),
+      scheduledTime: '16:00',
+      hasRecurrence: false,
+      channel: 'WhatsApp',
+      ticketStatus: 'Finalizado',
+      sector: 'Suporte',
+      status: 'Agendado'
     },
     {
       id: 4,
-      contatos: ['Roberto Lima'],
-      tipo: 'texto',
-      mensagem: 'Confirmação de reunião',
-      dataEnvio: '2024-01-18',
-      horaEnvio: '16:00',
-      canal: 'Email',
-      statusTicket: 'aguardando',
-      setor: 'Comercial',
-      assinatura: false,
-      status: 'pendente'
+      title: 'Oferta Especial',
+      contacts: [mockContacts[0], mockContacts[1], mockContacts[2]],
+      messageType: 'audio',
+      audioUrl: 'audio.mp3',
+      includeSignature: false,
+      hasAttachments: false,
+      scheduledDate: new Date(2024, 11, 22, 10, 0),
+      scheduledTime: '10:00',
+      hasRecurrence: true,
+      recurrenceType: 'weekly',
+      channel: 'Telegram',
+      ticketStatus: 'Aguardando',
+      sector: 'Vendas',
+      status: 'Agendado'
     },
     {
       id: 5,
-      contatos: ['Fernanda Silva', 'José Santos', 'Marina Costa'],
-      tipo: 'audio',
-      mensagem: '',
-      audioUrl: '/audio2.mp3',
-      dataEnvio: '2024-01-19',
-      horaEnvio: '11:30',
-      canal: 'Telegram',
-      recorrencia: {
-        tipo: 'semanal'
-      },
-      statusTicket: 'em-atendimento',
-      setor: 'Suporte',
-      assinatura: true,
-      status: 'pendente'
+      title: 'Comunicado Importante',
+      contacts: [mockContacts[4]],
+      messageType: 'text',
+      message: 'Informamos sobre as mudanças em nosso horário de funcionamento.',
+      includeSignature: true,
+      hasAttachments: true,
+      scheduledDate: new Date(2024, 11, 25, 8, 0),
+      scheduledTime: '08:00',
+      hasRecurrence: false,
+      channel: 'Instagram',
+      ticketStatus: 'Aguardando',
+      sector: 'Marketing',
+      status: 'Agendado'
     },
     {
       id: 6,
-      contatos: ['Lucas Oliveira'],
-      tipo: 'texto',
-      mensagem: 'Lembrete de pagamento',
-      dataEnvio: '2024-01-20',
-      horaEnvio: '08:00',
-      canal: 'WhatsApp',
-      statusTicket: 'aguardando',
-      setor: 'Financeiro',
-      assinatura: true,
-      status: 'pendente'
+      title: 'Follow-up Vendas',
+      contacts: [mockContacts[1], mockContacts[3]],
+      messageType: 'text',
+      message: 'Olá! Como está indo com o produto que você demonstrou interesse?',
+      includeSignature: false,
+      hasAttachments: false,
+      scheduledDate: new Date(2024, 11, 28, 15, 30),
+      scheduledTime: '15:30',
+      hasRecurrence: true,
+      recurrenceType: 'custom',
+      customDays: 7,
+      channel: 'WhatsApp',
+      ticketStatus: 'Em Atendimento',
+      sector: 'Vendas',
+      status: 'Agendado'
     }
-  ]);
-
-  const contatos = ['João Silva', 'Maria Costa', 'Pedro Santos', 'Ana Oliveira', 'Carlos Ferreira', 'Roberto Lima', 'Fernanda Silva', 'José Santos', 'Marina Costa', 'Lucas Oliveira'];
-  const tags = [
-    { nome: 'Cliente', contatos: ['João Silva', 'Maria Costa', 'Pedro Santos'] },
-    { nome: 'Lead', contatos: ['Ana Oliveira', 'Carlos Ferreira'] },
-    { nome: 'VIP', contatos: ['Roberto Lima', 'Fernanda Silva'] },
-    { nome: 'Interessado', contatos: ['José Santos', 'Marina Costa', 'Lucas Oliveira'] }
-  ];
-  const canais = ['WhatsApp', 'Instagram', 'Facebook', 'Telegram', 'Email'];
-  const setores = ['Atendimento', 'Vendas', 'Suporte', 'Marketing', 'Comercial', 'Financeiro'];
-
-  const tiposRecorrencia = [
-    { value: 'diaria', label: 'Diária (todo dia)' },
-    { value: 'semanal', label: 'Semanal' },
-    { value: 'mensal', label: 'Mensal (todo mês)' },
-    { value: 'trimestral', label: 'Trimestral (cada 3 meses)' },
-    { value: 'semestral', label: 'Semestral (cada 6 meses)' },
-    { value: 'anual', label: 'Anual (1 vez por ano)' },
-    { value: 'personalizado', label: 'Personalizado' }
   ];
 
-  const filteredContacts = contatos.filter(contato => 
-    contato.toLowerCase().includes(searchContacts.toLowerCase())
-  );
-
-  const handleSaveAgendamento = () => {
-    console.log('Salvando agendamento:', novoAgendamento);
-    setIsAddDialogOpen(false);
-    setEditingAgendamento(null);
-    resetForm();
-  };
-
-  const handleDiscardAgendamento = () => {
-    setIsAddDialogOpen(false);
-    setEditingAgendamento(null);
-    resetForm();
-  };
-
-  const resetForm = () => {
-    setNovoAgendamento({
-      contatos: [],
-      tipo: 'texto',
-      mensagem: '',
-      audioUrl: '',
-      dataEnvio: '',
-      horaEnvio: '',
-      canal: '',
-      recorrencia: false,
-      tipoRecorrencia: '',
-      diasPersonalizado: 1,
-      statusTicket: 'aguardando',
-      setor: '',
-      assinatura: true,
-      midias: []
+  const filteredAgendamentos = useMemo(() => {
+    return mockAgendamentos.filter(agendamento => {
+      const matchesSearch = agendamento.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           agendamento.contacts.some(contact => contact.name.toLowerCase().includes(searchTerm.toLowerCase()));
+      const matchesStatus = statusFilter === 'all' || agendamento.status === statusFilter;
+      
+      let matchesPeriod = true;
+      if (periodFilter !== 'all') {
+        const today = new Date();
+        const scheduleDate = agendamento.scheduledDate;
+        
+        switch (periodFilter) {
+          case 'today':
+            matchesPeriod = isSameDay(scheduleDate, today);
+            break;
+          case 'week':
+            const weekStart = new Date(today);
+            weekStart.setDate(today.getDate() - today.getDay());
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekStart.getDate() + 6);
+            matchesPeriod = scheduleDate >= weekStart && scheduleDate <= weekEnd;
+            break;
+          case 'month':
+            matchesPeriod = scheduleDate.getMonth() === today.getMonth() && 
+                          scheduleDate.getFullYear() === today.getFullYear();
+            break;
+        }
+      }
+      
+      return matchesSearch && matchesStatus && matchesPeriod;
     });
-    setSearchContacts('');
-  };
-
-  const handleEditAgendamento = (agendamento: Agendamento) => {
-    setEditingAgendamento(agendamento);
-    setNovoAgendamento({
-      contatos: agendamento.contatos,
-      tipo: agendamento.tipo,
-      mensagem: agendamento.mensagem,
-      audioUrl: agendamento.audioUrl || '',
-      dataEnvio: agendamento.dataEnvio,
-      horaEnvio: agendamento.horaEnvio,
-      canal: agendamento.canal,
-      recorrencia: !!agendamento.recorrencia,
-      tipoRecorrencia: agendamento.recorrencia?.tipo || '',
-      diasPersonalizado: agendamento.recorrencia?.dias || 1,
-      statusTicket: agendamento.statusTicket,
-      setor: agendamento.setor,
-      assinatura: agendamento.assinatura,
-      midias: []
-    });
-    setIsAddDialogOpen(true);
-  };
-
-  const addContatoByName = (nomeContato: string) => {
-    if (!novoAgendamento.contatos.includes(nomeContato)) {
-      setNovoAgendamento({ 
-        ...novoAgendamento, 
-        contatos: [...novoAgendamento.contatos, nomeContato] 
-      });
-    }
-    setSearchContacts('');
-  };
-
-  const addContatosByTag = (tagName: string) => {
-    const tag = tags.find(t => t.nome === tagName);
-    if (tag) {
-      const novosContatos = tag.contatos.filter(contato => !novoAgendamento.contatos.includes(contato));
-      setNovoAgendamento({ 
-        ...novoAgendamento, 
-        contatos: [...novoAgendamento.contatos, ...novosContatos] 
-      });
-    }
-  };
-
-  const removeContato = (contato: string) => {
-    setNovoAgendamento({
-      ...novoAgendamento,
-      contatos: novoAgendamento.contatos.filter(c => c !== contato)
-    });
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pendente': return 'bg-yellow-100 text-yellow-800';
-      case 'enviado': return 'bg-green-100 text-green-800';
-      case 'erro': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const handleDeleteAgendamento = (id: number) => {
-    console.log('Excluindo agendamento:', id);
-  };
+  }, [mockAgendamentos, searchTerm, statusFilter, periodFilter]);
 
   const getAgendamentosForDate = (date: Date) => {
-    const dateStr = date.toISOString().split('T')[0];
-    return agendamentos.filter(ag => ag.dataEnvio === dateStr);
+    return filteredAgendamentos.filter(agendamento => 
+      isSameDay(agendamento.scheduledDate, date)
+    );
   };
 
-  const renderCalendar = () => {
-    const today = new Date();
-    const currentMonth = today.getMonth();
-    const currentYear = today.getFullYear();
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+  const filteredContacts = useMemo(() => {
+    let contacts = mockContacts;
     
-    const days = [];
-    
-    // Dias vazios do início do mês
-    for (let i = 0; i < firstDay; i++) {
-      days.push(<div key={`empty-${i}`} className="h-24 border border-gray-200"></div>);
+    if (selectedTag) {
+      contacts = mockContacts.filter(contact =>
+        contact.tags.includes(selectedTag)
+      );
+      
+      // Se uma tag foi selecionada, adiciona todos os contatos com essa tag
+      if (selectedTag && !selectedContacts.some(sc => contacts.some(c => c.id === sc.id))) {
+        setSelectedContacts(contacts);
+      }
     }
     
-    // Dias do mês
-    for (let day = 1; day <= daysInMonth; day++) {
-      const date = new Date(currentYear, currentMonth, day);
-      const agendamentosDay = getAgendamentosForDate(date);
-      
-      days.push(
-        <div key={day} className="h-24 border border-gray-200 p-1 overflow-y-auto">
-          <div className="font-medium text-sm mb-1">{day}</div>
-          {agendamentosDay.map(ag => (
-            <div key={ag.id} className="text-xs bg-blue-100 text-blue-800 p-1 rounded mb-1 truncate">
-              {ag.horaEnvio} - {ag.contatos[0]}{ag.contatos.length > 1 ? ` +${ag.contatos.length - 1}` : ''}
-            </div>
-          ))}
-        </div>
+    if (contactSearch) {
+      contacts = contacts.filter(contact =>
+        contact.name.toLowerCase().includes(contactSearch.toLowerCase()) ||
+        contact.phone.includes(contactSearch)
       );
     }
     
-    return (
-      <div className="bg-white rounded-lg border border-gray-200">
-        <div className="grid grid-cols-7 gap-0">
-          {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(day => (
-            <div key={day} className="p-2 text-center font-medium bg-gray-50 border-b border-gray-200">
-              {day}
-            </div>
-          ))}
-          {days}
-        </div>
-      </div>
-    );
+    return contacts;
+  }, [contactSearch, selectedTag, mockContacts, selectedContacts]);
+
+  const handleSaveAgendamento = () => {
+    console.log('Salvando agendamento:', {
+      contacts: selectedContacts,
+      messageType,
+      message: messageText,
+      includeSignature,
+      hasAttachments,
+      scheduledDate: selectedDate,
+      scheduledTime: selectedTime,
+      hasRecurrence,
+      recurrenceType: hasRecurrence ? recurrenceType : undefined,
+      customDays: recurrenceType === 'custom' ? customDays : undefined,
+      channel: selectedChannel,
+      ticketStatus,
+      sector: selectedSector
+    });
+    
+    resetForm();
+    setIsNewAgendamentoOpen(false);
   };
+
+  const handleEditAgendamento = (agendamento: Agendamento) => {
+    setSelectedAgendamento(agendamento);
+    
+    // Preenche o formulário com os dados do agendamento
+    setSelectedContacts(agendamento.contacts);
+    setMessageType(agendamento.messageType);
+    setMessageText(agendamento.message || '');
+    setIncludeSignature(agendamento.includeSignature);
+    setHasAttachments(agendamento.hasAttachments);
+    setSelectedDate(agendamento.scheduledDate);
+    setSelectedTime(agendamento.scheduledTime);
+    setHasRecurrence(agendamento.hasRecurrence);
+    setRecurrenceType(agendamento.recurrenceType || 'daily');
+    setCustomDays(agendamento.customDays || 1);
+    setSelectedChannel(agendamento.channel);
+    setTicketStatus(agendamento.ticketStatus);
+    setSelectedSector(agendamento.sector);
+    
+    setIsEditAgendamentoOpen(true);
+  };
+
+  const handleSaveEditAgendamento = () => {
+    console.log('Salvando edição do agendamento:', selectedAgendamento?.id);
+    
+    resetForm();
+    setSelectedAgendamento(null);
+    setIsEditAgendamentoOpen(false);
+  };
+
+  const resetForm = () => {
+    setContactSearch('');
+    setSelectedContacts([]);
+    setSelectedTag('');
+    setMessageType('text');
+    setMessageText('');
+    setIncludeSignature(false);
+    setHasAttachments(false);
+    setSelectedDate(undefined);
+    setSelectedTime('');
+    setHasRecurrence(false);
+    setRecurrenceType('daily');
+    setCustomDays(1);
+    setSelectedChannel('WhatsApp');
+    setTicketStatus('Aguardando');
+    setSelectedSector('');
+  };
+
+  const handleDiscardAgendamento = () => {
+    resetForm();
+    setIsNewAgendamentoOpen(false);
+  };
+
+  const handleDiscardEditAgendamento = () => {
+    resetForm();
+    setSelectedAgendamento(null);
+    setIsEditAgendamentoOpen(false);
+  };
+
+  const handleSendNow = (agendamento: Agendamento) => {
+    console.log('Enviando agendamento agora:', agendamento.id);
+  };
+
+  const handleDeleteAgendamento = (agendamento: Agendamento) => {
+    console.log('Excluindo agendamento:', agendamento.id);
+  };
+
+  const navigateMonth = (direction: 'prev' | 'next') => {
+    const newDate = new Date(currentDate);
+    if (direction === 'prev') {
+      newDate.setMonth(currentMonth - 1);
+    } else {
+      newDate.setMonth(currentMonth + 1);
+    }
+    setCurrentDate(newDate);
+  };
+
+  const navigateYear = (direction: 'prev' | 'next') => {
+    const newDate = new Date(currentDate);
+    if (direction === 'prev') {
+      newDate.setFullYear(currentYear - 1);
+    } else {
+      newDate.setFullYear(currentYear + 1);
+    }
+    setCurrentDate(newDate);
+  };
+
+  const monthStart = startOfMonth(currentDate);
+  const monthEnd = endOfMonth(currentDate);
+  const calendarDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
   return (
     <TooltipProvider>
@@ -321,442 +366,572 @@ const Agendamentos = () => {
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-xl sm:text-2xl font-bold text-black mb-4 sm:mb-6">
-            Agendamentos ({agendamentos.length})
+            Agendamentos ({filteredAgendamentos.length})
           </h1>
 
-          {/* Controles superiores */}
-          <div className="flex flex-col lg:flex-row gap-4 mb-6">
-            {/* Barra de pesquisa */}
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder="Pesquisar agendamentos"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 border-gray-300"
-              />
+          {/* Barra de pesquisa */}
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              placeholder="Pesquisar agendamento ou contato"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 border-gray-300"
+            />
+          </div>
+
+          <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center mb-6">
+            {/* Filtros */}
+            <div className="flex flex-col sm:flex-row gap-4 flex-1">
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="border-gray-300 bg-white min-w-40">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
+                  <SelectItem value="all">Todos os Status</SelectItem>
+                  <SelectItem value="Agendado">Agendado</SelectItem>
+                  <SelectItem value="Enviado">Enviado</SelectItem>
+                  <SelectItem value="Cancelado">Cancelado</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={periodFilter} onValueChange={setPeriodFilter}>
+                <SelectTrigger className="border-gray-300 bg-white min-w-40">
+                  <SelectValue placeholder="Período" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
+                  <SelectItem value="all">Todos os Períodos</SelectItem>
+                  <SelectItem value="today">Hoje</SelectItem>
+                  <SelectItem value="week">Esta Semana</SelectItem>
+                  <SelectItem value="month">Este Mês</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
-            {/* Filtros */}
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Select value={filtroData} onValueChange={setFiltroData}>
-                <SelectTrigger className="w-full sm:w-48 border-gray-300 bg-white">
-                  <SelectValue placeholder="Filtrar por período" />
-                </SelectTrigger>
-                <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
-                  <SelectItem value="hoje">Hoje</SelectItem>
-                  <SelectItem value="semana">Esta semana</SelectItem>
-                  <SelectItem value="mes">Este mês</SelectItem>
-                  <SelectItem value="todos">Todos os períodos</SelectItem>
-                </SelectContent>
-              </Select>
+            {/* Toggle de visualização */}
+            <div className="flex items-center bg-gray-100 rounded-lg p-1">
+              <Button
+                variant={viewMode === 'calendar' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('calendar')}
+                className={cn(
+                  "flex items-center gap-2",
+                  viewMode === 'calendar' 
+                    ? "bg-black text-white hover:bg-gray-800" 
+                    : "text-gray-600 hover:text-black hover:bg-gray-200"
+                )}
+              >
+                <CalendarIcon className="h-4 w-4" />
+                Calendário
+              </Button>
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('list')}
+                className={cn(
+                  "flex items-center gap-2",
+                  viewMode === 'list' 
+                    ? "bg-black text-white hover:bg-gray-800" 
+                    : "text-gray-600 hover:text-black hover:bg-gray-200"
+                )}
+              >
+                <List className="h-4 w-4" />
+                Lista
+              </Button>
+            </div>
 
-              <Select value={filtroStatus} onValueChange={setFiltroStatus}>
-                <SelectTrigger className="w-full sm:w-48 border-gray-300 bg-white">
-                  <SelectValue placeholder="Filtrar por status" />
-                </SelectTrigger>
-                <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
-                  <SelectItem value="pendente">Pendente</SelectItem>
-                  <SelectItem value="enviado">Enviado</SelectItem>
-                  <SelectItem value="erro">Erro</SelectItem>
-                  <SelectItem value="todos">Todos os status</SelectItem>
-                </SelectContent>
-              </Select>
-
-              {/* Toggle de visualização com cores corretas */}
-              <div className="flex bg-gray-100 rounded-lg p-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setViewMode('calendario')}
-                  className={`${viewMode === 'calendario' ? 'bg-black text-white hover:bg-gray-800' : 'text-gray-600 hover:bg-gray-200'}`}
-                >
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Calendário
+            {/* Botão Novo Agendamento */}
+            <Dialog open={isNewAgendamentoOpen} onOpenChange={setIsNewAgendamentoOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-black text-white hover:bg-gray-800">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Novo Agendamento
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setViewMode('lista')}
-                  className={`${viewMode === 'lista' ? 'bg-black text-white hover:bg-gray-800' : 'text-gray-600 hover:bg-gray-200'}`}
-                >
-                  <Filter className="h-4 w-4 mr-2" />
-                  Lista
-                </Button>
-              </div>
-
-              <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="bg-black text-white hover:bg-gray-800" onClick={() => setEditingAgendamento(null)}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Novo Agendamento
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-2xl bg-white max-h-[90vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>{editingAgendamento ? 'Editar Agendamento' : 'Novo Agendamento'}</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-6">
-                    {/* Seleção de contatos com barra de pesquisa */}
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Contatos</label>
-                      <div className="space-y-3">
-                        <div className="flex gap-3">
-                          <div className="flex-1">
-                            <div className="relative">
-                              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                              <Input
-                                placeholder="Pesquisar contatos"
-                                value={searchContacts}
-                                onChange={(e) => setSearchContacts(e.target.value)}
-                                onKeyPress={(e) => {
-                                  if (e.key === 'Enter' && filteredContacts.length > 0) {
-                                    addContatoByName(filteredContacts[0]);
-                                  }
-                                }}
-                                className="pl-10 border-gray-300"
-                              />
-                              {searchContacts && filteredContacts.length > 0 && (
-                                <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-40 overflow-y-auto">
-                                  {filteredContacts.map((contato) => (
-                                    <div
-                                      key={contato}
-                                      className="p-2 hover:bg-gray-100 cursor-pointer text-sm"
-                                      onClick={() => addContatoByName(contato)}
-                                    >
-                                      {contato}
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          <div className="flex flex-wrap gap-2">
-                            {tags.map((tag) => (
-                              <Button
-                                key={tag.nome}
-                                variant="outline"
-                                size="sm"
-                                onClick={() => addContatosByTag(tag.nome)}
-                                className="border-gray-300"
-                              >
-                                {tag.nome}
-                              </Button>
-                            ))}
-                          </div>
-                        </div>
-
-                        {novoAgendamento.contatos.length > 0 && (
-                          <div>
-                            <span className="text-sm font-medium text-gray-700">Agendamento para:</span>
-                            <div className="flex flex-wrap gap-2 mt-2">
-                              {novoAgendamento.contatos.map((contato, index) => (
-                                <span key={index} className="px-2 py-1 bg-gray-100 text-xs rounded-full border border-gray-200 flex items-center gap-1">
-                                  {contato}
-                                  <X 
-                                    className="h-3 w-3 cursor-pointer hover:text-red-600" 
-                                    onClick={() => removeContato(contato)}
-                                  />
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Tipo de mensagem */}
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Tipo de mensagem</label>
-                      <div className="flex gap-2">
-                        <Button
-                          variant={novoAgendamento.tipo === 'texto' ? "default" : "outline"}
-                          onClick={() => setNovoAgendamento({ ...novoAgendamento, tipo: 'texto' })}
-                          className={novoAgendamento.tipo === 'texto' ? "bg-black text-white" : "border-gray-300"}
-                        >
-                          <MessageSquare className="h-4 w-4 mr-2" />
-                          Texto
-                        </Button>
-                        <Button
-                          variant={novoAgendamento.tipo === 'audio' ? "default" : "outline"}
-                          onClick={() => setNovoAgendamento({ ...novoAgendamento, tipo: 'audio' })}
-                          className={novoAgendamento.tipo === 'audio' ? "bg-black text-white" : "border-gray-300"}
-                        >
-                          <Mic className="h-4 w-4 mr-2" />
-                          Áudio
-                        </Button>
-                      </div>
-                    </div>
-
-                    {/* Conteúdo da mensagem */}
-                    {novoAgendamento.tipo === 'texto' ? (
-                      <div className="space-y-3">
-                        <div>
-                          <label className="text-sm font-medium">Mensagem</label>
-                          <Textarea
-                            value={novoAgendamento.mensagem}
-                            onChange={(e) => setNovoAgendamento({ ...novoAgendamento, mensagem: e.target.value })}
-                            placeholder="Digite sua mensagem..."
-                            className="border-gray-300 min-h-[100px]"
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-2xl bg-white max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Novo Agendamento</DialogTitle>
+                </DialogHeader>
+                
+                <div className="space-y-6">
+                  {/* Seleção de Contatos */}
+                  <div className="space-y-4">
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <div className="flex-1">
+                        <label className="text-sm font-medium mb-2 block">Pesquisar Contatos</label>
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                          <Input
+                            placeholder="Digite o nome ou telefone"
+                            value={contactSearch}
+                            onChange={(e) => setContactSearch(e.target.value)}
+                            className="pl-10 border-gray-300"
                           />
                         </div>
-                        
-                        <div className="flex items-center gap-4">
-                          <div className="flex items-center space-x-2">
-                            <Switch
-                              checked={novoAgendamento.assinatura}
-                              onCheckedChange={(checked) => setNovoAgendamento({ ...novoAgendamento, assinatura: checked })}
-                            />
-                            <label className="text-sm">Enviar assinatura</label>
-                          </div>
-                          
-                          <Button variant="outline" size="sm" className="border-gray-300">
-                            <Paperclip className="h-4 w-4 mr-2" />
-                            Anexar mídia
-                          </Button>
-                        </div>
                       </div>
-                    ) : (
+                      <div className="min-w-48">
+                        <label className="text-sm font-medium mb-2 block">Filtrar por TAG</label>
+                        <Select value={selectedTag} onValueChange={setSelectedTag}>
+                          <SelectTrigger className="border-gray-300 bg-white">
+                            <SelectValue placeholder="Selecionar TAG" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
+                            <SelectItem value="">Nenhuma TAG</SelectItem>
+                            {availableTags.map((tag) => (
+                              <SelectItem key={tag} value={tag}>
+                                {tag}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    {selectedContacts.length > 0 && (
                       <div>
-                        <label className="text-sm font-medium mb-2 block">Gravar áudio</label>
-                        <div className="flex items-center gap-3 p-4 border border-gray-300 rounded-lg">
-                          <Button
-                            variant={isRecording ? "destructive" : "default"}
-                            size="sm"
-                            onClick={() => setIsRecording(!isRecording)}
-                            className={isRecording ? "" : "bg-red-600 hover:bg-red-700"}
-                          >
-                            {isRecording ? (
-                              <>
-                                <Pause className="h-4 w-4 mr-2" />
-                                Parar
-                              </>
-                            ) : (
-                              <>
-                                <Mic className="h-4 w-4 mr-2" />
-                                Gravar
-                              </>
-                            )}
-                          </Button>
-                          {isRecording && (
-                            <div className="flex items-center gap-2 text-red-600">
-                              <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
-                              <span className="text-sm">Gravando...</span>
-                            </div>
-                          )}
+                        <label className="text-sm font-medium mb-2 block">Agendamento para:</label>
+                        <div className="bg-gray-50 p-3 rounded-lg">
+                          <div className="flex flex-wrap gap-2">
+                            {selectedContacts.map((contact) => (
+                              <span key={contact.id} className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-sm rounded-full border border-blue-200">
+                                {contact.name}
+                                <button
+                                  onClick={() => setSelectedContacts(selectedContacts.filter(c => c.id !== contact.id))}
+                                  className="text-blue-600 hover:text-blue-800"
+                                >
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     )}
+                  </div>
 
-                    {/* Data e hora */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-sm font-medium">Data de envio</label>
-                        <Input
-                          type="date"
-                          value={novoAgendamento.dataEnvio}
-                          onChange={(e) => setNovoAgendamento({ ...novoAgendamento, dataEnvio: e.target.value })}
-                          className="border-gray-300"
+                  {/* Tipo de Mensagem */}
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Tipo de Mensagem</label>
+                    <div className="flex gap-4">
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          name="messageType"
+                          value="text"
+                          checked={messageType === 'text'}
+                          onChange={(e) => setMessageType(e.target.value as 'text' | 'audio')}
+                          className="text-black"
                         />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium">Hora de envio</label>
-                        <Input
-                          type="time"
-                          value={novoAgendamento.horaEnvio}
-                          onChange={(e) => setNovoAgendamento({ ...novoAgendamento, horaEnvio: e.target.value })}
-                          className="border-gray-300"
+                        <span>Texto</span>
+                      </label>
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          name="messageType"
+                          value="audio"
+                          checked={messageType === 'audio'}
+                          onChange={(e) => setMessageType(e.target.value as 'text' | 'audio')}
+                          className="text-black"
                         />
-                      </div>
+                        <span>Áudio</span>
+                      </label>
                     </div>
+                  </div>
 
-                    {/* Recorrência */}
-                    <div className="space-y-3">
-                      <div className="flex items-center space-x-2">
-                        <Switch
-                          checked={novoAgendamento.recorrencia}
-                          onCheckedChange={(checked) => setNovoAgendamento({ ...novoAgendamento, recorrencia: checked })}
+                  {/* Conteúdo da Mensagem */}
+                  {messageType === 'text' ? (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">Mensagem</label>
+                        <Textarea
+                          placeholder="Digite sua mensagem aqui..."
+                          value={messageText}
+                          onChange={(e) => setMessageText(e.target.value)}
+                          className="border-gray-300 min-h-24"
                         />
-                        <label className="text-sm font-medium">Cadastrar recorrência</label>
                       </div>
                       
-                      {novoAgendamento.recorrencia && (
-                        <div className="space-y-3 pl-6">
-                          <Select value={novoAgendamento.tipoRecorrencia} onValueChange={(value) => setNovoAgendamento({ ...novoAgendamento, tipoRecorrencia: value })}>
-                            <SelectTrigger className="border-gray-300">
-                              <SelectValue placeholder="Selecionar tipo de recorrência" />
-                            </SelectTrigger>
-                            <SelectContent className="bg-white">
-                              {tiposRecorrencia.map((tipo) => (
-                                <SelectItem key={tipo.value} value={tipo.value}>
-                                  {tipo.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          
-                          {novoAgendamento.tipoRecorrencia === 'personalizado' && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm">Enviar a cada</span>
-                              <Input
-                                type="number"
-                                min="1"
-                                value={novoAgendamento.diasPersonalizado}
-                                onChange={(e) => setNovoAgendamento({ ...novoAgendamento, diasPersonalizado: parseInt(e.target.value) || 1 })}
-                                className="w-20 border-gray-300"
-                              />
-                              <span className="text-sm">dias</span>
+                      <div className="flex flex-col sm:flex-row gap-4">
+                        <label className="flex items-center space-x-2">
+                          <Checkbox
+                            checked={includeSignature}
+                            onCheckedChange={(checked) => setIncludeSignature(checked as boolean)}
+                          />
+                          <span className="text-sm">Incluir assinatura</span>
+                        </label>
+                        
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setHasAttachments(!hasAttachments)}
+                          className={cn(
+                            "flex items-center gap-2 border-gray-300",
+                            hasAttachments && "bg-gray-100"
+                          )}
+                        >
+                          <Paperclip className="h-4 w-4" />
+                          Anexar mídia
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Áudio</label>
+                      <Button variant="outline" className="flex items-center gap-2 border-gray-300">
+                        <Mic className="h-4 w-4" />
+                        Gravar áudio
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* Data e Hora */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Data de Envio</label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className="w-full justify-start border-gray-300">
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {selectedDate ? format(selectedDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : "Selecionar data"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0 bg-white border border-gray-300 shadow-lg">
+                          <Calendar
+                            mode="single"
+                            selected={selectedDate}
+                            onSelect={setSelectedDate}
+                            locale={ptBR}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Horário de Envio</label>
+                      <Input
+                        type="time"
+                        value={selectedTime}
+                        onChange={(e) => setSelectedTime(e.target.value)}
+                        className="border-gray-300"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Recorrência */}
+                  <div className="space-y-4">
+                    <label className="flex items-center space-x-2">
+                      <Checkbox
+                        checked={hasRecurrence}
+                        onCheckedChange={(checked) => setHasRecurrence(checked as boolean)}
+                      />
+                      <span className="text-sm font-medium">Cadastrar recorrência</span>
+                    </label>
+                    
+                    {hasRecurrence && (
+                      <div className="space-y-4 pl-6">
+                        <Select value={recurrenceType} onValueChange={(value) => setRecurrenceType(value as any)}>
+                          <SelectTrigger className="border-gray-300 bg-white">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
+                            <SelectItem value="daily">Diária (todo dia)</SelectItem>
+                            <SelectItem value="weekly">Semanal</SelectItem>
+                            <SelectItem value="monthly">Mensal (todo mês)</SelectItem>
+                            <SelectItem value="quarterly">Trimestral (cada 3 meses)</SelectItem>
+                            <SelectItem value="semiannual">Semestral (cada 6 meses)</SelectItem>
+                            <SelectItem value="annual">Anual (1 vez por ano)</SelectItem>
+                            <SelectItem value="custom">Personalizado</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        
+                        {recurrenceType === 'custom' && (
+                          <div>
+                            <label className="text-sm font-medium mb-2 block">Repetir a cada quantos dias?</label>
+                            <Input
+                              type="number"
+                              min="1"
+                              value={customDays}
+                              onChange={(e) => setCustomDays(Number(e.target.value))}
+                              className="border-gray-300"
+                              placeholder="Número de dias"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Canal e Configurações */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Canal de Envio</label>
+                      <Select value={selectedChannel} onValueChange={(value) => setSelectedChannel(value as any)}>
+                        <SelectTrigger className="border-gray-300 bg-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
+                          <SelectItem value="WhatsApp">WhatsApp</SelectItem>
+                          <SelectItem value="Instagram">Instagram</SelectItem>
+                          <SelectItem value="Facebook">Facebook</SelectItem>
+                          <SelectItem value="Telegram">Telegram</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Status do Ticket</label>
+                      <Select value={ticketStatus} onValueChange={(value) => setTicketStatus(value as any)}>
+                        <SelectTrigger className="border-gray-300 bg-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
+                          <SelectItem value="Finalizado">Finalizado</SelectItem>
+                          <SelectItem value="Aguardando">Aguardando</SelectItem>
+                          <SelectItem value="Em Atendimento">Em Atendimento</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Setor</label>
+                    <Select value={selectedSector} onValueChange={setSelectedSector}>
+                      <SelectTrigger className="border-gray-300 bg-white">
+                        <SelectValue placeholder="Selecionar setor" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
+                        {availableSectors.map((sector) => (
+                          <SelectItem key={sector} value={sector}>
+                            {sector}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Botões */}
+                  <div className="flex flex-col sm:flex-row justify-between gap-3 pt-4">
+                    <Button
+                      variant="outline"
+                      onClick={handleDiscardAgendamento}
+                      className="border-gray-300"
+                    >
+                      <X className="h-4 w-4 mr-2" />
+                      Descartar
+                    </Button>
+                    <Button
+                      onClick={handleSaveAgendamento}
+                      className="bg-black text-white hover:bg-gray-800"
+                    >
+                      <Save className="h-4 w-4 mr-2" />
+                      Salvar
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </div>
+
+        {/* Conteúdo Principal */}
+        {viewMode === 'calendar' ? (
+          <div className="bg-white border border-gray-200 rounded-lg">
+            {/* Header do Calendário */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigateMonth('prev')}
+                    className="border-gray-300"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigateMonth('next')}
+                    className="border-gray-300"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+                
+                <h2 className="text-lg font-semibold">
+                  {format(currentDate, "MMMM", { locale: ptBR })}
+                </h2>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigateYear('prev')}
+                  className="border-gray-300"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <span className="font-semibold min-w-16 text-center">{currentYear}</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigateYear('next')}
+                  className="border-gray-300"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Grid do Calendário */}
+            <div className="p-4">
+              {/* Cabeçalho dos dias da semana */}
+              <div className="grid grid-cols-7 gap-1 mb-2">
+                {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map((day) => (
+                  <div key={day} className="p-2 text-center text-sm font-medium text-gray-500">
+                    {day}
+                  </div>
+                ))}
+              </div>
+
+              {/* Dias do calendário */}
+              <div className="grid grid-cols-7 gap-1">
+                {calendarDays.map((day) => {
+                  const dayAgendamentos = getAgendamentosForDate(day);
+                  const isCurrentMonth = isSameMonth(day, currentDate);
+                  
+                  return (
+                    <div
+                      key={day.toISOString()}
+                      className={cn(
+                        "min-h-20 p-1 border border-gray-100 rounded",
+                        !isCurrentMonth && "bg-gray-50 text-gray-400"
+                      )}
+                    >
+                      <div className="text-sm font-medium mb-1">
+                        {format(day, "d")}
+                      </div>
+                      
+                      {dayAgendamentos.length > 0 && (
+                        <div className="space-y-1">
+                          {dayAgendamentos.slice(0, 2).map((agendamento) => (
+                            <div
+                              key={agendamento.id}
+                              className="text-xs p-1 bg-blue-100 text-blue-800 rounded truncate cursor-pointer hover:bg-blue-200"
+                              title={agendamento.title}
+                            >
+                              {agendamento.title}
+                            </div>
+                          ))}
+                          {dayAgendamentos.length > 2 && (
+                            <div className="text-xs text-gray-500">
+                              +{dayAgendamentos.length - 2} mais
                             </div>
                           )}
                         </div>
                       )}
                     </div>
-
-                    {/* Canal e configurações finais */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-sm font-medium">Canal</label>
-                        <Select value={novoAgendamento.canal} onValueChange={(value) => setNovoAgendamento({ ...novoAgendamento, canal: value })}>
-                          <SelectTrigger className="border-gray-300">
-                            <SelectValue placeholder="Selecionar canal" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-white">
-                            {canais.map((canal) => (
-                              <SelectItem key={canal} value={canal}>
-                                {canal}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div>
-                        <label className="text-sm font-medium">Setor</label>
-                        <Select value={novoAgendamento.setor} onValueChange={(value) => setNovoAgendamento({ ...novoAgendamento, setor: value })}>
-                          <SelectTrigger className="border-gray-300">
-                            <SelectValue placeholder="Selecionar setor" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-white">
-                            {setores.map((setor) => (
-                              <SelectItem key={setor} value={setor}>
-                                {setor}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium">Status do ticket após envio</label>
-                      <Select value={novoAgendamento.statusTicket} onValueChange={(value) => setNovoAgendamento({ ...novoAgendamento, statusTicket: value })}>
-                        <SelectTrigger className="border-gray-300">
-                          <SelectValue placeholder="Selecionar status" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white">
-                          <SelectItem value="finalizado">Finalizado</SelectItem>
-                          <SelectItem value="aguardando">Aguardando</SelectItem>
-                          <SelectItem value="em-atendimento">Em Atendimento</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row justify-between gap-3 pt-4">
-                      <Button
-                        variant="outline"
-                        onClick={handleDiscardAgendamento}
-                        className="border-gray-300"
-                      >
-                        <X className="h-4 w-4 mr-2" />
-                        Descartar
-                      </Button>
-                      <Button
-                        onClick={handleSaveAgendamento}
-                        className="bg-black text-white hover:bg-gray-800"
-                      >
-                        <Save className="h-4 w-4 mr-2" />
-                        Salvar
-                      </Button>
-                    </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        </div>
-
-        {/* Conteúdo principal */}
-        {viewMode === 'calendario' ? (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-medium">Janeiro 2024</h2>
-            </div>
-            {renderCalendar()}
           </div>
         ) : (
           <div className="space-y-4">
-            {agendamentos.map((agendamento) => (
-              <div key={agendamento.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            {filteredAgendamentos.map((agendamento) => (
+              <div key={agendamento.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                   <div className="flex-1 space-y-2">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(agendamento.status)}`}>
-                        {agendamento.status}
-                      </span>
-                      <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
-                        {agendamento.canal}
-                      </span>
-                      {agendamento.recorrencia && (
-                        <span className="px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded-full">
-                          Recorrente
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                      <h3 className="font-semibold text-black">{agendamento.title}</h3>
+                      <div className="flex flex-wrap gap-2">
+                        <span className="px-2 py-1 bg-blue-100 text-xs rounded-full border border-blue-200">
+                          {agendamento.channel}
                         </span>
-                      )}
+                        <span className="px-2 py-1 bg-green-100 text-xs rounded-full border border-green-200">
+                          {agendamento.status}
+                        </span>
+                        {agendamento.hasRecurrence && (
+                          <span className="px-2 py-1 bg-purple-100 text-xs rounded-full border border-purple-200">
+                            <RefreshCw className="h-3 w-3 inline mr-1" />
+                            Recorrente
+                          </span>
+                        )}
+                      </div>
                     </div>
                     
-                    <div>
-                      <h3 className="font-medium text-gray-900">
-                        {agendamento.contatos.join(', ')}
-                      </h3>
-                      <p className="text-sm text-gray-600">
-                        {agendamento.tipo === 'texto' ? agendamento.mensagem : 'Mensagem de áudio'}
-                      </p>
-                    </div>
-                    
-                    <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-                      <span className="flex items-center gap-1">
+                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                      <div className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
-                        {agendamento.dataEnvio} às {agendamento.horaEnvio}
-                      </span>
-                      <span>{agendamento.setor}</span>
+                        {format(agendamento.scheduledDate, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Users className="h-4 w-4" />
+                        {agendamento.contacts.length} contato(s)
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Hash className="h-4 w-4" />
+                        {agendamento.sector}
+                      </div>
+                    </div>
+                    
+                    {agendamento.messageType === 'text' && agendamento.message && (
+                      <p className="text-sm text-gray-700 bg-gray-50 p-2 rounded line-clamp-2">
+                        {agendamento.message}
+                      </p>
+                    )}
+                    
+                    <div className="flex flex-wrap gap-1">
+                      {agendamento.contacts.map((contact) => (
+                        <span key={contact.id} className="px-2 py-1 bg-gray-100 text-xs rounded-full border border-gray-200">
+                          {contact.name}
+                        </span>
+                      ))}
                     </div>
                   </div>
                   
-                  <div className="flex gap-2">
+                  <div className="flex flex-row lg:flex-col gap-2">
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button variant="outline" size="sm" onClick={() => handleEditAgendamento(agendamento)}>
-                          <Edit className="h-4 w-4" />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDeleteAgendamento(agendamento)}
+                          className="border-red-200 text-red-600 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent><p>Editar agendamento</p></TooltipContent>
+                      <TooltipContent><p>Excluir Agendamento</p></TooltipContent>
                     </Tooltip>
                     
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button variant="outline" size="sm" onClick={() => handleDeleteAgendamento(agendamento.id)}>
-                          <Trash2 className="h-4 w-4" />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleSendNow(agendamento)}
+                          className="border-green-200 text-green-600 hover:bg-green-50"
+                        >
+                          <Send className="h-4 w-4" />
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent><p>Excluir agendamento</p></TooltipContent>
+                      <TooltipContent><p>Enviar Agora</p></TooltipContent>
                     </Tooltip>
-
+                    
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button variant="outline" size="sm">
-                          <Play className="h-4 w-4" />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEditAgendamento(agendamento)}
+                          className="border-gray-300"
+                        >
+                          <Edit className="h-4 w-4" />
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent><p>Enviar agora</p></TooltipContent>
+                      <TooltipContent><p>Editar Agendamento</p></TooltipContent>
                     </Tooltip>
                   </div>
                 </div>
@@ -764,6 +939,295 @@ const Agendamentos = () => {
             ))}
           </div>
         )}
+
+        {/* Dialog de Editar Agendamento */}
+        <Dialog open={isEditAgendamentoOpen} onOpenChange={setIsEditAgendamentoOpen}>
+          <DialogContent className="sm:max-w-2xl bg-white max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Editar Agendamento</DialogTitle>
+            </DialogHeader>
+            
+            {selectedAgendamento && (
+              <div className="space-y-6">
+                {/* Formulário de edição com os mesmos campos do novo agendamento */}
+                <div className="space-y-6">
+                  {/* Seleção de Contatos */}
+                  <div className="space-y-4">
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <div className="flex-1">
+                        <label className="text-sm font-medium mb-2 block">Pesquisar Contatos</label>
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                          <Input
+                            placeholder="Digite o nome ou telefone"
+                            value={contactSearch}
+                            onChange={(e) => setContactSearch(e.target.value)}
+                            className="pl-10 border-gray-300"
+                          />
+                        </div>
+                      </div>
+                      <div className="min-w-48">
+                        <label className="text-sm font-medium mb-2 block">Filtrar por TAG</label>
+                        <Select value={selectedTag} onValueChange={setSelectedTag}>
+                          <SelectTrigger className="border-gray-300 bg-white">
+                            <SelectValue placeholder="Selecionar TAG" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
+                            <SelectItem value="">Nenhuma TAG</SelectItem>
+                            {availableTags.map((tag) => (
+                              <SelectItem key={tag} value={tag}>
+                                {tag}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    {selectedContacts.length > 0 && (
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">Agendamento para:</label>
+                        <div className="bg-gray-50 p-3 rounded-lg">
+                          <div className="flex flex-wrap gap-2">
+                            {selectedContacts.map((contact) => (
+                              <span key={contact.id} className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-sm rounded-full border border-blue-200">
+                                {contact.name}
+                                <button
+                                  onClick={() => setSelectedContacts(selectedContacts.filter(c => c.id !== contact.id))}
+                                  className="text-blue-600 hover:text-blue-800"
+                                >
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Tipo de Mensagem */}
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Tipo de Mensagem</label>
+                    <div className="flex gap-4">
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          name="messageType"
+                          value="text"
+                          checked={messageType === 'text'}
+                          onChange={(e) => setMessageType(e.target.value as 'text' | 'audio')}
+                          className="text-black"
+                        />
+                        <span>Texto</span>
+                      </label>
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          name="messageType"
+                          value="audio"
+                          checked={messageType === 'audio'}
+                          onChange={(e) => setMessageType(e.target.value as 'text' | 'audio')}
+                          className="text-black"
+                        />
+                        <span>Áudio</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Conteúdo da Mensagem */}
+                  {messageType === 'text' ? (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">Mensagem</label>
+                        <Textarea
+                          placeholder="Digite sua mensagem aqui..."
+                          value={messageText}
+                          onChange={(e) => setMessageText(e.target.value)}
+                          className="border-gray-300 min-h-24"
+                        />
+                      </div>
+                      
+                      <div className="flex flex-col sm:flex-row gap-4">
+                        <label className="flex items-center space-x-2">
+                          <Checkbox
+                            checked={includeSignature}
+                            onCheckedChange={(checked) => setIncludeSignature(checked as boolean)}
+                          />
+                          <span className="text-sm">Incluir assinatura</span>
+                        </label>
+                        
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setHasAttachments(!hasAttachments)}
+                          className={cn(
+                            "flex items-center gap-2 border-gray-300",
+                            hasAttachments && "bg-gray-100"
+                          )}
+                        >
+                          <Paperclip className="h-4 w-4" />
+                          Anexar mídia
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Áudio</label>
+                      <Button variant="outline" className="flex items-center gap-2 border-gray-300">
+                        <Mic className="h-4 w-4" />
+                        Gravar áudio
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* Data e Hora */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Data de Envio</label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className="w-full justify-start border-gray-300">
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {selectedDate ? format(selectedDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : "Selecionar data"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0 bg-white border border-gray-300 shadow-lg">
+                          <Calendar
+                            mode="single"
+                            selected={selectedDate}
+                            onSelect={setSelectedDate}
+                            locale={ptBR}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Horário de Envio</label>
+                      <Input
+                        type="time"
+                        value={selectedTime}
+                        onChange={(e) => setSelectedTime(e.target.value)}
+                        className="border-gray-300"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Recorrência */}
+                  <div className="space-y-4">
+                    <label className="flex items-center space-x-2">
+                      <Checkbox
+                        checked={hasRecurrence}
+                        onCheckedChange={(checked) => setHasRecurrence(checked as boolean)}
+                      />
+                      <span className="text-sm font-medium">Cadastrar recorrência</span>
+                    </label>
+                    
+                    {hasRecurrence && (
+                      <div className="space-y-4 pl-6">
+                        <Select value={recurrenceType} onValueChange={(value) => setRecurrenceType(value as any)}>
+                          <SelectTrigger className="border-gray-300 bg-white">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
+                            <SelectItem value="daily">Diária (todo dia)</SelectItem>
+                            <SelectItem value="weekly">Semanal</SelectItem>
+                            <SelectItem value="monthly">Mensal (todo mês)</SelectItem>
+                            <SelectItem value="quarterly">Trimestral (cada 3 meses)</SelectItem>
+                            <SelectItem value="semiannual">Semestral (cada 6 meses)</SelectItem>
+                            <SelectItem value="annual">Anual (1 vez por ano)</SelectItem>
+                            <SelectItem value="custom">Personalizado</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        
+                        {recurrenceType === 'custom' && (
+                          <div>
+                            <label className="text-sm font-medium mb-2 block">Repetir a cada quantos dias?</label>
+                            <Input
+                              type="number"
+                              min="1"
+                              value={customDays}
+                              onChange={(e) => setCustomDays(Number(e.target.value))}
+                              className="border-gray-300"
+                              placeholder="Número de dias"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Canal e Configurações */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Canal de Envio</label>
+                      <Select value={selectedChannel} onValueChange={(value) => setSelectedChannel(value as any)}>
+                        <SelectTrigger className="border-gray-300 bg-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
+                          <SelectItem value="WhatsApp">WhatsApp</SelectItem>
+                          <SelectItem value="Instagram">Instagram</SelectItem>
+                          <SelectItem value="Facebook">Facebook</SelectItem>
+                          <SelectItem value="Telegram">Telegram</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Status do Ticket</label>
+                      <Select value={ticketStatus} onValueChange={(value) => setTicketStatus(value as any)}>
+                        <SelectTrigger className="border-gray-300 bg-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
+                          <SelectItem value="Finalizado">Finalizado</SelectItem>
+                          <SelectItem value="Aguardando">Aguardando</SelectItem>
+                          <SelectItem value="Em Atendimento">Em Atendimento</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Setor</label>
+                    <Select value={selectedSector} onValueChange={setSelectedSector}>
+                      <SelectTrigger className="border-gray-300 bg-white">
+                        <SelectValue placeholder="Selecionar setor" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
+                        {availableSectors.map((sector) => (
+                          <SelectItem key={sector} value={sector}>
+                            {sector}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row justify-between gap-3 pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={handleDiscardEditAgendamento}
+                    className="border-gray-300"
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Descartar
+                  </Button>
+                  <Button
+                    onClick={handleSaveEditAgendamento}
+                    className="bg-black text-white hover:bg-gray-800"
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    Salvar
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </TooltipProvider>
   );
