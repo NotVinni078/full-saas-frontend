@@ -1,11 +1,13 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Search, Smile, Paperclip, Users, ArrowLeft } from 'lucide-react';
+import { Send, Search, Smile, Paperclip, UserPlus, ArrowLeft } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface Message {
   id: string;
@@ -31,6 +33,7 @@ const ChatInterno = () => {
   const [message, setMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [showChat, setShowChat] = useState(false);
+  const [showNewChatDialog, setShowNewChatDialog] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const contacts: Contact[] = [
@@ -75,6 +78,52 @@ const ChatInterno = () => {
       status: 'online',
       lastMessage: 'Perfeito! Vamos em frente',
       lastMessageTime: '10:20'
+    },
+    {
+      id: '6',
+      name: 'Luciana Ferreira',
+      department: 'RH',
+      status: 'online',
+      lastMessage: 'Documentos enviados por email',
+      lastMessageTime: '09:45',
+      unreadCount: 3
+    },
+    {
+      id: '7',
+      name: 'Roberto Alves',
+      department: 'Operações',
+      status: 'away',
+      lastMessage: 'Processo aprovado!',
+      lastMessageTime: '09:15'
+    },
+    {
+      id: '8',
+      name: 'Fernanda Souza',
+      department: 'Qualidade',
+      status: 'offline',
+      lastMessage: 'Relatório está pronto',
+      lastMessageTime: 'Ontem'
+    }
+  ];
+
+  const availableUsers: Contact[] = [
+    {
+      id: '9',
+      name: 'Ricardo Mendes',
+      department: 'TI',
+      status: 'online'
+    },
+    {
+      id: '10',
+      name: 'Juliana Rocha',
+      department: 'Comercial',
+      status: 'online'
+    },
+    {
+      id: '11',
+      name: 'André Barbosa',
+      department: 'Logística',
+      status: 'away'
     }
   ];
 
@@ -100,14 +149,173 @@ const ChatInterno = () => {
         content: 'Ótimo! Podemos revisar juntos depois?',
         timestamp: '14:33',
         isOwn: false
+      },
+      {
+        id: '4',
+        sender: 'Você',
+        content: 'Claro! Que tal às 16h?',
+        timestamp: '14:34',
+        isOwn: true
       }
     ],
     '2': [
       {
         id: '1',
         sender: 'Maria Santos',
+        content: 'Bom dia! Recebi sua proposta comercial',
+        timestamp: '13:40',
+        isOwn: false
+      },
+      {
+        id: '2',
+        sender: 'Você',
+        content: 'Ótimo! O que achou dos valores?',
+        timestamp: '13:42',
+        isOwn: true
+      },
+      {
+        id: '3',
+        sender: 'Maria Santos',
         content: 'Vou verificar isso',
         timestamp: '13:45',
+        isOwn: false
+      }
+    ],
+    '3': [
+      {
+        id: '1',
+        sender: 'Pedro Costa',
+        content: 'Conseguiu resolver o bug da API?',
+        timestamp: '12:10',
+        isOwn: false
+      },
+      {
+        id: '2',
+        sender: 'Você',
+        content: 'Sim! Era um problema na validação dos dados',
+        timestamp: '12:12',
+        isOwn: true
+      },
+      {
+        id: '3',
+        sender: 'Pedro Costa',
+        content: 'Obrigado pela ajuda!',
+        timestamp: '12:15',
+        isOwn: false
+      }
+    ],
+    '4': [
+      {
+        id: '1',
+        sender: 'Ana Oliveira',
+        content: 'Preciso confirmar nossa reunião de amanhã',
+        timestamp: '11:25',
+        isOwn: false
+      },
+      {
+        id: '2',
+        sender: 'Você',
+        content: 'Claro! Às 10h na sala de reuniões?',
+        timestamp: '11:28',
+        isOwn: true
+      },
+      {
+        id: '3',
+        sender: 'Ana Oliveira',
+        content: 'Reunião confirmada para amanhã',
+        timestamp: '11:30',
+        isOwn: false
+      }
+    ],
+    '5': [
+      {
+        id: '1',
+        sender: 'Carlos Lima',
+        content: 'Os números do trimestre estão aprovados',
+        timestamp: '10:15',
+        isOwn: false
+      },
+      {
+        id: '2',
+        sender: 'Você',
+        content: 'Excelente! Podemos prosseguir com o planejamento',
+        timestamp: '10:18',
+        isOwn: true
+      },
+      {
+        id: '3',
+        sender: 'Carlos Lima',
+        content: 'Perfeito! Vamos em frente',
+        timestamp: '10:20',
+        isOwn: false
+      }
+    ],
+    '6': [
+      {
+        id: '1',
+        sender: 'Luciana Ferreira',
+        content: 'Enviados os contratos para assinatura',
+        timestamp: '09:40',
+        isOwn: false
+      },
+      {
+        id: '2',
+        sender: 'Você',
+        content: 'Recebi! Vou revisar hoje',
+        timestamp: '09:42',
+        isOwn: true
+      },
+      {
+        id: '3',
+        sender: 'Luciana Ferreira',
+        content: 'Documentos enviados por email',
+        timestamp: '09:45',
+        isOwn: false
+      }
+    ],
+    '7': [
+      {
+        id: '1',
+        sender: 'Roberto Alves',
+        content: 'Solicitação de melhoria foi analisada',
+        timestamp: '09:10',
+        isOwn: false
+      },
+      {
+        id: '2',
+        sender: 'Você',
+        content: 'E qual foi o resultado?',
+        timestamp: '09:12',
+        isOwn: true
+      },
+      {
+        id: '3',
+        sender: 'Roberto Alves',
+        content: 'Processo aprovado!',
+        timestamp: '09:15',
+        isOwn: false
+      }
+    ],
+    '8': [
+      {
+        id: '1',
+        sender: 'Fernanda Souza',
+        content: 'Análise de qualidade finalizada',
+        timestamp: 'Ontem 16:30',
+        isOwn: false
+      },
+      {
+        id: '2',
+        sender: 'Você',
+        content: 'Ótimo! Alguma observação importante?',
+        timestamp: 'Ontem 16:32',
+        isOwn: true
+      },
+      {
+        id: '3',
+        sender: 'Fernanda Souza',
+        content: 'Relatório está pronto',
+        timestamp: 'Ontem 16:35',
         isOwn: false
       }
     ]
@@ -130,6 +338,11 @@ const ChatInterno = () => {
     setSelectedContact('');
   };
 
+  const handleCloseChat = () => {
+    setSelectedContact('');
+    setShowChat(false);
+  };
+
   const handleSendMessage = () => {
     if (message.trim()) {
       console.log('Enviando mensagem:', message);
@@ -142,6 +355,12 @@ const ChatInterno = () => {
       e.preventDefault();
       handleSendMessage();
     }
+  };
+
+  const handleStartNewChat = (userId: string) => {
+    console.log('Iniciando novo chat com usuário:', userId);
+    setShowNewChatDialog(false);
+    // Aqui você poderia adicionar lógica para criar uma nova conversa
   };
 
   const getStatusColor = (status: string) => {
@@ -174,9 +393,41 @@ const ChatInterno = () => {
         <div className="p-4 border-b border-border">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-semibold text-card-foreground">Chat Interno</h2>
-            <Button variant="ghost" size="sm">
-              <Users className="h-4 w-4" />
-            </Button>
+            <Dialog open={showNewChatDialog} onOpenChange={setShowNewChatDialog}>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <UserPlus className="h-4 w-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Iniciar Nova Conversa</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-2 max-h-60 overflow-y-auto">
+                  {availableUsers.map((user) => (
+                    <button
+                      key={user.id}
+                      onClick={() => handleStartNewChat(user.id)}
+                      className="w-full p-3 rounded-lg text-left transition-colors hover:bg-muted flex items-center space-x-3"
+                    >
+                      <div className="relative">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={user.avatar} />
+                          <AvatarFallback className="bg-muted text-muted-foreground text-xs">
+                            {user.name.split(' ').map(n => n[0]).join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className={`absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border border-card ${getStatusColor(user.status)}`} />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-medium text-sm text-card-foreground">{user.name}</h3>
+                        <p className="text-xs text-muted-foreground">{user.department}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
           
           {/* Busca */}
@@ -285,10 +536,19 @@ const ChatInterno = () => {
                   </Avatar>
                   <div className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border border-card ${getStatusColor(currentContact.status)}`} />
                 </div>
-                <div>
+                <div className="flex-1">
                   <h3 className="font-medium text-card-foreground">{currentContact.name}</h3>
                   <p className="text-xs text-muted-foreground">{currentContact.department} • {getStatusText(currentContact.status)}</p>
                 </div>
+                {/* Botão fechar conversa - ao lado da foto */}
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={handleCloseChat}
+                  className="text-muted-foreground hover:text-card-foreground"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
               </div>
             </div>
 
@@ -356,7 +616,7 @@ const ChatInterno = () => {
         ) : (
           <div className="flex-1 flex items-center justify-center bg-background">
             <div className="text-center">
-              <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <UserPlus className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-medium text-card-foreground mb-2">Selecione um usuário</h3>
               <p className="text-muted-foreground">Escolha uma conversa para começar a conversar</p>
             </div>
