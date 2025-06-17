@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Search, Edit, Trash2, MessageSquare, Hash, Eye, EyeOff } from "lucide-react";
+
 interface RespostaRapida {
   id: string;
   titulo: string;
@@ -17,6 +18,7 @@ interface RespostaRapida {
   visivelParaTodos: boolean;
   dataCriacao: Date;
 }
+
 const RespostasRapidas = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [filtroAtivo, setFiltroAtivo] = useState<'minhas' | 'todas'>('minhas');
@@ -78,7 +80,11 @@ const RespostasRapidas = () => {
       respostasFiltradas = respostasFiltradas.filter(resposta => resposta.criadoPor === usuarioAtual);
     }
     if (searchTerm) {
-      respostasFiltradas = respostasFiltradas.filter(resposta => resposta.titulo.toLowerCase().includes(searchTerm.toLowerCase()) || resposta.atalho.toLowerCase().includes(searchTerm.toLowerCase()) || resposta.conteudo.toLowerCase().includes(searchTerm.toLowerCase()));
+      respostasFiltradas = respostasFiltradas.filter(resposta => 
+        resposta.titulo.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        resposta.atalho.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        resposta.conteudo.toLowerCase().includes(searchTerm.toLowerCase())
+      );
     }
     return respostasFiltradas;
   };
@@ -105,66 +111,97 @@ const RespostasRapidas = () => {
     console.log('Excluir resposta:', respostaId);
   };
   const contadores = contarRespostas();
-  return <div className="p-4 lg:p-6 space-y-4 lg:space-y-6 min-h-screen bg-gray-50">
+  return (
+    <div className="p-4 lg:p-6 space-y-4 lg:space-y-6 min-h-screen bg-background">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl lg:text-2xl font-bold text-white">Respostas Rápidas</h1>
-          <p className="text-gray-400 mt-1 text-sm lg:text-base">Gerencie mensagens pré-definidas para atendimento</p>
+          <h1 className="text-xl lg:text-2xl font-bold text-foreground">Respostas Rápidas</h1>
+          <p className="text-muted-foreground mt-1 text-sm lg:text-base">Gerencie mensagens pré-definidas para atendimento</p>
         </div>
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-black hover:bg-gray-800 text-white w-full sm:w-auto">
+            <Button className="bg-foreground hover:bg-foreground/90 text-background w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
               Criar Resposta Rápida
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px] mx-4 bg-gray-800 border-gray-700">
+          <DialogContent className="sm:max-w-[500px] mx-4 bg-card border-border">
             <DialogHeader>
-              <DialogTitle className="text-white">Criar Nova Resposta Rápida</DialogTitle>
+              <DialogTitle className="text-card-foreground">Criar Nova Resposta Rápida</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="titulo" className="text-gray-300">Título da Resposta Rápida</Label>
-                <Input id="titulo" value={novaResposta.titulo} onChange={e => setNovaResposta({
-                ...novaResposta,
-                titulo: e.target.value
-              })} placeholder="Digite o título da resposta" className="bg-gray-700 border-gray-600 text-white placeholder-gray-400" />
+                <Label htmlFor="titulo" className="text-card-foreground">Título da Resposta Rápida</Label>
+                <Input 
+                  id="titulo" 
+                  value={novaResposta.titulo} 
+                  onChange={e => setNovaResposta({
+                    ...novaResposta,
+                    titulo: e.target.value
+                  })} 
+                  placeholder="Digite o título da resposta" 
+                  className="bg-background border-border text-foreground placeholder-muted-foreground" 
+                />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="atalho" className="text-gray-300">Atalho da Resposta Rápida</Label>
-                <Input id="atalho" value={novaResposta.atalho} onChange={e => setNovaResposta({
-                ...novaResposta,
-                atalho: e.target.value
-              })} placeholder="/atalho" className="bg-gray-700 border-gray-600 text-white placeholder-gray-400" />
+                <Label htmlFor="atalho" className="text-card-foreground">Atalho da Resposta Rápida</Label>
+                <Input 
+                  id="atalho" 
+                  value={novaResposta.atalho} 
+                  onChange={e => setNovaResposta({
+                    ...novaResposta,
+                    atalho: e.target.value
+                  })} 
+                  placeholder="/atalho" 
+                  className="bg-background border-border text-foreground placeholder-muted-foreground" 
+                />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="conteudo" className="text-gray-300">Conteúdo da Resposta Rápida</Label>
-                <Textarea id="conteudo" value={novaResposta.conteudo} onChange={e => setNovaResposta({
-                ...novaResposta,
-                conteudo: e.target.value
-              })} placeholder="Digite o conteúdo da mensagem" rows={4} className="bg-gray-700 border-gray-600 text-white placeholder-gray-400" />
+                <Label htmlFor="conteudo" className="text-card-foreground">Conteúdo da Resposta Rápida</Label>
+                <Textarea 
+                  id="conteudo" 
+                  value={novaResposta.conteudo} 
+                  onChange={e => setNovaResposta({
+                    ...novaResposta,
+                    conteudo: e.target.value
+                  })} 
+                  placeholder="Digite o conteúdo da mensagem" 
+                  rows={4} 
+                  className="bg-background border-border text-foreground placeholder-muted-foreground" 
+                />
               </div>
               
               <div className="flex items-center justify-center space-x-4 py-2">
-                <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="w-full sm:w-auto border-gray-600 text-gray-300 hover:bg-gray-700">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsDialogOpen(false)} 
+                  className="w-full sm:w-auto border-border text-foreground hover:bg-accent"
+                >
                   Descartar
                 </Button>
                 
                 <div className="flex items-center space-x-2">
-                  <Switch id="visibility" checked={novaResposta.visivelParaTodos} onCheckedChange={checked => setNovaResposta({
-                  ...novaResposta,
-                  visivelParaTodos: checked
-                })} />
-                  <Label htmlFor="visibility" className="text-gray-300 text-sm">
+                  <Switch 
+                    id="visibility" 
+                    checked={novaResposta.visivelParaTodos} 
+                    onCheckedChange={checked => setNovaResposta({
+                      ...novaResposta,
+                      visivelParaTodos: checked
+                    })} 
+                  />
+                  <Label htmlFor="visibility" className="text-card-foreground text-sm">
                     Visível para todos
                   </Label>
                 </div>
                 
-                <Button onClick={handleCriarResposta} className="bg-black hover:bg-gray-800 text-white w-full sm:w-auto">
+                <Button 
+                  onClick={handleCriarResposta} 
+                  className="bg-foreground hover:bg-foreground/90 text-background w-full sm:w-auto"
+                >
                   Salvar
                 </Button>
               </div>
@@ -176,18 +213,39 @@ const RespostasRapidas = () => {
       {/* Barra de pesquisa */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
-          <Input placeholder="Buscar respostas rápidas..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10 bg-gray-800 border-gray-700 text-white placeholder-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Input 
+            placeholder="Buscar respostas rápidas..." 
+            value={searchTerm} 
+            onChange={e => setSearchTerm(e.target.value)} 
+            className="pl-10 bg-background border-border text-foreground placeholder-muted-foreground" 
+          />
         </div>
       </div>
 
       {/* Filtros rápidos */}
       <div className="flex flex-wrap gap-2">
-        <Button variant={filtroAtivo === 'minhas' ? 'default' : 'outline'} onClick={() => setFiltroAtivo('minhas')} className={`text-xs sm:text-sm ${filtroAtivo === 'minhas' ? 'bg-black hover:bg-gray-800 text-white' : 'border-gray-600 text-gray-300 hover:bg-gray-800'}`}>
+        <Button 
+          variant={filtroAtivo === 'minhas' ? 'default' : 'outline'} 
+          onClick={() => setFiltroAtivo('minhas')} 
+          className={`text-xs sm:text-sm ${
+            filtroAtivo === 'minhas' 
+              ? 'bg-foreground hover:bg-foreground/90 text-background' 
+              : 'border-border text-foreground hover:bg-accent'
+          }`}
+        >
           <MessageSquare className="h-4 w-4 mr-1" />
           Minhas Respostas Rápidas ({contadores.minhas})
         </Button>
-        <Button variant={filtroAtivo === 'todas' ? 'default' : 'outline'} onClick={() => setFiltroAtivo('todas')} className={`text-xs sm:text-sm ${filtroAtivo === 'todas' ? 'bg-black hover:bg-gray-800 text-white' : 'border-gray-600 text-gray-300 hover:bg-gray-800'}`}>
+        <Button 
+          variant={filtroAtivo === 'todas' ? 'default' : 'outline'} 
+          onClick={() => setFiltroAtivo('todas')} 
+          className={`text-xs sm:text-sm ${
+            filtroAtivo === 'todas' 
+              ? 'bg-foreground hover:bg-foreground/90 text-background' 
+              : 'border-border text-foreground hover:bg-accent'
+          }`}
+        >
           <MessageSquare className="h-4 w-4 mr-1" />
           Todas as Respostas Rápidas ({contadores.todas})
         </Button>
@@ -195,54 +253,78 @@ const RespostasRapidas = () => {
 
       {/* Lista de Respostas */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-        {filtrarRespostas().map(resposta => <Card key={resposta.id} className="bg-gray-800 border-gray-700 hover:shadow-lg transition-shadow">
+        {filtrarRespostas().map(resposta => (
+          <Card key={resposta.id} className="bg-card border-border hover:shadow-lg transition-shadow">
             <CardHeader className="pb-3">
               <div className="flex justify-between items-start gap-2">
                 <div className="flex-1">
-                  <CardTitle className="text-white text-lg break-words">{resposta.titulo}</CardTitle>
+                  <CardTitle className="text-card-foreground text-lg break-words">{resposta.titulo}</CardTitle>
                   <div className="flex items-center gap-2 mt-2">
-                    <Badge className="bg-gray-700 text-gray-300 border-gray-600">
+                    <Badge className="bg-muted text-muted-foreground border-border">
                       <Hash className="h-3 w-3 mr-1" />
                       {resposta.atalho}
                     </Badge>
-                    <Badge className={`${resposta.visivelParaTodos ? 'bg-green-900 text-green-300' : 'bg-orange-900 text-orange-300'}`}>
-                      {resposta.visivelParaTodos ? <Eye className="h-3 w-3 mr-1" /> : <EyeOff className="h-3 w-3 mr-1" />}
+                    <Badge className={`${
+                      resposta.visivelParaTodos 
+                        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' 
+                        : 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300'
+                    }`}>
+                      {resposta.visivelParaTodos ? (
+                        <Eye className="h-3 w-3 mr-1" />
+                      ) : (
+                        <EyeOff className="h-3 w-3 mr-1" />
+                      )}
                       {resposta.visivelParaTodos ? 'Público' : 'Privado'}
                     </Badge>
                   </div>
                 </div>
                 <div className="flex gap-1">
-                  <Button variant="ghost" size="sm" onClick={() => handleEditarResposta(resposta.id)} className="text-gray-400 hover:text-white hover:bg-gray-700 p-2">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => handleEditarResposta(resposta.id)} 
+                    className="text-muted-foreground hover:text-foreground hover:bg-accent p-2"
+                  >
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={() => handleExcluirResposta(resposta.id)} className="text-gray-400 hover:text-red-400 hover:bg-gray-700 p-2">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => handleExcluirResposta(resposta.id)} 
+                    className="text-muted-foreground hover:text-destructive hover:bg-accent p-2"
+                  >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="pt-0">
-              <p className="text-gray-300 text-sm leading-relaxed break-words">
+              <p className="text-muted-foreground text-sm leading-relaxed break-words">
                 {resposta.conteudo}
               </p>
-              <div className="mt-3 pt-3 border-t border-gray-700">
-                <p className="text-xs text-gray-500">
-                  Criado por: <span className="text-gray-400">{resposta.criadoPor}</span>
+              <div className="mt-3 pt-3 border-t border-border">
+                <p className="text-xs text-muted-foreground">
+                  Criado por: <span className="text-foreground">{resposta.criadoPor}</span>
                 </p>
               </div>
             </CardContent>
-          </Card>)}
+          </Card>
+        ))}
       </div>
 
-      {filtrarRespostas().length === 0 && <Card className="bg-gray-800 border-gray-700">
+      {filtrarRespostas().length === 0 && (
+        <Card className="bg-card border-border">
           <CardContent className="p-8 text-center">
-            <div className="text-gray-500">
+            <div className="text-muted-foreground">
               <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p className="text-lg font-medium text-white">Nenhuma resposta rápida encontrada</p>
-              <p className="text-sm mt-1 text-gray-400">Tente ajustar os filtros ou criar uma nova resposta rápida</p>
+              <p className="text-lg font-medium text-foreground">Nenhuma resposta rápida encontrada</p>
+              <p className="text-sm mt-1 text-muted-foreground">Tente ajustar os filtros ou criar uma nova resposta rápida</p>
             </div>
           </CardContent>
-        </Card>}
-    </div>;
+        </Card>
+      )}
+    </div>
+  );
 };
+
 export default RespostasRapidas;
