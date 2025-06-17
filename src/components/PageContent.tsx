@@ -6,6 +6,7 @@ import GestaoUsuarios from './GestaoUsuarios';
 import Agendamentos from './Agendamentos';
 import Tarefas from './Tarefas';
 import RespostasRapidas from './RespostasRapidas';
+import ChatInterno from './ChatInterno';
 
 interface PageContentProps {
   page: string;
@@ -33,12 +34,7 @@ const PageContent = ({ page }: PageContentProps) => {
         return <RespostasRapidas />;
       
       case 'chat-interno':
-        return (
-          <div className="p-6">
-            <h1 className="text-2xl font-bold mb-4">Chat Interno</h1>
-            <p className="text-gray-600">Sistema de chat interno entre colaboradores.</p>
-          </div>
-        );
+        return <ChatInterno />;
 
       case 'painel-atendimentos':
         return (

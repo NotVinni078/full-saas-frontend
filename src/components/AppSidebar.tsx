@@ -270,12 +270,12 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                           className={cn(
                             "w-full flex items-center space-x-2 px-2 py-1.5 ml-5 rounded-lg text-left transition-colors text-xs",
                             isActive 
-                              ? "bg-primary text-primary-foreground" 
+                              ? "bg-black text-white dark:bg-white dark:text-black" 
                               : "text-card-foreground hover:bg-accent"
                           )}
                         >
-                          <ItemIcon className={cn("h-3 w-3 flex-shrink-0", isActive ? "text-primary-foreground" : "text-card-foreground")} />
-                          <span className={cn("text-xs", isActive ? "text-primary-foreground" : "text-card-foreground")}>{subItem.label}</span>
+                          <ItemIcon className={cn("h-3 w-3 flex-shrink-0", isActive ? "text-white dark:text-black" : "text-card-foreground")} />
+                          <span className={cn("text-xs", isActive ? "text-white dark:text-black" : "text-card-foreground")}>{subItem.label}</span>
                         </button>
                       );
                     })}
@@ -295,13 +295,13 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                 className={cn(
                   "w-full flex items-center space-x-2 px-2 py-1.5 rounded-lg text-left transition-colors",
                   isActive 
-                    ? "bg-primary text-primary-foreground" 
+                    ? "bg-black text-white dark:bg-white dark:text-black" 
                     : "text-card-foreground hover:bg-accent",
                   isCollapsed && "md:justify-center"
                 )}
               >
-                <Icon className={cn("h-3.5 w-3.5 flex-shrink-0", isActive ? "text-primary-foreground" : "text-card-foreground")} />
-                {(!isCollapsed || window.innerWidth < 768) && <span className={cn("font-medium text-xs", isActive ? "text-primary-foreground" : "text-card-foreground")}>{singleItem.label}</span>}
+                <Icon className={cn("h-3.5 w-3.5 flex-shrink-0", isActive ? "text-white dark:text-black" : "text-card-foreground")} />
+                {(!isCollapsed || window.innerWidth < 768) && <span className={cn("font-medium text-xs", isActive ? "text-white dark:text-black" : "text-card-foreground")}>{singleItem.label}</span>}
               </button>
             );
           }
