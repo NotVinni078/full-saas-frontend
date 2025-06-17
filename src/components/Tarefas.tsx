@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { CalendarIcon, Plus, Clock, AlertTriangle, CheckCircle2, User, Calendar } from "lucide-react";
+import { CalendarIcon, Plus, Clock, AlertTriangle, CheckCircle2, User, Calendar, Check } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -27,7 +27,7 @@ interface Tarefa {
 
 const Tarefas = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [filtroAtivo, setFiltroAtivo] = useState<'todos' | 'pendente' | 'em_atraso' | 'concluida'>('todos');
+  const [filtroAtivo, setFiltroAtivo] = useState<'todos' | 'pendente' | 'em_atraso' | 'concluida'>('pendente');
   const [searchTerm, setSearchTerm] = useState('');
   const [novaTarefa, setNovaTarefa] = useState({
     titulo: '',
@@ -80,7 +80,8 @@ const Tarefas = () => {
       atribuidoPara: 'Roberto Silva',
       situacao: 'pendente',
       dataCriacao: new Date('2024-06-17'),
-      prazo: new Date('2024-06-25')
+      prazo: new Date('2024-06-25'),
+      dataInicio: new Date('2024-06-18')
     },
     {
       id: '5',
@@ -142,6 +143,12 @@ const Tarefas = () => {
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
 
+  const calcularDuracaoTarefa = (dataInicio: Date | undefined, dataFim: Date | undefined) => {
+    if (!dataInicio || !dataFim) return 0;
+    const diffTime = dataFim.getTime() - dataInicio.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
+
   const filtrarTarefas = () => {
     let tarefasFiltradas = tarefas;
 
@@ -175,6 +182,11 @@ const Tarefas = () => {
     setNovaTarefa({ titulo: '', descricao: '', atribuidoPara: '', prazo: '' });
   };
 
+  const handleConcluirTarefa = (tarefaId: string) => {
+    // Aqui seria a lógica para marcar a tarefa como concluída
+    console.log('Concluir tarefa:', tarefaId);
+  };
+
   const getSituacaoIcon = (situacao: string) => {
     switch (situacao) {
       case 'pendente':
@@ -191,7 +203,7 @@ const Tarefas = () => {
   const getSituacaoColor = (situacao: string) => {
     switch (situacao) {
       case 'pendente':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-gray-100 text-gray-800';
       case 'em_atraso':
         return 'bg-red-100 text-red-800';
       case 'concluida':
@@ -214,7 +226,7 @@ const Tarefas = () => {
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-blue-600 hover:bg-blue-700">
+            <Button className="bg-black hover:bg-gray-800 text-white">
               <Plus className="h-4 w-4 mr-2" />
               Nova Tarefa
             </Button>
@@ -275,7 +287,7 @@ const Tarefas = () => {
                 <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
                   Cancelar
                 </Button>
-                <Button onClick={handleCriarTarefa} className="bg-blue-600 hover:bg-blue-700">
+                <Button onClick={handleCriarTarefa} className="bg-black hover:bg-gray-800 text-white">
                   Criar Tarefa
                 </Button>
               </div>
@@ -287,13 +299,6 @@ const Tarefas = () => {
       {/* Filtros e Contadores */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex flex-wrap gap-2">
-          <Button
-            variant={filtroAtivo === 'todos' ? 'default' : 'outline'}
-            onClick={() => setFiltroAtivo('todos')}
-            className="text-sm"
-          >
-            Todas ({tarefas.length})
-          </Button>
           <Button
             variant={filtroAtivo === 'pendente' ? 'default' : 'outline'}
             onClick={() => setFiltroAtivo('pendente')}
@@ -317,6 +322,13 @@ const Tarefas = () => {
           >
             <CheckCircle2 className="h-4 w-4 mr-1" />
             Concluídas ({contadores.concluidas})
+          </Button>
+          <Button
+            variant={filtroAtivo === 'todos' ? 'default' : 'outline'}
+            onClick={() => setFiltroAtivo('todos')}
+            className="text-sm"
+          >
+            Todas ({tarefas.length})
           </Button>
         </div>
         
@@ -373,11 +385,20 @@ const Tarefas = () => {
                         <div className="text-green-600">
                           <strong>Conclusão:</strong> {tarefa.dataConclusao && format(tarefa.dataConclusao, 'dd/MM/yyyy', { locale: ptBR })}
                         </div>
+                        <div className="text-green-600">
+                          <strong>Duração:</strong> {calcularDuracaoTarefa(tarefa.dataInicio, tarefa.dataConclusao)} dias
+                        </div>
                       </>
                     ) : (
                       <>
                         {tarefa.dataInicio && (
-                          <div className="text-blue-600">
+                          <div className="text-gray-600">
+                            <strong>Início:</strong> {format(tarefa.dataInicio, 'dd/MM/yyyy', { locale: ptBR })}
+                          </div>
+                        )}
+                        
+                        {tarefa.dataInicio && (
+                          <div className="text-gray-600">
                             <strong>Dias em aberto:</strong> {calcularDiasEmAberto(tarefa.dataInicio, tarefa.situacao)}
                           </div>
                         )}
@@ -397,6 +418,20 @@ const Tarefas = () => {
                     )}
                   </div>
                 </div>
+                
+                {/* Botão de Concluir para tarefas Em Atraso e Pendentes */}
+                {(tarefa.situacao === 'pendente' || tarefa.situacao === 'em_atraso') && (
+                  <div className="flex justify-end">
+                    <Button
+                      onClick={() => handleConcluirTarefa(tarefa.id)}
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                      size="sm"
+                    >
+                      <Check className="h-4 w-4 mr-2" />
+                      Concluir
+                    </Button>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
