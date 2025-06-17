@@ -4,6 +4,7 @@ import AtendimentosOmnichannel from './AtendimentosOmnichannel';
 import GestaoContatos from './GestaoContatos';
 import GestaoUsuarios from './GestaoUsuarios';
 import Agendamentos from './Agendamentos';
+import Tarefas from './Tarefas';
 
 interface PageContentProps {
   page: string;
@@ -23,6 +24,9 @@ const PageContent = ({ page }: PageContentProps) => {
       
       case 'agendamentos':
         return <Agendamentos />;
+      
+      case 'tarefas':
+        return <Tarefas />;
       
       case 'chat-interno':
         return (
@@ -45,14 +49,6 @@ const PageContent = ({ page }: PageContentProps) => {
           <div className="p-6">
             <h1 className="text-2xl font-bold mb-4">Respostas Rápidas</h1>
             <p className="text-gray-600">Modelos de respostas pré-definidas para agilizar o atendimento.</p>
-          </div>
-        );
-
-      case 'tarefas':
-        return (
-          <div className="p-6">
-            <h1 className="text-2xl font-bold mb-4">Tarefas</h1>
-            <p className="text-gray-600">Gerenciamento de tarefas e atividades.</p>
           </div>
         );
 
