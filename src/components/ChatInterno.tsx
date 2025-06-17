@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Search, Smile, Paperclip, UserPlus, ArrowLeft } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -459,8 +460,8 @@ const ChatInterno = () => {
 
   return (
     <div className="h-full bg-background flex">
-      {/* Lista de Contatos - Mobile: condicional, Desktop: sempre visível com largura reduzida */}
-      <div className={`w-full md:w-72 border-r border-border bg-card flex flex-col ${showChat ? 'hidden md:flex' : 'flex'}`}>
+      {/* Lista de Contatos - Mobile e Tablet: condicional, Desktop (lg+): sempre visível */}
+      <div className={`w-full lg:w-80 border-r border-border bg-card flex flex-col ${showChat ? 'hidden lg:flex' : 'flex'}`}>
         {/* Header da lista */}
         <div className="p-4 border-b border-border">
           <div className="flex items-center justify-between mb-3">
@@ -582,29 +583,29 @@ const ChatInterno = () => {
         </ScrollArea>
       </div>
 
-      {/* Área de Chat - Mobile: condicional, Desktop: sempre visível */}
-      <div className={`flex-1 flex flex-col bg-background ${!showChat ? 'hidden md:flex' : 'flex'}`}>
+      {/* Área de Chat - Mobile e Tablet: condicional, Desktop (lg+): sempre visível */}
+      <div className={`flex-1 flex flex-col bg-background ${!showChat ? 'hidden lg:flex' : 'flex'}`}>
         {currentContact ? (
           <>
             {/* Header do chat */}
             <div className="p-4 border-b border-border bg-card flex items-center">
-              {/* Botão voltar - apenas mobile */}
+              {/* Botão voltar - mobile e tablet */}
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="md:hidden mr-2"
+                className="lg:hidden mr-2"
                 onClick={handleBackToList}
               >
                 <ArrowLeft className="h-4 w-4" />
               </Button>
               
               <div className="flex items-center space-x-3 flex-1">
-                {/* Botão fechar conversa - apenas para desktop */}
+                {/* Botão fechar conversa - apenas para desktop (lg+) */}
                 <Button 
                   variant="ghost" 
                   size="sm"
                   onClick={handleCloseChat}
-                  className="hidden md:flex text-muted-foreground hover:text-card-foreground"
+                  className="hidden lg:flex text-muted-foreground hover:text-card-foreground"
                 >
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
