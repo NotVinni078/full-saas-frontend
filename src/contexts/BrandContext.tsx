@@ -16,6 +16,8 @@ interface BrandConfig {
   pageTitle: string;
   logo: string;
   favicon: string;
+  iosIcon: string;
+  androidIcon: string;
   colors: {
     light: BrandColors;
     dark: BrandColors;
@@ -34,24 +36,26 @@ const defaultBrandConfig: BrandConfig = {
   pageTitle: 'Sistema de Atendimento',
   logo: '',
   favicon: '/favicon.ico',
+  iosIcon: '',
+  androidIcon: '',
   colors: {
     light: {
-      primary: '#3b82f6',
-      secondary: '#f1f5f9',
-      accent: '#f1f5f9',
-      background: '#ffffff',
-      foreground: '#0f172a',
-      muted: '#f1f5f9',
-      border: '#e2e8f0'
+      primary: '221.2 83.2% 53.3%',
+      secondary: '210 40% 96.1%',
+      accent: '210 40% 96.1%',
+      background: '0 0% 100%',
+      foreground: '222.2 84% 4.9%',
+      muted: '210 40% 96.1%',
+      border: '214.3 31.8% 91.4%'
     },
     dark: {
-      primary: '#f8fafc',
-      secondary: '#0f172a',
-      accent: '#0f172a',
-      background: '#000000',
-      foreground: '#f8fafc',
-      muted: '#0f172a',
-      border: '#1e293b'
+      primary: '210 40% 98%',
+      secondary: '0 0% 5%',
+      accent: '0 0% 5%',
+      background: '0 0% 0%',
+      foreground: '210 40% 98%',
+      muted: '0 0% 5%',
+      border: '0 0% 10%'
     }
   }
 };
@@ -71,6 +75,30 @@ export const useBrand = () => {
   return context;
 };
 
+// Convert hex to HSL
+const hexToHsl = (hex: string): string => {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0, s = 0, l = (max + min) / 2;
+
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h /= 6;
+  }
+
+  return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
+};
+
 export const BrandProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [brandConfig, setBrandConfig] = useState<BrandConfig>(() => {
     const stored = localStorage.getItem('brandConfig');
@@ -87,11 +115,22 @@ export const BrandProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const updateColors = (theme: 'light' | 'dark', colors: Partial<BrandColors>) => {
     setBrandConfig(prev => {
+      const processedColors: Partial<BrandColors> = {};
+      
+      // Convert hex colors to HSL format
+      Object.entries(colors).forEach(([key, value]) => {
+        if (value && value.startsWith('#')) {
+          processedColors[key as keyof BrandColors] = hexToHsl(value);
+        } else {
+          processedColors[key as keyof BrandColors] = value;
+        }
+      });
+
       const updated = {
         ...prev,
         colors: {
           ...prev.colors,
-          [theme]: { ...prev.colors[theme], ...colors }
+          [theme]: { ...prev.colors[theme], ...processedColors }
         }
       };
       localStorage.setItem('brandConfig', JSON.stringify(updated));
@@ -115,7 +154,7 @@ export const BrandProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // Update page title and favicon
     document.title = brandConfig.pageTitle;
     const favicon = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
-    if (favicon) {
+    if (favicon && brandConfig.favicon) {
       favicon.href = brandConfig.favicon;
     }
   };

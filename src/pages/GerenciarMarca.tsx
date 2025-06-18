@@ -12,7 +12,7 @@ import { useBrand } from '@/contexts/BrandContext';
 import ColorPicker from '@/components/brand/ColorPicker';
 import ImageUpload from '@/components/brand/ImageUpload';
 import BrandPreview from '@/components/brand/BrandPreview';
-import { Palette, Image, Globe, Smartphone, Monitor, Download, Upload, RotateCcw } from 'lucide-react';
+import { Palette, Image, Globe, Smartphone, Monitor, Download, Upload, RotateCcw, Apple } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const GerenciarMarca = () => {
@@ -34,24 +34,26 @@ const GerenciarMarca = () => {
       pageTitle: 'Sistema de Atendimento',
       logo: '',
       favicon: '/favicon.ico',
+      iosIcon: '',
+      androidIcon: '',
       colors: {
         light: {
-          primary: '#3b82f6',
-          secondary: '#f1f5f9',
-          accent: '#f1f5f9',
-          background: '#ffffff',
-          foreground: '#0f172a',
-          muted: '#f1f5f9',
-          border: '#e2e8f0'
+          primary: '221.2 83.2% 53.3%',
+          secondary: '210 40% 96.1%',
+          accent: '210 40% 96.1%',
+          background: '0 0% 100%',
+          foreground: '222.2 84% 4.9%',
+          muted: '210 40% 96.1%',
+          border: '214.3 31.8% 91.4%'
         },
         dark: {
-          primary: '#f8fafc',
-          secondary: '#0f172a',
-          accent: '#0f172a',
-          background: '#000000',
-          foreground: '#f8fafc',
-          muted: '#0f172a',
-          border: '#1e293b'
+          primary: '210 40% 98%',
+          secondary: '0 0% 5%',
+          accent: '0 0% 5%',
+          background: '0 0% 0%',
+          foreground: '210 40% 98%',
+          muted: '0 0% 5%',
+          border: '0 0% 10%'
         }
       }
     };
@@ -141,7 +143,7 @@ const GerenciarMarca = () => {
           {/* Configuration Panel */}
           <div className="lg:col-span-2">
             <Tabs defaultValue="general" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="general">
                   <Globe className="w-4 h-4 mr-2" />
                   Geral
@@ -153,10 +155,6 @@ const GerenciarMarca = () => {
                 <TabsTrigger value="images">
                   <Image className="w-4 h-4 mr-2" />
                   Imagens
-                </TabsTrigger>
-                <TabsTrigger value="mobile">
-                  <Smartphone className="w-4 h-4 mr-2" />
-                  Mobile
                 </TabsTrigger>
               </TabsList>
 
@@ -175,6 +173,9 @@ const GerenciarMarca = () => {
                         onChange={(e) => updateBrandConfig({ companyName: e.target.value })}
                         placeholder="Digite o nome da empresa"
                       />
+                      <p className="text-sm text-muted-foreground">
+                        Este nome aparecerá no sistema e nos apps instalados
+                      </p>
                     </div>
                     
                     <div className="space-y-2">
@@ -282,7 +283,7 @@ const GerenciarMarca = () => {
               <TabsContent value="images">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Logotipo e Imagens</CardTitle>
+                    <CardTitle>Logotipo e Ícones</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <ImageUpload
@@ -294,64 +295,87 @@ const GerenciarMarca = () => {
                     
                     <Separator />
                     
-                    <ImageUpload
-                      label="Favicon"
-                      value={brandConfig.favicon}
-                      onChange={(url) => updateBrandConfig({ favicon: url })}
-                      description="Ícone que aparecerá na aba do navegador (recomendado: 32x32px ou 16x16px)"
-                      accept="image/png,image/x-icon,image/vnd.microsoft.icon"
-                    />
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              {/* Mobile Tab */}
-              <TabsContent value="mobile">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Configurações Mobile</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
                     <div className="space-y-4">
-                      <div>
-                        <h4 className="font-medium mb-2">Ícones para Dispositivos Móveis</h4>
-                        <p className="text-sm text-muted-foreground mb-4">
-                          Configure ícones específicos para diferentes dispositivos móveis
-                        </p>
+                      <h4 className="font-medium">Ícones para Diferentes Plataformas</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Configure ícones específicos que aparecerão nos apps instalados e na aba do navegador
+                      </p>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <Card className="p-4">
+                          <div className="flex items-center mb-3">
+                            <Monitor className="w-5 h-5 mr-2" />
+                            <h5 className="font-medium">PC (Favicon)</h5>
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-3">
+                            Ícone da aba do navegador (32x32px)
+                          </p>
+                          {brandConfig.favicon && brandConfig.favicon !== '/favicon.ico' && (
+                            <div className="mb-3">
+                              <img
+                                src={brandConfig.favicon}
+                                alt="Favicon"
+                                className="w-8 h-8 object-contain border border-border rounded"
+                              />
+                            </div>
+                          )}
+                          <ImageUpload
+                            label="Favicon"
+                            value={brandConfig.favicon}
+                            onChange={(url) => updateBrandConfig({ favicon: url })}
+                            accept="image/png,image/x-icon,image/vnd.microsoft.icon"
+                          />
+                        </Card>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <Card className="p-4">
-                            <h5 className="font-medium mb-2 flex items-center">
-                              <Smartphone className="w-4 h-4 mr-2" />
-                              iOS (iPhone/iPad)
-                            </h5>
-                            <p className="text-sm text-muted-foreground mb-3">
-                              Ícone para dispositivos Apple (180x180px recomendado)
-                            </p>
-                            <ImageUpload
-                              label="Ícone iOS"
-                              value=""
-                              onChange={() => {}}
-                              accept="image/png"
-                            />
-                          </Card>
-                          
-                          <Card className="p-4">
-                            <h5 className="font-medium mb-2 flex items-center">
-                              <Monitor className="w-4 h-4 mr-2" />
-                              Android
-                            </h5>
-                            <p className="text-sm text-muted-foreground mb-3">
-                              Ícone para dispositivos Android (192x192px recomendado)
-                            </p>
-                            <ImageUpload
-                              label="Ícone Android"
-                              value=""
-                              onChange={() => {}}
-                              accept="image/png"
-                            />
-                          </Card>
-                        </div>
+                        <Card className="p-4">
+                          <div className="flex items-center mb-3">
+                            <Apple className="w-5 h-5 mr-2" />
+                            <h5 className="font-medium">iOS</h5>
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-3">
+                            App instalado no iPhone/iPad (180x180px)
+                          </p>
+                          {brandConfig.iosIcon && (
+                            <div className="mb-3">
+                              <img
+                                src={brandConfig.iosIcon}
+                                alt="iOS Icon"
+                                className="w-12 h-12 object-contain border border-border rounded"
+                              />
+                            </div>
+                          )}
+                          <ImageUpload
+                            label="Ícone iOS"
+                            value={brandConfig.iosIcon}
+                            onChange={(url) => updateBrandConfig({ iosIcon: url })}
+                            accept="image/png"
+                          />
+                        </Card>
+                        
+                        <Card className="p-4">
+                          <div className="flex items-center mb-3">
+                            <Smartphone className="w-5 h-5 mr-2" />
+                            <h5 className="font-medium">Android</h5>
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-3">
+                            App instalado no Android (192x192px)
+                          </p>
+                          {brandConfig.androidIcon && (
+                            <div className="mb-3">
+                              <img
+                                src={brandConfig.androidIcon}
+                                alt="Android Icon"
+                                className="w-12 h-12 object-contain border border-border rounded"
+                              />
+                            </div>
+                          )}
+                          <ImageUpload
+                            label="Ícone Android"
+                            value={brandConfig.androidIcon}
+                            onChange={(url) => updateBrandConfig({ androidIcon: url })}
+                            accept="image/png"
+                          />
+                        </Card>
                       </div>
                     </div>
                   </CardContent>
