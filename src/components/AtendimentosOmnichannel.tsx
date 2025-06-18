@@ -66,6 +66,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useContacts } from '@/hooks/useContacts';
+import { useUsers } from '@/hooks/useUsers';
+import { useTags } from '@/hooks/useTags';
+import ContactSelector from '@/components/selectors/ContactSelector';
+import UserSelector from '@/components/selectors/UserSelector';
+import { Contact, User } from '@/types/global';
 
 interface Conversa {
   id: string;
@@ -125,7 +131,7 @@ const ChannelLogo = ({ canal }: { canal: string }) => {
       return (
         <div className="w-4 h-4 bg-blue-400 rounded-sm flex items-center justify-center">
           <svg viewBox="0 0 24 24" className="w-3 h-3 fill-white">
-            <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+            <path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0a12 12 0 00-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
           </svg>
         </div>
       );
@@ -152,208 +158,6 @@ const canalColors = {
   webchat: 'bg-gray-500'
 };
 
-const conversasExemplo: Conversa[] = [
-  {
-    id: '1',
-    cliente: 'João Silva',
-    canal: 'whatsapp',
-    ultimaMensagem: 'Olá, gostaria de saber sobre os produtos...',
-    timestamp: '14:30',
-    naoLidas: 2,
-    status: 'online',
-    statusAtendimento: 'atendendo',
-    avatar: 'JS',
-    telefone: '(11) 99999-9999',
-    email: 'joao@email.com',
-    endereco: 'Rua das Flores, 123',
-    observacoes: 'Cliente preferencial, sempre compra produtos premium',
-    tags: ['VIP', 'Premium', 'Fidelizado']
-  },
-  {
-    id: '2',
-    cliente: 'Maria Santos',
-    canal: 'instagram',
-    ultimaMensagem: 'Quando vocês fazem entrega?',
-    timestamp: '13:45',
-    naoLidas: 1,
-    status: 'offline',
-    statusAtendimento: 'aguardando',
-    avatar: 'MS',
-    telefone: '(11) 88888-8888',
-    email: 'maria@email.com',
-    endereco: 'Av. Principal, 456',
-    observacoes: 'Interessada em produtos para casa',
-    tags: ['Novo Cliente', 'Casa']
-  },
-  {
-    id: '3',
-    cliente: 'Pedro Costa',
-    canal: 'facebook',
-    ultimaMensagem: 'Obrigado pelo atendimento!',
-    timestamp: '12:20',
-    naoLidas: 0,
-    status: 'ausente',
-    statusAtendimento: 'finalizado',
-    avatar: 'PC',
-    telefone: '(11) 77777-7777',
-    email: 'pedro@email.com',
-    endereco: 'Rua Central, 789',
-    observacoes: 'Cliente satisfeito com a compra',
-    tags: ['Satisfeito', 'Recomenda']
-  },
-  {
-    id: '4',
-    cliente: 'Ana Oliveira',
-    canal: 'telegram',
-    ultimaMensagem: 'Qual o prazo de entrega?',
-    timestamp: '11:15',
-    naoLidas: 3,
-    status: 'online',
-    statusAtendimento: 'chatbot',
-    avatar: 'AO',
-    telefone: '(11) 66666-6666',
-    email: 'ana@email.com',
-    endereco: 'Praça da Liberdade, 321',
-    observacoes: 'Sempre pergunta sobre prazos',
-    tags: ['Ansiosa', 'Pragmática']
-  },
-  {
-    id: '5',
-    cliente: 'Grupo Vendas',
-    canal: 'whatsapp',
-    ultimaMensagem: 'Reunião amanhã às 10h',
-    timestamp: '10:30',
-    naoLidas: 1,
-    status: 'online',
-    statusAtendimento: 'atendendo',
-    isGrupo: true,
-    avatar: 'GV',
-    telefone: '',
-    email: '',
-    endereco: '',
-    observacoes: 'Grupo interno da equipe de vendas',
-    tags: ['Interno', 'Vendas']
-  },
-  {
-    id: '6',
-    cliente: 'Carlos Ferreira',
-    canal: 'whatsapp',
-    ultimaMensagem: 'Preciso de mais informações sobre garantia',
-    timestamp: '09:45',
-    naoLidas: 0,
-    status: 'offline',
-    statusAtendimento: 'aguardando',
-    avatar: 'CF',
-    telefone: '(11) 55555-5555',
-    email: 'carlos@email.com',
-    endereco: 'Rua das Palmeiras, 100',
-    observacoes: 'Muito detalhista, gosta de informações completas',
-    tags: ['Detalhista', 'Garantia']
-  },
-  {
-    id: '7',
-    cliente: 'Julia Lima',
-    canal: 'instagram',
-    ultimaMensagem: 'Vocês têm desconto para estudantes?',
-    timestamp: '08:30',
-    naoLidas: 2,
-    status: 'online',
-    statusAtendimento: 'atendendo',
-    avatar: 'JL',
-    telefone: '(11) 44444-4444',
-    email: 'julia@email.com',
-    endereco: 'Av. Universitária, 200',
-    observacoes: 'Estudante universitária, interessada em descontos',
-    tags: ['Estudante', 'Desconto']
-  },
-  {
-    id: '8',
-    cliente: 'Roberto Alves',
-    canal: 'facebook',
-    ultimaMensagem: 'O produto chegou com defeito',
-    timestamp: '07:15',
-    naoLidas: 4,
-    status: 'online',
-    statusAtendimento: 'aguardando',
-    avatar: 'RA',
-    telefone: '(11) 33333-3333',
-    email: 'roberto@email.com',
-    endereco: 'Rua do Comércio, 50',
-    observacoes: 'Produto com defeito, precisa de troca urgente',
-    tags: ['Problema', 'Troca', 'Urgente']
-  },
-  {
-    id: '9',
-    cliente: 'Fernanda Costa',
-    canal: 'telegram',
-    ultimaMensagem: 'Adorei a qualidade dos produtos!',
-    timestamp: '06:50',
-    naoLidas: 0,
-    status: 'offline',
-    statusAtendimento: 'finalizado',
-    avatar: 'FC',
-    telefone: '(11) 22222-2222',
-    email: 'fernanda@email.com',
-    endereco: 'Av. dos Sonhos, 300',
-    observacoes: 'Cliente muito satisfeita, potencial para indicações',
-    tags: ['Satisfeita', 'Indicações', 'Qualidade']
-  },
-  {
-    id: '10',
-    cliente: 'Marcos Pereira',
-    canal: 'webchat',
-    ultimaMensagem: 'Gostaria de falar com um supervisor',
-    timestamp: '06:20',
-    naoLidas: 1,
-    status: 'ausente',
-    statusAtendimento: 'aguardando',
-    avatar: 'MP',
-    telefone: '(11) 11111-1111',
-    email: 'marcos@email.com',
-    endereco: 'Rua da Esperança, 400',
-    observacoes: 'Cliente insatisfeito, quer falar com supervisor',
-    tags: ['Insatisfeito', 'Supervisor', 'Escalação']
-  }
-];
-
-const mensagensExemplo: Mensagem[] = [
-  {
-    id: '1',
-    remetente: 'cliente',
-    conteudo: 'Olá, gostaria de saber sobre os produtos disponíveis',
-    timestamp: '14:25',
-    status: 'lida'
-  },
-  {
-    id: '2',
-    remetente: 'atendente',
-    conteudo: 'Olá! Claro, temos vários produtos disponíveis. Qual categoria te interessa?',
-    timestamp: '14:26',
-    status: 'lida'
-  },
-  {
-    id: '3',
-    remetente: 'cliente',
-    conteudo: 'Estou procurando produtos para casa',
-    timestamp: '14:28',
-    status: 'lida'
-  },
-  {
-    id: '4',
-    remetente: 'atendente',
-    conteudo: 'Perfeito! Temos uma linha completa de produtos para casa. Posso te enviar nosso catálogo?',
-    timestamp: '14:29',
-    status: 'entregue'
-  },
-  {
-    id: '5',
-    remetente: 'cliente',
-    conteudo: 'Sim, por favor!',
-    timestamp: '14:30',
-    status: 'enviada'
-  }
-];
-
 const AtendimentosOmnichannel = () => {
   const [conversaSelecionada, setConversaSelecionada] = useState<string>('');
   const [mensagens, setMensagens] = useState<Mensagem[]>(mensagensExemplo);
@@ -368,17 +172,38 @@ const AtendimentosOmnichannel = () => {
   const [isSignatureActive, setIsSignatureActive] = useState(false);
   const [isContactListOpen, setIsContactListOpen] = useState(false);
   const [isChatbotListOpen, setIsChatbotListOpen] = useState(false);
+  const [isTransferDialogOpen, setIsTransferDialogOpen] = useState(false);
 
-  const conversaAtual = conversasExemplo.find(c => c.id === conversaSelecionada);
-  
-  const conversasFiltradas = conversasExemplo.filter(conversa => {
-    const matchStatus = filtroStatus === 'todos' || conversa.statusAtendimento === filtroStatus;
-    const matchTipo = filtroTipo === 'todos' || 
-                     (filtroTipo === 'grupos' && conversa.isGrupo) ||
-                     (filtroTipo === 'individuais' && !conversa.isGrupo);
-    const matchBusca = conversa.cliente.toLowerCase().includes(busca.toLowerCase()) ||
-                      conversa.ultimaMensagem.toLowerCase().includes(busca.toLowerCase());
-    return matchStatus && matchTipo && matchBusca;
+  // Usar dados sincronizados
+  const { contacts, getContactTags } = useContacts();
+  const { getActiveUsers } = useUsers();
+  const { getTagsByIds } = useTags();
+
+  // Converter contatos para conversas (mantendo exemplo para demonstração)
+  const conversasExemplo: Conversa[] = contacts.slice(0, 10).map((contact, index) => {
+    const contactTags = getContactTags(contact);
+    return {
+      id: contact.id,
+      cliente: contact.nome,
+      canal: contact.canal,
+      ultimaMensagem: index === 0 ? 'Olá, gostaria de saber sobre os produtos...' : 
+                     index === 1 ? 'Quando vocês fazem entrega?' :
+                     index === 2 ? 'Obrigado pelo atendimento!' :
+                     'Mensagem de exemplo',
+      timestamp: `${14 - index}:${30 + index}`,
+      naoLidas: index < 3 ? index + 1 : 0,
+      status: contact.status,
+      statusAtendimento: index === 0 ? 'atendendo' : 
+                        index === 1 ? 'aguardando' :
+                        index === 2 ? 'finalizado' : 'chatbot',
+      isGrupo: false,
+      avatar: contact.avatar,
+      telefone: contact.telefone,
+      email: contact.email,
+      endereco: contact.endereco,
+      observacoes: contact.observacoes,
+      tags: contactTags.map(tag => tag.nome)
+    };
   });
 
   const enviarMensagem = () => {
@@ -417,6 +242,35 @@ const AtendimentosOmnichannel = () => {
   const handleEditContact = (conversa: Conversa) => {
     setSelectedContact(conversa);
     setIsEditContactOpen(true);
+  };
+
+  const handleTransferUser = (user: User) => {
+    console.log('Transferindo atendimento para:', user.nome);
+    setIsTransferDialogOpen(false);
+  };
+
+  const handleContactFromSelector = (contact: Contact) => {
+    // Iniciar conversa com contato selecionado
+    const novaConversa: Conversa = {
+      id: contact.id,
+      cliente: contact.nome,
+      canal: contact.canal,
+      ultimaMensagem: 'Conversa iniciada',
+      timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+      naoLidas: 0,
+      status: contact.status,
+      statusAtendimento: 'atendendo',
+      isGrupo: false,
+      avatar: contact.avatar,
+      telefone: contact.telefone,
+      email: contact.email,
+      endereco: contact.endereco,
+      observacoes: contact.observacoes,
+      tags: getContactTags(contact).map(tag => tag.nome)
+    };
+    
+    setConversaSelecionada(contact.id);
+    setIsContactDialogOpen(false);
   };
 
   const StatusIndicator = ({ status }: { status: string }) => {
@@ -646,70 +500,83 @@ const AtendimentosOmnichannel = () => {
       <div className="flex-1 overflow-hidden">
         <ScrollArea className="h-full">
           <div className="p-2">
-            {conversasFiltradas.map((conversa) => (
-              <Card
-                key={conversa.id}
-                className={`p-4 mb-2 cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-900 min-h-[80px] ${
-                  conversaSelecionada === conversa.id ? 'border-blue-500 bg-blue-50 dark:bg-blue-950' : ''
-                }`}
-                onClick={() => handleConversaClick(conversa.id)}
-              >
-                <div className="flex items-start gap-3 h-full">
-                  <div className="relative">
-                    <div 
-                      className="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center text-sm font-medium cursor-pointer hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleContactClick(conversa);
-                      }}
-                    >
-                      {conversa.avatar}
-                    </div>
-                    <div className="absolute -bottom-1 -right-1">
-                      <ChannelLogo canal={conversa.canal} />
-                    </div>
-                  </div>
-                  
-                  <div className="flex-1 min-w-0 flex flex-col">
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="flex items-center gap-2 min-w-0 flex-1">
-                        <h3 className="font-medium text-gray-900 dark:text-white truncate">
-                          {conversa.cliente}
-                          {conversa.isGrupo && <UsersRound className="inline h-3 w-3 ml-1" />}
-                        </h3>
-                        <div className="flex gap-1">
-                          {conversa.tags?.map((tag) => (
-                            <Badge key={tag} variant="secondary" className="text-xs px-1 py-0 h-4 text-[10px]">
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
+            {conversasFiltradas.map((conversa) => {
+              // Usar tags sincronizadas
+              const conversaTags = conversa.tags || [];
+              return (
+                <Card
+                  key={conversa.id}
+                  className={`p-4 mb-2 cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-900 min-h-[80px] ${
+                    conversaSelecionada === conversa.id ? 'border-blue-500 bg-blue-50 dark:bg-blue-950' : ''
+                  }`}
+                  onClick={() => handleConversaClick(conversa.id)}
+                >
+                  <div className="flex items-start gap-3 h-full">
+                    <div className="relative">
+                      <div 
+                        className="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center text-sm font-medium cursor-pointer hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleContactClick(conversa);
+                        }}
+                      >
+                        {conversa.avatar}
                       </div>
-                      <div className="flex items-center gap-1">
-                        <ActionIcons statusAtendimento={conversa.statusAtendimento} />
-                        <span className="text-xs text-gray-500">{conversa.timestamp}</span>
+                      <div className="absolute -bottom-1 -right-1">
+                        <ChannelLogo canal={conversa.canal} />
                       </div>
                     </div>
                     
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
-                        {conversa.ultimaMensagem}
-                      </p>
-                      {conversa.naoLidas > 0 && (
-                        <Badge variant="destructive" className="ml-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
-                          {conversa.naoLidas}
-                        </Badge>
-                      )}
+                    <div className="flex-1 min-w-0 flex flex-col">
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <h3 className="font-medium text-gray-900 dark:text-white truncate">
+                            {conversa.cliente}
+                            {conversa.isGrupo && <UsersRound className="inline h-3 w-3 ml-1" />}
+                          </h3>
+                          <div className="flex gap-1">
+                            {conversaTags.slice(0, 2).map((tagName) => {
+                              // Encontrar a tag real para pegar a cor
+                              const realTag = getTagsByIds(['1', '2', '3', '4', '5', '6']).find(t => t.nome === tagName);
+                              return (
+                                <Badge key={tagName} className={`text-xs px-1 py-0 h-4 text-[10px] ${realTag?.cor || 'bg-gray-100 text-gray-800'}`}>
+                                  {tagName}
+                                </Badge>
+                              );
+                            })}
+                            {conversaTags.length > 2 && (
+                              <Badge variant="secondary" className="text-xs px-1 py-0 h-4 text-[10px]">
+                                +{conversaTags.length - 2}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <ActionIcons statusAtendimento={conversa.statusAtendimento} />
+                          <span className="text-xs text-gray-500">{conversa.timestamp}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
+                          {conversa.ultimaMensagem}
+                        </p>
+                        {conversa.naoLidas > 0 && (
+                          <Badge variant="destructive" className="ml-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
+                            {conversa.naoLidas}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
           </div>
         </ScrollArea>
       </div>
 
-      {/* Botão Flutuante */}
+      {/* Botão Flutuante com ContactSelector */}
       <Dialog open={isContactDialogOpen} onOpenChange={setIsContactDialogOpen}>
         <DialogTrigger asChild>
           <Button
@@ -723,42 +590,11 @@ const AtendimentosOmnichannel = () => {
           <DialogHeader>
             <DialogTitle>Selecionar Contato</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Buscar contatos..."
-                className="pl-10"
-              />
-            </div>
-            <ScrollArea className="h-[300px]">
-              <div className="space-y-2">
-                {conversasExemplo.map((conversa) => (
-                  <div
-                    key={conversa.id}
-                    className="flex items-center gap-3 p-3 rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
-                    onClick={() => {
-                      handleConversaClick(conversa.id);
-                      setIsContactDialogOpen(false);
-                    }}
-                  >
-                    <Avatar className="h-10 w-10">
-                      <AvatarFallback>{conversa.avatar}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-900 dark:text-white truncate">
-                        {conversa.cliente}
-                      </p>
-                      <p className="text-sm text-gray-500 truncate">
-                        {conversa.telefone || 'Sem telefone'}
-                      </p>
-                    </div>
-                    <ChannelLogo canal={conversa.canal} />
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
-          </div>
+          <ContactSelector
+            onSelectContact={handleContactFromSelector}
+            placeholder="Buscar contatos..."
+            showTags={true}
+          />
         </DialogContent>
       </Dialog>
     </div>
@@ -810,11 +646,14 @@ const AtendimentosOmnichannel = () => {
                       {conversaAtual.cliente}
                     </h3>
                     <div className="flex gap-1">
-                      {conversaAtual.tags?.map((tag) => (
-                        <Badge key={tag} variant="secondary" className="text-xs px-2 py-0.5">
-                          {tag}
-                        </Badge>
-                      ))}
+                      {(conversaAtual.tags || []).map((tagName) => {
+                        const realTag = getTagsByIds(['1', '2', '3', '4', '5', '6']).find(t => t.nome === tagName);
+                        return (
+                          <Badge key={tagName} className={`text-xs px-2 py-0.5 ${realTag?.cor || 'bg-gray-100 text-gray-800'}`}>
+                            {tagName}
+                          </Badge>
+                        );
+                      })}
                     </div>
                   </div>
                   <div className="text-sm text-gray-500 truncate">
@@ -824,18 +663,32 @@ const AtendimentosOmnichannel = () => {
               </div>
 
               <div className="flex items-center gap-2">
-                {/* Ícones visíveis em telas grandes */}
+                {/* Transferir atendimento com UserSelector */}
                 <div className="hidden md:flex items-center gap-2">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <RefreshCcw className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Transferir atendimento</p>
-                    </TooltipContent>
-                  </Tooltip>
+                  <Dialog open={isTransferDialogOpen} onOpenChange={setIsTransferDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <RefreshCcw className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Transferir atendimento</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                      <DialogHeader>
+                        <DialogTitle>Transferir Atendimento</DialogTitle>
+                      </DialogHeader>
+                      <UserSelector
+                        onSelectUser={handleTransferUser}
+                        placeholder="Buscar usuários..."
+                        showSector={true}
+                      />
+                    </DialogContent>
+                  </Dialog>
 
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -856,17 +709,6 @@ const AtendimentosOmnichannel = () => {
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>Retornar a aguardando</p>
-                    </TooltipContent>
-                  </Tooltip>
-
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <CircleCheckBig className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Finalizar Atendimento</p>
                     </TooltipContent>
                   </Tooltip>
 
@@ -964,7 +806,7 @@ const AtendimentosOmnichannel = () => {
                               <div className="ml-2">
                                 {mensagem.status === 'lida' && <CheckCircle className="h-3 w-3" />}
                                 {mensagem.status === 'entregue' && <CheckCircle className="h-3 w-3 opacity-60" />}
-                                {mensagem.status === 'enviada' && <Clock className="h-3 w-3 opacity-60" />}
+                                {mensagem.status === 'enviada' && <Clock className="h-3 w-3 opacity-60" />
                               </div>
                             )}
                           </div>
