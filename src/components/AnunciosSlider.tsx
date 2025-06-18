@@ -12,6 +12,7 @@ interface CardData {
   descricao: string;
   data: string;
   tipo: string;
+  imagem?: string;
 }
 
 interface AnunciosSliderProps {
@@ -24,6 +25,9 @@ interface AnunciosSliderProps {
 
 const AnunciosSlider = ({ items, onCardClick, title, icon, showDeleteButton = false }: AnunciosSliderProps) => {
   const { deleteAnuncio, deleteNotaAtualizacao } = useAnuncios();
+
+  console.log('AnunciosSlider items:', items);
+  console.log('Items with images:', items.filter(item => item.imagem));
 
   const getIcon = (tipo: string) => {
     return tipo === 'Nota de Atualização' ? <FileText className="h-5 w-5" /> : <Bell className="h-5 w-5" />;
@@ -60,7 +64,7 @@ const AnunciosSlider = ({ items, onCardClick, title, icon, showDeleteButton = fa
           {items.map((item) => (
             <CarouselItem key={item.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
               <Card 
-                className="hover:shadow-md transition-shadow duration-200 cursor-pointer h-full relative"
+                className="hover:shadow-md transition-shadow duration-200 cursor-pointer h-full relative overflow-hidden"
                 onClick={() => onCardClick(item)}
               >
                 {showDeleteButton && (
@@ -73,6 +77,24 @@ const AnunciosSlider = ({ items, onCardClick, title, icon, showDeleteButton = fa
                     <Trash className="h-4 w-4" />
                   </Button>
                 )}
+                
+                {item.imagem && (
+                  <div className="w-full h-48 overflow-hidden">
+                    <img 
+                      src={item.imagem} 
+                      alt={item.titulo}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        console.error('Erro ao carregar imagem:', item.imagem);
+                        e.currentTarget.style.display = 'none';
+                      }}
+                      onLoad={() => {
+                        console.log('Imagem carregada com sucesso:', item.imagem);
+                      }}
+                    />
+                  </div>
+                )}
+                
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between pr-8">
                     <div className="flex items-center space-x-2">
