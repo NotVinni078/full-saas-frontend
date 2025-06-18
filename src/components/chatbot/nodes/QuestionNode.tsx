@@ -31,32 +31,38 @@ const QuestionNode = memo(({ data, id }: any) => {
         </div>
         
         <div className="space-y-3">
-          <Textarea
-            value={question}
-            onChange={(e) => handleQuestionChange(e.target.value)}
-            placeholder="Digite a pergunta..."
-            className="min-h-[80px] resize-none"
-          />
+          <div>
+            <label className="text-sm font-medium">Pergunta a ser enviada:</label>
+            <Textarea
+              value={question}
+              onChange={(e) => handleQuestionChange(e.target.value)}
+              placeholder="Digite a pergunta que o chatbot fará..."
+              className="mt-1 min-h-[80px] resize-none"
+            />
+          </div>
           
           <div>
-            <label className="text-sm font-medium">Salvar resposta em:</label>
+            <label className="text-sm font-medium">Nome da variável para salvar a resposta:</label>
             <Input
               value={variable}
               onChange={(e) => handleVariableChange(e.target.value)}
-              placeholder="Nome da variável"
+              placeholder="Ex: nome_cliente, email, telefone"
               className="mt-1"
             />
+            <p className="text-xs text-muted-foreground mt-1">
+              A resposta do usuário será salva nesta variável para uso posterior no fluxo
+            </p>
           </div>
         </div>
         
         <Handle
           type="target"
-          position={Position.Top}
+          position={Position.Left}
           className="w-3 h-3 bg-green-500 border-2 border-white"
         />
         <Handle
           type="source"
-          position={Position.Bottom}
+          position={Position.Right}
           className="w-3 h-3 bg-green-500 border-2 border-white"
         />
       </CardContent>

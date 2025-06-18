@@ -28,14 +28,14 @@ const EndNode = memo(({ data, id }: any) => {
           <Textarea
             value={message}
             onChange={(e) => handleMessageChange(e.target.value)}
-            placeholder="Digite a mensagem final..."
+            placeholder="Digite a mensagem final que será enviada..."
             className="mt-1 min-h-[80px] resize-none"
           />
         </div>
         
         <Handle
           type="target"
-          position={Position.Top}
+          position={Position.Left}
           className="w-3 h-3 bg-red-500 border-2 border-white"
         />
       </CardContent>

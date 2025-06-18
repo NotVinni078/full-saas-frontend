@@ -59,12 +59,7 @@ const TransferNode = memo(({ data, id }: any) => {
         
         <Handle
           type="target"
-          position={Position.Top}
-          className="w-3 h-3 bg-yellow-500 border-2 border-white"
-        />
-        <Handle
-          type="source"
-          position={Position.Bottom}
+          position={Position.Left}
           className="w-3 h-3 bg-yellow-500 border-2 border-white"
         />
       </CardContent>

@@ -23,21 +23,24 @@ const MessageNode = memo(({ data, id }: any) => {
           <span className="font-medium">Mensagem</span>
         </div>
         
-        <Textarea
-          value={content}
-          onChange={(e) => handleContentChange(e.target.value)}
-          placeholder="Digite a mensagem que será enviada..."
-          className="min-h-[100px] resize-none"
-        />
+        <div>
+          <label className="text-sm font-medium">Mensagem que será enviada:</label>
+          <Textarea
+            value={content}
+            onChange={(e) => handleContentChange(e.target.value)}
+            placeholder="Digite a mensagem que o chatbot enviará..."
+            className="mt-1 min-h-[100px] resize-none"
+          />
+        </div>
         
         <Handle
           type="target"
-          position={Position.Top}
+          position={Position.Left}
           className="w-3 h-3 bg-blue-500 border-2 border-white"
         />
         <Handle
           type="source"
-          position={Position.Bottom}
+          position={Position.Right}
           className="w-3 h-3 bg-blue-500 border-2 border-white"
         />
       </CardContent>
