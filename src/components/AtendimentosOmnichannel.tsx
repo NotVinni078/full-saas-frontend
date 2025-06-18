@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -308,111 +309,211 @@ const AtendimentosOmnichannel = () => {
       case 'atendendo':
         return (
           <div className="flex gap-1">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-6 w-6">
-                  <Clock9 className="h-3 w-3" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Retornar a Aguardando</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-6 w-6">
-                  <Star className="h-3 w-3" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Enviar pesquisa de satisfação</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-6 w-6">
-                  <CircleCheckBig className="h-3 w-3" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Finalizar</p>
-              </TooltipContent>
-            </Tooltip>
+            {/* Desktop - Mostrar todos os ícones */}
+            <div className="hidden lg:flex gap-1">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-6 w-6">
+                    <Clock9 className="h-3 w-3" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Retornar a Aguardando</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-6 w-6">
+                    <Star className="h-3 w-3" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Enviar pesquisa de satisfação</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-6 w-6">
+                    <CircleCheckBig className="h-3 w-3" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Finalizar</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            
+            {/* Mobile/Tablet - Mostrar apenas ellipsis-vertical */}
+            <div className="lg:hidden">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-6 w-6">
+                    <EllipsisVertical className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem>
+                    <Clock9 className="h-4 w-4 mr-2" />
+                    Retornar a Aguardando
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Star className="h-4 w-4 mr-2" />
+                    Enviar pesquisa
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <CircleCheckBig className="h-4 w-4 mr-2" />
+                    Finalizar
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         );
       case 'aguardando':
         return (
           <div className="flex gap-1">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-6 w-6">
-                  <MessageSquare className="h-3 w-3" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Realizar Atendimento</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-6 w-6">
-                  <CircleCheckBig className="h-3 w-3" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Finalizar</p>
-              </TooltipContent>
-            </Tooltip>
+            {/* Desktop - Mostrar todos os ícones */}
+            <div className="hidden lg:flex gap-1">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-6 w-6">
+                    <MessageSquare className="h-3 w-3" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Realizar Atendimento</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-6 w-6">
+                    <CircleCheckBig className="h-3 w-3" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Finalizar</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            
+            {/* Mobile/Tablet - Mostrar apenas ellipsis-vertical */}
+            <div className="lg:hidden">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-6 w-6">
+                    <EllipsisVertical className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem>
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Realizar Atendimento
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <CircleCheckBig className="h-4 w-4 mr-2" />
+                    Finalizar
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         );
       case 'chatbot':
         return (
           <div className="flex gap-1">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-6 w-6">
-                  <MessageSquare className="h-3 w-3" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Realizar Atendimento</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-6 w-6">
-                  <CircleCheckBig className="h-3 w-3" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Finalizar</p>
-              </TooltipContent>
-            </Tooltip>
+            {/* Desktop - Mostrar todos os ícones */}
+            <div className="hidden lg:flex gap-1">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-6 w-6">
+                    <MessageSquare className="h-3 w-3" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Realizar Atendimento</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-6 w-6">
+                    <CircleCheckBig className="h-3 w-3" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Finalizar</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            
+            {/* Mobile/Tablet - Mostrar apenas ellipsis-vertical */}
+            <div className="lg:hidden">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-6 w-6">
+                    <EllipsisVertical className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem>
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Realizar Atendimento
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <CircleCheckBig className="h-4 w-4 mr-2" />
+                    Finalizar
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         );
       case 'finalizado':
         return (
           <div className="flex gap-1">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-6 w-6">
-                  <MessageSquare className="h-3 w-3" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Realizar Atendimento</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-6 w-6">
-                  <RefreshCcw className="h-3 w-3" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Transferir para outro Atendente</p>
-              </TooltipContent>
-            </Tooltip>
+            {/* Desktop - Mostrar todos os ícones */}
+            <div className="hidden lg:flex gap-1">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-6 w-6">
+                    <MessageSquare className="h-3 w-3" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Realizar Atendimento</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-6 w-6">
+                    <RefreshCcw className="h-3 w-3" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Transferir para outro Atendente</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            
+            {/* Mobile/Tablet - Mostrar apenas ellipsis-vertical */}
+            <div className="lg:hidden">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-6 w-6">
+                    <EllipsisVertical className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem>
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Realizar Atendimento
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <RefreshCcw className="h-4 w-4 mr-2" />
+                    Transferir para outro Atendente
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         );
       default:
@@ -694,8 +795,8 @@ const AtendimentosOmnichannel = () => {
               </div>
 
               <div className="flex items-center gap-2">
-                {/* Transferir atendimento com UserSelector */}
-                <div className="hidden md:flex items-center gap-2">
+                {/* Desktop - Mostrar todos os ícones */}
+                <div className="hidden lg:flex items-center gap-2">
                   <Dialog open={isTransferDialogOpen} onOpenChange={setIsTransferDialogOpen}>
                     <DialogTrigger asChild>
                       <Tooltip>
@@ -774,51 +875,45 @@ const AtendimentosOmnichannel = () => {
                   </Button>
                 </div>
 
-                {/* Menu de opções para telas pequenas */}
-                <div className="md:hidden">
-                  <Sheet>
-                    <SheetTrigger asChild>
+                {/* Mobile/Tablet - Usar ellipsis-vertical */}
+                <div className="lg:hidden">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon">
                         <EllipsisVertical className="h-4 w-4" />
                       </Button>
-                    </SheetTrigger>
-                    <SheetContent side="right" className="w-80">
-                      <div className="space-y-4 mt-6">
-                        <Button variant="outline" className="w-full justify-start">
-                          <RefreshCcw className="h-4 w-4 mr-2" />
-                          Transferir atendimento
-                        </Button>
-                        <Button variant="outline" className="w-full justify-start">
-                          <UserPlus className="h-4 w-4 mr-2" />
-                          Adicionar Participante a Conversa
-                        </Button>
-                        <Button variant="outline" className="w-full justify-start">
-                          <ClockArrowDown className="h-4 w-4 mr-2" />
-                          Retornar a aguardando
-                        </Button>
-                        <Button variant="outline" className="w-full justify-start">
-                          <Star className="h-4 w-4 mr-2" />
-                          Enviar pesquisa de satisfação
-                        </Button>
-                        <Button variant="outline" className="w-full justify-start">
-                          <CircleCheckBig className="h-4 w-4 mr-2" />
-                          Finalizar Atendimento
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          className="w-full justify-start"
-                          onClick={() => handleEditContact(conversaAtual)}
-                        >
-                          <SquarePen className="h-4 w-4 mr-2" />
-                          Editar Contato
-                        </Button>
-                        <Button variant="outline" className="w-full justify-start">
-                          <Phone className="h-4 w-4 mr-2" />
-                          Ligar
-                        </Button>
-                      </div>
-                    </SheetContent>
-                  </Sheet>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => setIsTransferDialogOpen(true)}>
+                        <RefreshCcw className="h-4 w-4 mr-2" />
+                        Transferir atendimento
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <UserPlus className="h-4 w-4 mr-2" />
+                        Adicionar Participante
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <ClockArrowDown className="h-4 w-4 mr-2" />
+                        Retornar a aguardando
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Star className="h-4 w-4 mr-2" />
+                        Enviar pesquisa
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <CircleCheckBig className="h-4 w-4 mr-2" />
+                        Finalizar Atendimento
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleEditContact(conversaAtual)}>
+                        <SquarePen className="h-4 w-4 mr-2" />
+                        Editar Contato
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Phone className="h-4 w-4 mr-2" />
+                        Ligar
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
             </div>
@@ -864,69 +959,116 @@ const AtendimentosOmnichannel = () => {
               </ScrollArea>
             </div>
 
-            {/* Barra de Digitação - ÁREA VERDE */}
+            {/* Barra de Digitação */}
             <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
               <div className="flex items-center gap-2 max-w-full">
-                {/* Menu suspenso com opções */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="flex-shrink-0">
-                      <EllipsisVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-auto p-1 bg-transparent border-none shadow-none">
-                    <div className="flex flex-col gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setIsSignatureActive(!isSignatureActive)}
-                        className={`w-8 h-8 rounded-full shadow-lg flex-shrink-0 ${
-                          isSignatureActive ? 'bg-red-100 hover:bg-red-200' : 'bg-green-100 hover:bg-green-200'
-                        }`}
-                      >
+                {/* Desktop - Mostrar botões expandidos */}
+                <div className="hidden lg:flex items-center gap-2">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="flex-shrink-0">
+                        <EllipsisVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-auto p-1 bg-transparent border-none shadow-none">
+                      <div className="flex flex-col gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setIsSignatureActive(!isSignatureActive)}
+                          className={`w-8 h-8 rounded-full shadow-lg flex-shrink-0 ${
+                            isSignatureActive ? 'bg-red-100 hover:bg-red-200' : 'bg-green-100 hover:bg-green-200'
+                          }`}
+                        >
+                          {isSignatureActive ? (
+                            <PenOff className="h-4 w-4 text-red-600" />
+                          ) : (
+                            <PenLine className="h-4 w-4 text-green-600" />
+                          )}
+                        </Button>
+                        
+                        <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg flex-shrink-0">
+                          <Zap className="h-4 w-4" />
+                        </Button>
+                        
+                        <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg flex-shrink-0">
+                          <NotebookPen className="h-4 w-4" />
+                        </Button>
+                        
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg flex-shrink-0"
+                          onClick={() => setIsContactListOpen(true)}
+                        >
+                          <IdCard className="h-4 w-4" />
+                        </Button>
+                        
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg flex-shrink-0"
+                          onClick={() => setIsChatbotListOpen(true)}
+                        >
+                          <BotMessageSquare className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  <Button variant="ghost" size="icon" className="flex-shrink-0">
+                    <SmilePlus className="h-4 w-4" />
+                  </Button>
+
+                  <Button variant="ghost" size="icon" className="flex-shrink-0">
+                    <Paperclip className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                {/* Mobile/Tablet - Mostrar apenas ellipsis-vertical */}
+                <div className="lg:hidden">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="flex-shrink-0">
+                        <EllipsisVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start">
+                      <DropdownMenuItem onClick={() => setIsSignatureActive(!isSignatureActive)}>
                         {isSignatureActive ? (
-                          <PenOff className="h-4 w-4 text-red-600" />
+                          <PenOff className="h-4 w-4 mr-2" />
                         ) : (
-                          <PenLine className="h-4 w-4 text-green-600" />
+                          <PenLine className="h-4 w-4 mr-2" />
                         )}
-                      </Button>
-                      
-                      <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg flex-shrink-0">
-                        <Zap className="h-4 w-4" />
-                      </Button>
-                      
-                      <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg flex-shrink-0">
-                        <NotebookPen className="h-4 w-4" />
-                      </Button>
-                      
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg flex-shrink-0"
-                        onClick={() => setIsContactListOpen(true)}
-                      >
-                        <IdCard className="h-4 w-4" />
-                      </Button>
-                      
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 shadow-lg flex-shrink-0"
-                        onClick={() => setIsChatbotListOpen(true)}
-                      >
-                        <BotMessageSquare className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-
-                <Button variant="ghost" size="icon" className="flex-shrink-0">
-                  <SmilePlus className="h-4 w-4" />
-                </Button>
-
-                <Button variant="ghost" size="icon" className="flex-shrink-0">
-                  <Paperclip className="h-4 w-4" />
-                </Button>
+                        Assinatura
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Zap className="h-4 w-4 mr-2" />
+                        Ações rápidas
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <NotebookPen className="h-4 w-4 mr-2" />
+                        Notas
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setIsContactListOpen(true)}>
+                        <IdCard className="h-4 w-4 mr-2" />
+                        Contatos
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setIsChatbotListOpen(true)}>
+                        <BotMessageSquare className="h-4 w-4 mr-2" />
+                        Chatbot
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <SmilePlus className="h-4 w-4 mr-2" />
+                        Emojis
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Paperclip className="h-4 w-4 mr-2" />
+                        Anexar
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
                 
                 <div className="flex-1 min-w-0">
                   <Input
