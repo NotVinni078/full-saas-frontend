@@ -43,9 +43,9 @@ const FluxoEditor = ({ fluxo, onSave, onBack }: FluxoEditorProps) => {
   }, []);
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col brand-background">
       {/* Header */}
-      <div className="border-b bg-background p-4 flex items-center justify-between">
+      <div className="brand-border border-b brand-background p-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="outline" size="sm" onClick={onBack}>
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -55,13 +55,13 @@ const FluxoEditor = ({ fluxo, onSave, onBack }: FluxoEditorProps) => {
             <Input
               value={currentFluxo.name}
               onChange={(e) => setCurrentFluxo(prev => ({ ...prev, name: e.target.value }))}
-              className="font-semibold border-none p-0 h-auto focus-visible:ring-0"
+              className="font-semibold border-none p-0 h-auto focus-visible:ring-0 brand-background brand-text-foreground"
               placeholder="Nome do fluxo"
             />
             <Input
               value={currentFluxo.description}
               onChange={(e) => setCurrentFluxo(prev => ({ ...prev, description: e.target.value }))}
-              className="text-sm text-muted-foreground border-none p-0 h-auto focus-visible:ring-0"
+              className="text-sm brand-text-muted border-none p-0 h-auto focus-visible:ring-0 brand-background"
               placeholder="Descrição do fluxo"
             />
           </div>
@@ -101,7 +101,7 @@ const FluxoEditor = ({ fluxo, onSave, onBack }: FluxoEditorProps) => {
         </div>
         
         {showPreview && (
-          <div className="w-1/3 border-l bg-muted/30">
+          <div className="w-1/3 brand-border border-l brand-muted">
             <FlowPreview 
               nodes={currentFluxo.nodes}
               edges={currentFluxo.edges}

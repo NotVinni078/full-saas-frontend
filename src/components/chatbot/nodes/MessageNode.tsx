@@ -21,27 +21,27 @@ const MessageNode = memo(({ data, id }: any) => {
   };
 
   return (
-    <Card className="w-80 shadow-lg">
+    <Card className="w-80 shadow-lg brand-card">
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-              <MessageSquare className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 brand-info rounded-lg flex items-center justify-center">
+              <MessageSquare className="w-4 h-4 brand-text-background" />
             </div>
-            <span className="font-medium">Mensagem</span>
+            <span className="font-medium brand-text-foreground">Mensagem</span>
           </div>
           <Button
             variant="ghost"
             size="sm"
             onClick={handleDelete}
-            className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+            className="h-6 w-6 p-0 brand-text-error hover:brand-text-error hover:brand-hover-error"
           >
             <Trash2 className="w-4 h-4" />
           </Button>
         </div>
         
         <div>
-          <label className="text-sm font-medium">Mensagem que será enviada:</label>
+          <label className="text-sm font-medium brand-text-foreground">Mensagem que será enviada:</label>
           <Textarea
             value={content}
             onChange={(e) => handleContentChange(e.target.value)}
@@ -53,12 +53,12 @@ const MessageNode = memo(({ data, id }: any) => {
         <Handle
           type="target"
           position={Position.Left}
-          className="w-3 h-3 bg-blue-500 border-2 border-white"
+          className="w-3 h-3 brand-info border-2 brand-border-background"
         />
         <Handle
           type="source"
           position={Position.Right}
-          className="w-3 h-3 bg-blue-500 border-2 border-white"
+          className="w-3 h-3 brand-info border-2 brand-border-background"
         />
       </CardContent>
     </Card>

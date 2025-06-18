@@ -1,3 +1,4 @@
+
 import React, { memo, useState } from 'react';
 import { Handle, Position, useReactFlow } from '@xyflow/react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -27,20 +28,20 @@ const QuestionNode = memo(({ data, id }: any) => {
   };
 
   return (
-    <Card className="w-80 shadow-lg">
+    <Card className="w-80 shadow-lg brand-card">
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-              <HelpCircle className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 brand-success rounded-lg flex items-center justify-center">
+              <HelpCircle className="w-4 h-4 brand-text-background" />
             </div>
-            <span className="font-medium">Pergunta</span>
+            <span className="font-medium brand-text-foreground">Pergunta</span>
           </div>
           <Button
             variant="ghost"
             size="sm"
             onClick={handleDelete}
-            className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+            className="h-6 w-6 p-0 brand-text-error hover:brand-text-error hover:brand-hover-error"
           >
             <Trash2 className="w-4 h-4" />
           </Button>
@@ -48,7 +49,7 @@ const QuestionNode = memo(({ data, id }: any) => {
         
         <div className="space-y-3">
           <div>
-            <label className="text-sm font-medium">Pergunta a ser enviada:</label>
+            <label className="text-sm font-medium brand-text-foreground">Pergunta a ser enviada:</label>
             <Textarea
               value={question}
               onChange={(e) => handleQuestionChange(e.target.value)}
@@ -58,14 +59,14 @@ const QuestionNode = memo(({ data, id }: any) => {
           </div>
           
           <div>
-            <label className="text-sm font-medium">Nome da variável para salvar a resposta:</label>
+            <label className="text-sm font-medium brand-text-foreground">Nome da variável para salvar a resposta:</label>
             <Input
               value={variable}
               onChange={(e) => handleVariableChange(e.target.value)}
               placeholder="Ex: nome_cliente, email, telefone"
               className="mt-1"
             />
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs brand-text-muted mt-1">
               A resposta do usuário será salva nesta variável para uso posterior no fluxo
             </p>
           </div>
@@ -74,12 +75,12 @@ const QuestionNode = memo(({ data, id }: any) => {
         <Handle
           type="target"
           position={Position.Left}
-          className="w-3 h-3 bg-green-500 border-2 border-white"
+          className="w-3 h-3 brand-success border-2 brand-border-background"
         />
         <Handle
           type="source"
           position={Position.Right}
-          className="w-3 h-3 bg-green-500 border-2 border-white"
+          className="w-3 h-3 brand-success border-2 brand-border-background"
         />
       </CardContent>
     </Card>
