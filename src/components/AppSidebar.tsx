@@ -85,7 +85,7 @@ const menuGroups = [
     items: [
       { id: 'gestao-usuarios', label: 'Gestão de Usuários', icon: UserPen, route: '/gestao-usuarios' },
       { id: 'gestao-setores', label: 'Gestão de Setores', icon: Network, route: '/gestao-setores' },
-      { id: 'anuncios', label: 'Anúncios', icon: Newspaper, route: '/inicio' },
+      { id: 'anuncios', label: 'Anúncios', icon: Newspaper, route: '/anuncios' },
       { id: 'admin-empresas', label: 'Administração de Empresas', icon: Building2, route: '/admin-empresas' },
     ]
   },
@@ -147,7 +147,6 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
     onPageChange(pageId);
   };
 
-  // Função para renderizar os itens na ordem correta
   const renderMenuItems = () => {
     const orderedItems = [];
 

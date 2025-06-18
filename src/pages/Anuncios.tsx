@@ -1,6 +1,6 @@
-
 import React, { useState } from 'react';
-import { Bell, FileText } from 'lucide-react';
+import { Bell, FileText, Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import SidebarLayout from '@/components/SidebarLayout';
 import AnunciosSlider from '@/components/AnunciosSlider';
 import CardModal from '@/components/CardModal';
@@ -89,12 +89,26 @@ const AnunciosContent = () => {
     setSelectedCard(null);
   };
 
+  const handleNovoAnuncio = () => {
+    // Implementar ação do novo anúncio
+    console.log('Novo anúncio clicado');
+  };
+
   return (
     <div className="container mx-auto p-6 space-y-8">
-      {/* Header */}
-      <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold text-foreground">Anúncios e Atualizações</h1>
-        <p className="text-muted-foreground">Fique por dentro das últimas novidades e atualizações do sistema</p>
+      {/* Header com botão Novo Anúncio */}
+      <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold text-foreground">Anúncios e Atualizações</h1>
+          <p className="text-muted-foreground">Fique por dentro das últimas novidades e atualizações do sistema</p>
+        </div>
+        <Button 
+          onClick={handleNovoAnuncio}
+          className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Novo Anúncio
+        </Button>
       </div>
 
       {/* Notas de Atualização */}
