@@ -147,13 +147,13 @@ const GestaoSetores = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white">Gestão de Setores</h1>
-          <p className="text-gray-600 dark:text-gray-300 mt-1 text-sm lg:text-base">Gerencie os setores e departamentos da empresa</p>
+          <h1 className="text-xl lg:text-2xl font-bold text-foreground">Gestão de Setores</h1>
+          <p className="text-muted-foreground mt-1 text-sm lg:text-base">Gerencie os setores e departamentos da empresa</p>
         </div>
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-black hover:bg-gray-800 text-white w-full sm:w-auto">
+            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
               Novo Setor
             </Button>
@@ -198,7 +198,7 @@ const GestaoSetores = () => {
                 </Button>
                 <Button 
                   onClick={handleCriarSetor} 
-                  className="bg-black hover:bg-gray-800 text-white w-full sm:w-auto"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground w-full sm:w-auto"
                   disabled={!novoSetor.nome.trim()}
                 >
                   {isEditMode ? 'Salvar Alterações' : 'Salvar'}
@@ -264,7 +264,7 @@ const GestaoSetores = () => {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleAdicionarUsuarios(setor)}
-                              className="h-8 w-8 p-0 hover:bg-green-100 hover:text-green-600"
+                              className="h-8 w-8 p-0 hover:bg-accent hover:text-accent-foreground"
                             >
                               <UserPlus className="h-4 w-4" />
                             </Button>
@@ -272,7 +272,7 @@ const GestaoSetores = () => {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleEditarSetor(setor)}
-                              className="h-8 w-8 p-0 hover:bg-blue-100 hover:text-blue-600"
+                              className="h-8 w-8 p-0 hover:bg-accent hover:text-accent-foreground"
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
@@ -280,7 +280,7 @@ const GestaoSetores = () => {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleExcluirSetor(setor.id)}
-                              className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600"
+                              className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -362,7 +362,7 @@ const GestaoSetores = () => {
                         <Button
                           size="sm"
                           onClick={() => handleSelecionarUsuario(usuario.id)}
-                          className="bg-green-600 hover:bg-green-700 text-white"
+                          className="bg-primary hover:bg-primary/90 text-primary-foreground"
                         >
                           <Plus className="h-4 w-4 mr-2" />
                           Adicionar
