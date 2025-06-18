@@ -57,8 +57,29 @@ export const AnunciosProvider = ({ children }: AnunciosProviderProps) => {
     {
       id: 4,
       titulo: "Correções de segurança",
-      descricao: "Implementamos importantes correções de segurança para proteger ainda mais seus dados e conversas.",
+      descricao: "Implementamos importantes correções de segurança para proteger ainda mais seus dados e conversas. Atualizamos protocolos de criptografia e melhoramos a autenticação de dois fatores.",
       data: "05 de Janeiro, 2024",
+      tipo: "Nota de Atualização"
+    },
+    {
+      id: 5,
+      titulo: "Atualização da interface",
+      descricao: "Nova interface mais moderna e intuitiva! Redesenhamos completamente o painel de controle com foco na usabilidade e experiência do usuário. Agora é ainda mais fácil navegar e encontrar o que você precisa.",
+      data: "02 de Janeiro, 2024",
+      tipo: "Nota de Atualização"
+    },
+    {
+      id: 6,
+      titulo: "Melhorias de performance",
+      descricao: "Otimizamos o sistema para carregamento 50% mais rápido. Implementamos cache inteligente e compressão de dados para uma experiência mais fluida em todas as funcionalidades.",
+      data: "28 de Dezembro, 2023",
+      tipo: "Nota de Atualização"
+    },
+    {
+      id: 7,
+      titulo: "Novo sistema de relatórios",
+      descricao: "Lançamos uma nova ferramenta de relatórios com gráficos interativos e exportação em múltiplos formatos. Agora você pode ter insights ainda mais detalhados sobre seu atendimento.",
+      data: "25 de Dezembro, 2023",
       tipo: "Nota de Atualização"
     }
   ]);
@@ -88,8 +109,43 @@ export const AnunciosProvider = ({ children }: AnunciosProviderProps) => {
     {
       id: 4,
       titulo: "Nova integração com CRM",
-      descricao: "Conecte seu sistema de atendimento com os principais CRMs do mercado para uma gestão completa dos seus clientes.",
+      descricao: "Conecte seu sistema de atendimento com os principais CRMs do mercado para uma gestão completa dos seus clientes. Suporte para Salesforce, HubSpot, RD Station e muito mais.",
       data: "15 de Janeiro, 2024",
+      tipo: "Anúncio"
+    },
+    {
+      id: 5,
+      titulo: "Desconto especial de 30%",
+      descricao: "Oferta limitada para novos clientes! Aproveite 30% de desconto nos primeiros 3 meses de qualquer plano. Válido até o final do mês. Use o código NOVO30 no checkout.",
+      data: "10 de Janeiro, 2024",
+      tipo: "Anúncio"
+    },
+    {
+      id: 6,
+      titulo: "Certificação ISO 27001",
+      descricao: "Temos o prazer de anunciar que nossa empresa obteve a certificação ISO 27001 para segurança da informação. Isso reforça nosso compromisso com a proteção dos seus dados.",
+      data: "08 de Janeiro, 2024",
+      tipo: "Anúncio"
+    },
+    {
+      id: 7,
+      titulo: "Novo aplicativo mobile",
+      descricao: "Baixe agora nosso novo app para iOS e Android! Gerencie seus atendimentos, visualize relatórios e receba notificações em tempo real, tudo na palma da sua mão.",
+      data: "05 de Janeiro, 2024",
+      tipo: "Anúncio"
+    },
+    {
+      id: 8,
+      titulo: "Workshop gratuito de automação",
+      descricao: "Inscreva-se em nosso workshop online sobre automação de atendimento. Aprenda a configurar chatbots, respostas automáticas e fluxos de trabalho para economizar tempo.",
+      data: "03 de Janeiro, 2024",
+      tipo: "Anúncio"
+    },
+    {
+      id: 9,
+      titulo: "Expansão para novos países",
+      descricao: "Estamos expandindo nossos serviços para Argentina, Chile e Colômbia! Em breve, mais empresas da América Latina poderão aproveitar nossa plataforma de atendimento.",
+      data: "01 de Janeiro, 2024",
       tipo: "Anúncio"
     }
   ]);
