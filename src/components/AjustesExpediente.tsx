@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import HorariosTrabalho from './HorariosTrabalho';
 import { useAjustes } from '@/pages/Ajustes';
@@ -12,6 +11,8 @@ interface HorarioTrabalho {
 interface Setor {
   id: string;
   nome: string;
+  quantidadeUsuarios: number;
+  cor: string;
   horarios: Record<string, HorarioTrabalho>;
 }
 
@@ -21,15 +22,55 @@ const AjustesExpediente = () => {
   const [setores, setSetores] = useState<Setor[]>([]);
   const [horariosCargos, setHorariosCargos] = useState<Record<string, Record<string, HorarioTrabalho>>>({});
 
-  // Simulação de dados dos setores (normalmente viriam da API)
+  // Dados dos setores - mesma estrutura de GestaoSetores
   useEffect(() => {
-    // Simulando setores existentes
-    const setoresSimulados: Setor[] = [
-      { id: '1', nome: 'Vendas', horarios: {} },
-      { id: '2', nome: 'Suporte', horarios: {} },
-      { id: '3', nome: 'Financeiro', horarios: {} }
+    // Setores idênticos aos de GestaoSetores
+    const setoresData: Setor[] = [
+      {
+        id: '1',
+        nome: 'Vendas',
+        quantidadeUsuarios: 12,
+        cor: '#10B981',
+        horarios: {}
+      },
+      {
+        id: '2',
+        nome: 'Suporte',
+        quantidadeUsuarios: 8,
+        cor: '#F59E0B',
+        horarios: {}
+      },
+      {
+        id: '3',
+        nome: 'Financeiro',
+        quantidadeUsuarios: 5,
+        cor: '#EF4444',
+        horarios: {}
+      },
+      {
+        id: '4',
+        nome: 'Marketing',
+        quantidadeUsuarios: 6,
+        cor: '#8B5CF6',
+        horarios: {}
+      },
+      {
+        id: '5',
+        nome: 'RH',
+        quantidadeUsuarios: 3,
+        cor: '#06B6D4',
+        horarios: {}
+      },
+      {
+        id: '6',
+        nome: 'TI',
+        quantidadeUsuarios: 4,
+        cor: '#84CC16',
+        horarios: {}
+      }
     ];
-    setSetores(setoresSimulados);
+    
+    setSetores(setoresData);
 
     // Inicializar horários padrão
     const horariosDefault: Record<string, HorarioTrabalho> = {
