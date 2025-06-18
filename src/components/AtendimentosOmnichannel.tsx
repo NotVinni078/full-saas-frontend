@@ -99,9 +99,25 @@ interface Mensagem {
   status: 'enviada' | 'entregue' | 'lida';
 }
 
+// Sample messages for demonstration
+const mensagensExemplo: Mensagem[] = [
+  {
+    id: '1',
+    remetente: 'cliente',
+    conteudo: 'Olá, gostaria de saber mais sobre os produtos.',
+    timestamp: '14:30',
+    status: 'lida'
+  },
+  {
+    id: '2',
+    remetente: 'atendente',
+    conteudo: 'Olá! Claro, posso te ajudar. Qual produto específico você tem interesse?',
+    timestamp: '14:32',
+    status: 'lida'
+  }
+];
+
 const ChannelLogo = ({ canal }: { canal: string }) => {
-  const logoStyle = "w-4 h-4 rounded-sm";
-  
   switch (canal) {
     case 'whatsapp':
       return (
@@ -150,14 +166,6 @@ const ChannelLogo = ({ canal }: { canal: string }) => {
   }
 };
 
-const canalColors = {
-  whatsapp: 'bg-green-500',
-  instagram: 'bg-pink-500',
-  facebook: 'bg-blue-600',
-  telegram: 'bg-blue-400',
-  webchat: 'bg-gray-500'
-};
-
 const AtendimentosOmnichannel = () => {
   const [conversaSelecionada, setConversaSelecionada] = useState<string>('');
   const [mensagens, setMensagens] = useState<Mensagem[]>(mensagensExemplo);
@@ -179,7 +187,7 @@ const AtendimentosOmnichannel = () => {
   const { getActiveUsers } = useUsers();
   const { getTagsByIds } = useTags();
 
-  // Converter contatos para conversas (mantendo exemplo para demonstração)
+  // Converter contatos para conversas
   const conversasExemplo: Conversa[] = contacts.slice(0, 10).map((contact, index) => {
     const contactTags = getContactTags(contact);
     return {
@@ -204,6 +212,18 @@ const AtendimentosOmnichannel = () => {
       observacoes: contact.observacoes,
       tags: contactTags.map(tag => tag.nome)
     };
+  });
+
+  const conversaAtual = conversasExemplo.find(c => c.id === conversaSelecionada);
+  
+  const conversasFiltradas = conversasExemplo.filter(conversa => {
+    const matchStatus = filtroStatus === 'todos' || conversa.statusAtendimento === filtroStatus;
+    const matchTipo = filtroTipo === 'todos' || 
+                     (filtroTipo === 'grupos' && conversa.isGrupo) ||
+                     (filtroTipo === 'individuais' && !conversa.isGrupo);
+    const matchBusca = conversa.cliente.toLowerCase().includes(busca.toLowerCase()) ||
+                      conversa.ultimaMensagem.toLowerCase().includes(busca.toLowerCase());
+    return matchStatus && matchTipo && matchBusca;
   });
 
   const enviarMensagem = () => {
@@ -250,7 +270,6 @@ const AtendimentosOmnichannel = () => {
   };
 
   const handleContactFromSelector = (contact: Contact) => {
-    // Iniciar conversa com contato selecionado
     const novaConversa: Conversa = {
       id: contact.id,
       cliente: contact.nome,
@@ -806,7 +825,7 @@ const AtendimentosOmnichannel = () => {
                               <div className="ml-2">
                                 {mensagem.status === 'lida' && <CheckCircle className="h-3 w-3" />}
                                 {mensagem.status === 'entregue' && <CheckCircle className="h-3 w-3 opacity-60" />}
-                                {mensagem.status === 'enviada' && <Clock className="h-3 w-3 opacity-60" />
+                                {mensagem.status === 'enviada' && <Clock className="h-3 w-3 opacity-60" />}
                               </div>
                             )}
                           </div>
