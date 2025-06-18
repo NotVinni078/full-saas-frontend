@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MessageSquare, HelpCircle, Menu, UserCheck, XCircle, List, MousePointer } from 'lucide-react';
+import { MessageSquare, HelpCircle, Menu, UserCheck, XCircle, List, MousePointer, MessageSquareQuote, Bot, Clock, Image } from 'lucide-react';
 
 const nodeTypes = [
   {
@@ -35,10 +35,34 @@ const nodeTypes = [
     color: 'bg-orange-500'
   },
   {
+    type: 'quick-replies',
+    label: 'Botões Respostas',
+    icon: MessageSquareQuote,
+    color: 'bg-blue-600'
+  },
+  {
     type: 'transfer',
     label: 'Transferir',
     icon: UserCheck,
     color: 'bg-yellow-500'
+  },
+  {
+    type: 'chatbot-transfer',
+    label: 'Transferir Chatbot',
+    icon: Bot,
+    color: 'bg-cyan-500'
+  },
+  {
+    type: 'delay',
+    label: 'Tempo de Espera',
+    icon: Clock,
+    color: 'bg-orange-500'
+  },
+  {
+    type: 'media',
+    label: 'Enviar Mídia',
+    icon: Image,
+    color: 'bg-pink-500'
   },
   {
     type: 'end',

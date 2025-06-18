@@ -1,4 +1,3 @@
-
 import React, { useCallback, useState } from 'react';
 import {
   ReactFlow,
@@ -20,6 +19,10 @@ import QuestionNode from './nodes/QuestionNode';
 import MenuNode from './nodes/MenuNode';
 import TransferNode from './nodes/TransferNode';
 import EndNode from './nodes/EndNode';
+import QuickRepliesNode from './nodes/QuickRepliesNode';
+import ChatbotTransferNode from './nodes/ChatbotTransferNode';
+import DelayNode from './nodes/DelayNode';
+import MediaNode from './nodes/MediaNode';
 
 const nodeTypes: NodeTypes = {
   message: MessageNode,
@@ -27,6 +30,10 @@ const nodeTypes: NodeTypes = {
   menu: MenuNode,
   transfer: TransferNode,
   end: EndNode,
+  'quick-replies': QuickRepliesNode,
+  'chatbot-transfer': ChatbotTransferNode,
+  delay: DelayNode,
+  media: MediaNode,
 };
 
 interface FlowCanvasProps {
