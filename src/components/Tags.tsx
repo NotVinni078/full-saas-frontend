@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -148,45 +149,46 @@ const Tags = () => {
   };
 
   return (
-    <div className="p-4 lg:p-6 space-y-4 lg:space-y-6">
+    <div className="p-4 lg:p-6 space-y-4 lg:space-y-6 brand-background">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white">Tags</h1>
-          <p className="text-gray-600 dark:text-gray-300 mt-1 text-sm lg:text-base">Gerencie etiquetas para organizar seus contatos</p>
+          <h1 className="text-xl lg:text-2xl font-bold brand-text-foreground">Tags</h1>
+          <p className="brand-text-muted mt-1 text-sm lg:text-base">Gerencie etiquetas para organizar seus contatos</p>
         </div>
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-black hover:bg-gray-800 text-white w-full sm:w-auto">
+            <Button className="brand-primary brand-hover-primary brand-text-background w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
               Nova Tag
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[400px] mx-4">
+          <DialogContent className="sm:max-w-[400px] mx-4 brand-card brand-border">
             <DialogHeader>
-              <DialogTitle>{isEditMode ? 'Editar Tag' : 'Criar Nova Tag'}</DialogTitle>
+              <DialogTitle className="brand-text-foreground">{isEditMode ? 'Editar Tag' : 'Criar Nova Tag'}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="nome">Nome da Tag</Label>
+                <Label htmlFor="nome" className="brand-text-foreground">Nome da Tag</Label>
                 <Input
                   id="nome"
                   value={novaTag.nome}
                   onChange={(e) => setNovaTag({...novaTag, nome: e.target.value})}
                   placeholder="Digite o nome da tag"
+                  className="brand-input brand-border brand-text-foreground brand-placeholder-muted"
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="cor">Cor da Tag</Label>
+                <Label htmlFor="cor" className="brand-text-foreground">Cor da Tag</Label>
                 <div className="flex items-center gap-3">
                   <Input
                     id="cor"
                     type="color"
                     value={novaTag.cor}
                     onChange={(e) => setNovaTag({...novaTag, cor: e.target.value})}
-                    className="w-16 h-10 p-1 border rounded"
+                    className="w-16 h-10 p-1 brand-border rounded"
                   />
                   <Badge 
                     style={{ backgroundColor: novaTag.cor, color: 'white' }}
@@ -198,12 +200,12 @@ const Tags = () => {
               </div>
               
               <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 pt-4">
-                <Button variant="outline" onClick={handleCloseDialog} className="w-full sm:w-auto">
+                <Button variant="outline" onClick={handleCloseDialog} className="w-full sm:w-auto brand-border brand-text-foreground brand-hover-accent">
                   Descartar
                 </Button>
                 <Button 
                   onClick={handleCriarTag} 
-                  className="bg-black hover:bg-gray-800 text-white w-full sm:w-auto"
+                  className="brand-primary brand-hover-primary brand-text-background w-full sm:w-auto"
                   disabled={!novaTag.nome.trim()}
                 >
                   {isEditMode ? 'Salvar Alterações' : 'Salvar'}
@@ -221,15 +223,15 @@ const Tags = () => {
             placeholder="Pesquisar tags..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full"
+            className="w-full brand-input brand-border brand-text-foreground brand-placeholder-muted"
           />
         </div>
       </div>
 
       {/* Tabela de Tags */}
-      <Card>
+      <Card className="brand-card brand-border">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 brand-text-foreground">
             <Tag className="h-5 w-5" />
             Tags Criadas ({filtrarTags().length})
           </CardTitle>
@@ -238,16 +240,16 @@ const Tags = () => {
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>TAG</TableHead>
-                  <TableHead className="text-center">QTD DE CONTATOS</TableHead>
-                  <TableHead className="text-center">AÇÕES</TableHead>
+                <TableRow className="brand-border-gray-200 hover:brand-hover-accent">
+                  <TableHead className="brand-text-muted">TAG</TableHead>
+                  <TableHead className="text-center brand-text-muted">QTD DE CONTATOS</TableHead>
+                  <TableHead className="text-center brand-text-muted">AÇÕES</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filtrarTags().length > 0 ? (
                   filtrarTags().map((tag) => (
-                    <TableRow key={tag.id} className="hover:bg-muted/50">
+                    <TableRow key={tag.id} className="brand-border-gray-200 hover:brand-hover-accent">
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <Badge 
@@ -259,7 +261,7 @@ const Tags = () => {
                         </div>
                       </TableCell>
                       <TableCell className="text-center">
-                        <span className="font-medium">{tag.quantidadeContatos}</span>
+                        <span className="font-medium brand-text-foreground">{tag.quantidadeContatos}</span>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center justify-center">
@@ -269,7 +271,7 @@ const Tags = () => {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleAdicionarContatos(tag)}
-                              className="h-8 w-8 p-0 hover:bg-green-100 hover:text-green-600"
+                              className="h-8 w-8 p-0 brand-hover-success brand-text-success"
                             >
                               <UserPlus className="h-4 w-4" />
                             </Button>
@@ -277,7 +279,7 @@ const Tags = () => {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleEditarTag(tag)}
-                              className="h-8 w-8 p-0 hover:bg-blue-100 hover:text-blue-600"
+                              className="h-8 w-8 p-0 brand-hover-info brand-text-info"
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
@@ -285,7 +287,7 @@ const Tags = () => {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleExcluirTag(tag.id)}
-                              className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600"
+                              className="h-8 w-8 p-0 brand-hover-error brand-text-error"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -295,20 +297,20 @@ const Tags = () => {
                           <div className="sm:hidden">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 brand-text-muted brand-hover-accent">
                                   <EllipsisVertical className="h-4 w-4" />
                                 </Button>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end" className="w-48">
-                                <DropdownMenuItem onClick={() => handleAdicionarContatos(tag)}>
+                              <DropdownMenuContent align="end" className="w-48 brand-card brand-border">
+                                <DropdownMenuItem onClick={() => handleAdicionarContatos(tag)} className="brand-text-foreground brand-hover-accent">
                                   <UserPlus className="h-4 w-4 mr-2" />
                                   Adicionar contatos
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleEditarTag(tag)}>
+                                <DropdownMenuItem onClick={() => handleEditarTag(tag)} className="brand-text-foreground brand-hover-accent">
                                   <Edit className="h-4 w-4 mr-2" />
                                   Editar tag
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleExcluirTag(tag.id)}>
+                                <DropdownMenuItem onClick={() => handleExcluirTag(tag.id)} className="brand-text-foreground brand-hover-accent">
                                   <Trash2 className="h-4 w-4 mr-2" />
                                   Excluir tag
                                 </DropdownMenuItem>
@@ -322,7 +324,7 @@ const Tags = () => {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={3} className="text-center py-8">
-                      <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                      <div className="flex flex-col items-center gap-2 brand-text-muted">
                         <Tag className="h-8 w-8 opacity-50" />
                         <p>Nenhuma tag encontrada</p>
                         {searchTerm && (
@@ -340,34 +342,34 @@ const Tags = () => {
 
       {/* Dialog para Adicionar Contatos */}
       <Dialog open={isContatosDialogOpen} onOpenChange={setIsContatosDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] mx-4">
+        <DialogContent className="sm:max-w-[600px] mx-4 brand-card brand-border">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="brand-text-foreground">
               Adicionar Contatos à Tag "{selectedTagForContatos?.nome}"
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <div className="max-h-96 overflow-y-auto">
+            <div className="max-h-96 overflow-y-auto brand-scrollbar">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>NOME</TableHead>
-                    <TableHead>TELEFONE</TableHead>
-                    <TableHead>EMAIL</TableHead>
-                    <TableHead className="text-center">AÇÃO</TableHead>
+                  <TableRow className="brand-border-gray-200">
+                    <TableHead className="brand-text-muted">NOME</TableHead>
+                    <TableHead className="brand-text-muted">TELEFONE</TableHead>
+                    <TableHead className="brand-text-muted">EMAIL</TableHead>
+                    <TableHead className="text-center brand-text-muted">AÇÃO</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {contatos.map((contato) => (
-                    <TableRow key={contato.id}>
-                      <TableCell className="font-medium">{contato.nome}</TableCell>
-                      <TableCell>{contato.telefone}</TableCell>
-                      <TableCell>{contato.email}</TableCell>
+                    <TableRow key={contato.id} className="brand-border-gray-200 hover:brand-hover-accent">
+                      <TableCell className="font-medium brand-text-foreground">{contato.nome}</TableCell>
+                      <TableCell className="brand-text-foreground">{contato.telefone}</TableCell>
+                      <TableCell className="brand-text-foreground">{contato.email}</TableCell>
                       <TableCell className="text-center">
                         <Button
                           size="sm"
                           onClick={() => handleSelecionarContato(contato.id)}
-                          className="bg-green-600 hover:bg-green-700 text-white"
+                          className="brand-success brand-hover-success brand-text-background"
                         >
                           <Plus className="h-4 w-4 mr-2" />
                           Adicionar
@@ -379,8 +381,8 @@ const Tags = () => {
               </Table>
             </div>
             
-            <div className="flex justify-end pt-4">
-              <Button variant="outline" onClick={handleCloseContatosDialog}>
+            <div className="flex justify-end pt-4 brand-border-gray-200 border-t">
+              <Button variant="outline" onClick={handleCloseContatosDialog} className="brand-border brand-text-foreground brand-hover-accent">
                 Fechar
               </Button>
             </div>

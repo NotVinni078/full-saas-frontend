@@ -1,259 +1,179 @@
 
 import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Plus, RotateCcw, Unplug, Trash2, Link, QrCode, UserPlus, Check, X } from "lucide-react";
-import { EllipsisVertical } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { 
+  Smartphone, 
+  Instagram, 
+  Mail, 
+  MessageSquare, 
+  Settings, 
+  Plus, 
+  QrCode,
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  Wifi,
+  WifiOff
+} from 'lucide-react';
 
 interface Conexao {
   id: string;
+  tipo: 'whatsapp' | 'instagram' | 'email' | 'telegram';
   nome: string;
-  canal: string;
-  status: 'conectado' | 'desconectado' | 'erro';
-  setores: string[];
-  configuracao?: any;
-}
-
-interface Setor {
-  id: string;
-  nome: string;
+  identificador: string;
+  status: 'conectado' | 'desconectado' | 'erro' | 'pendente';
+  ultimaAtualizacao: string;
+  ativa: boolean;
 }
 
 const Conexoes = () => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isSetoresOpen, setIsSetoresOpen] = useState(false);
-  const [novaConexao, setNovaConexao] = useState({
-    nome: '',
-    canal: '',
-    setoresSelecionados: [] as string[]
-  });
-
-  // Mock data - setores disponíveis
-  const setores: Setor[] = [
-    { id: '1', nome: 'Vendas' },
-    { id: '2', nome: 'Suporte' },
-    { id: '3', nome: 'Marketing' },
-    { id: '4', nome: 'Financeiro' },
-    { id: '5', nome: 'RH' }
-  ];
-
-  // Mock data - conexões existentes
-  const conexoes: Conexao[] = [
+  const [conexoes, setConexoes] = useState<Conexao[]>([
     {
       id: '1',
-      nome: 'WhatsApp Principal',
-      canal: 'WhatsApp',
+      tipo: 'whatsapp',
+      nome: 'WhatsApp Business',
+      identificador: '+55 11 99999-9999',
       status: 'conectado',
-      setores: ['Vendas', 'Suporte']
+      ultimaAtualizacao: '2024-01-15 14:30',
+      ativa: true
     },
     {
       id: '2',
-      nome: 'Instagram Empresarial',
-      canal: 'Instagram Oficial Meta',
+      tipo: 'instagram',
+      nome: 'Instagram Business',
+      identificador: '@minhaempresa',
       status: 'conectado',
-      setores: ['Marketing']
+      ultimaAtualizacao: '2024-01-15 14:25',
+      ativa: true
     },
     {
       id: '3',
-      nome: 'Facebook Business',
-      canal: 'Facebook Oficial Meta',
+      tipo: 'email',
+      nome: 'Email Corporativo',
+      identificador: 'contato@empresa.com',
       status: 'desconectado',
-      setores: ['Marketing', 'Vendas']
+      ultimaAtualizacao: '2024-01-14 09:15',
+      ativa: false
+    },
+    {
+      id: '4',
+      tipo: 'telegram',
+      nome: 'Telegram Bot',
+      identificador: '@empresabot',
+      status: 'erro',
+      ultimaAtualizacao: '2024-01-13 16:45',
+      ativa: false
     }
-  ];
+  ]);
 
-  const canais = [
-    'WhatsApp',
-    'WhatsApp Oficial Meta',
-    'Instagram Oficial Meta',
-    'Facebook Oficial Meta',
-    'Telegram',
-    'WebChat'
-  ];
+  const [novaConexao, setNovaConexao] = useState({
+    tipo: 'whatsapp' as 'whatsapp' | 'instagram' | 'email' | 'telegram',
+    nome: '',
+    identificador: ''
+  });
 
-  const filtrarConexoes = () => {
-    if (!searchTerm) return conexoes;
-    return conexoes.filter(conexao =>
-      conexao.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      conexao.canal.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  };
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleCriarConexao = () => {
-    console.log('Nova conexão:', novaConexao);
-    setIsDialogOpen(false);
-    setNovaConexao({ nome: '', canal: '', setoresSelecionados: [] });
-  };
-
-  const handleCloseDialog = () => {
-    setIsDialogOpen(false);
-    setNovaConexao({ nome: '', canal: '', setoresSelecionados: [] });
-  };
-
-  const handleToggleSetor = (setorId: string) => {
-    setNovaConexao(prev => ({
-      ...prev,
-      setoresSelecionados: prev.setoresSelecionados.includes(setorId)
-        ? prev.setoresSelecionados.filter(id => id !== setorId)
-        : [...prev.setoresSelecionados, setorId]
-    }));
-  };
-
-  const getLogoUrl = (canal: string) => {
-    const logos: { [key: string]: string } = {
-      'WhatsApp': 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg',
-      'WhatsApp Oficial Meta': 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg',
-      'Instagram Oficial Meta': 'https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png',
-      'Facebook Oficial Meta': 'https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg',
-      'Telegram': 'https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg',
-      'WebChat': 'https://cdn-icons-png.flaticon.com/512/1087/1087815.png'
-    };
-    return logos[canal] || '';
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'conectado':
+        return <CheckCircle className="h-4 w-4 text-green-600" />;
+      case 'desconectado':
+        return <WifiOff className="h-4 w-4 text-gray-400" />;
+      case 'erro':
+        return <XCircle className="h-4 w-4 text-red-600" />;
+      case 'pendente':
+        return <AlertTriangle className="h-4 w-4 text-yellow-600" />;
+      default:
+        return <Wifi className="h-4 w-4 text-gray-400" />;
+    }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'conectado': return 'bg-green-500';
-      case 'desconectado': return 'bg-red-500';
-      case 'erro': return 'bg-red-500';
-      default: return 'bg-gray-500';
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'conectado': return 'Conectado';
-      case 'desconectado': return 'Desconectado';
-      case 'erro': return 'Erro';
-      default: return 'Desconhecido';
-    }
-  };
-
-  const renderCanalConfig = () => {
-    switch (novaConexao.canal) {
-      case 'WhatsApp':
-        return (
-          <div className="space-y-4">
-            <div className="flex flex-col items-center p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
-              <QrCode className="h-16 w-16 text-gray-400 mb-4" />
-              <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
-                Escaneie o QR Code com seu WhatsApp
-              </p>
-              <div className="mt-4 w-48 h-48 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
-                <span className="text-xs text-gray-500">QR Code simulado</span>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 'WhatsApp Oficial Meta':
-        return (
-          <div className="space-y-4">
-            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2">Requisitos WhatsApp Meta API:</h4>
-              <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
-                <li>• Conta Business do Facebook verificada</li>
-                <li>• WhatsApp Business Account aprovado</li>
-                <li>• Número de telefone verificado</li>
-                <li>• Token de acesso da Meta</li>
-                <li>• Webhook configurado</li>
-              </ul>
-            </div>
-            <div className="space-y-2">
-              <Label>Token de Acesso</Label>
-              <Input placeholder="Digite seu token de acesso da Meta" type="password" />
-            </div>
-            <div className="space-y-2">
-              <Label>Phone Number ID</Label>
-              <Input placeholder="ID do número de telefone" />
-            </div>
-          </div>
-        );
-
-      case 'Instagram Oficial Meta':
-        return (
-          <div className="space-y-4">
-            <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-              <h4 className="font-medium text-purple-900 dark:text-purple-100 mb-2">Requisitos Instagram Business:</h4>
-              <ul className="text-sm text-purple-800 dark:text-purple-200 space-y-1">
-                <li>• Conta Business do Instagram</li>
-                <li>• Página do Facebook vinculada</li>
-                <li>• Token de acesso do Instagram</li>
-                <li>• Webhook configurado</li>
-              </ul>
-            </div>
-            <div className="space-y-2">
-              <Label>Token de Acesso Instagram</Label>
-              <Input placeholder="Digite seu token de acesso do Instagram" type="password" />
-            </div>
-          </div>
-        );
-
-      case 'Facebook Oficial Meta':
-        return (
-          <div className="space-y-4">
-            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2">Requisitos Facebook Messenger:</h4>
-              <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
-                <li>• Página do Facebook Business</li>
-                <li>• App do Facebook configurado</li>
-                <li>• Token de acesso da página</li>
-                <li>• Webhook verificado</li>
-              </ul>
-            </div>
-            <div className="space-y-2">
-              <Label>Token da Página</Label>
-              <Input placeholder="Token de acesso da página do Facebook" type="password" />
-            </div>
-          </div>
-        );
-
-      case 'Telegram':
-        return (
-          <div className="space-y-4">
-            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2">Requisitos Telegram Bot:</h4>
-              <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
-                <li>• Bot criado via @BotFather</li>
-                <li>• Token do bot do Telegram</li>
-                <li>• Webhook configurado (opcional)</li>
-              </ul>
-            </div>
-            <div className="space-y-2">
-              <Label>Token do Bot</Label>
-              <Input placeholder="Token fornecido pelo BotFather" type="password" />
-            </div>
-          </div>
-        );
-
-      case 'WebChat':
-        return (
-          <div className="space-y-4">
-            <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-              <h4 className="font-medium text-green-900 dark:text-green-100 mb-2">Configuração WebChat:</h4>
-              <ul className="text-sm text-green-800 dark:text-green-200 space-y-1">
-                <li>• Widget será gerado automaticamente</li>
-                <li>• Código para incorporar no site</li>
-                <li>• Personalização de cores e textos</li>
-              </ul>
-            </div>
-            <div className="space-y-2">
-              <Label>Cor Principal</Label>
-              <Input type="color" defaultValue="#3B82F6" />
-            </div>
-          </div>
-        );
-
+      case 'conectado':
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+      case 'desconectado':
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+      case 'erro':
+        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+      case 'pendente':
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
       default:
-        return null;
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
     }
+  };
+
+  const getTipoIcon = (tipo: string) => {
+    switch (tipo) {
+      case 'whatsapp':
+        return <MessageSquare className="h-5 w-5 text-green-600" />;
+      case 'instagram':
+        return <div className="h-5 w-5 bg-gradient-to-r from-purple-500 to-pink-500 rounded" />;
+      case 'email':
+        return <Mail className="h-5 w-5 text-blue-600" />;
+      case 'telegram':
+        return <Smartphone className="h-5 w-5 text-blue-500" />;
+      default:
+        return <Settings className="h-5 w-5 text-gray-600" />;
+    }
+  };
+
+  const handleToggleConexao = (id: string) => {
+    setConexoes(prev => prev.map(conexao => 
+      conexao.id === id 
+        ? { ...conexao, ativa: !conexao.ativa }
+        : conexao
+    ));
+  };
+
+  const handleConectar = (id: string) => {
+    setConexoes(prev => prev.map(conexao => 
+      conexao.id === id 
+        ? { 
+            ...conexao, 
+            status: 'conectado',
+            ultimaAtualizacao: new Date().toLocaleString('pt-BR')
+          }
+        : conexao
+    ));
+  };
+
+  const handleDesconectar = (id: string) => {
+    setConexoes(prev => prev.map(conexao => 
+      conexao.id === id 
+        ? { 
+            ...conexao, 
+            status: 'desconectado',
+            ultimaAtualizacao: new Date().toLocaleString('pt-BR')
+          }
+        : conexao
+    ));
+  };
+
+  const handleAdicionarConexao = () => {
+    const nova: Conexao = {
+      id: Date.now().toString(),
+      ...novaConexao,
+      status: 'pendente',
+      ultimaAtualizacao: new Date().toLocaleString('pt-BR'),
+      ativa: false
+    };
+
+    setConexoes(prev => [...prev, nova]);
+    setNovaConexao({
+      tipo: 'whatsapp',
+      nome: '',
+      identificador: ''
+    });
+    setIsDialogOpen(false);
   };
 
   return (
@@ -261,115 +181,78 @@ const Conexoes = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white">Conexões</h1>
-          <p className="text-gray-600 dark:text-gray-300 mt-1 text-sm lg:text-base">Gerencie suas conexões com diferentes canais</p>
+          <h1 className="text-xl lg:text-2xl font-bold brand-text-foreground">Conexões</h1>
+          <p className="brand-text-muted mt-1 text-sm lg:text-base">
+            Gerencie suas conexões com diferentes canais de comunicação
+          </p>
         </div>
-        
+
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-black hover:bg-gray-800 text-white w-full sm:w-auto">
+            <Button className="brand-primary brand-hover-primary brand-text-background w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
               Nova Conexão
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px] mx-4 max-h-[90vh] overflow-y-auto">
+          <DialogContent className="sm:max-w-[400px] mx-4 brand-card brand-border">
             <DialogHeader>
-              <DialogTitle>Criar Nova Conexão</DialogTitle>
+              <DialogTitle className="brand-text-foreground">Adicionar Nova Conexão</DialogTitle>
+              <DialogDescription className="brand-text-muted">
+                Configure uma nova conexão com um canal de comunicação
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="nome">Nome da Conexão</Label>
+                <Label htmlFor="tipo" className="brand-text-foreground">Tipo de Conexão</Label>
+                <select
+                  id="tipo"
+                  value={novaConexao.tipo}
+                  onChange={(e) => setNovaConexao({...novaConexao, tipo: e.target.value as any})}
+                  className="w-full p-2 brand-border rounded-md brand-background brand-text-foreground"
+                >
+                  <option value="whatsapp">WhatsApp</option>
+                  <option value="instagram">Instagram</option>
+                  <option value="email">Email</option>
+                  <option value="telegram">Telegram</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="nome" className="brand-text-foreground">Nome da Conexão</Label>
                 <Input
                   id="nome"
                   value={novaConexao.nome}
                   onChange={(e) => setNovaConexao({...novaConexao, nome: e.target.value})}
-                  placeholder="Digite o nome da conexão"
+                  placeholder="Ex: WhatsApp Principal"
+                  className="brand-input brand-border brand-text-foreground brand-placeholder-muted"
                 />
               </div>
-              
-              <div className="space-y-2">
-                <Label>Canal</Label>
-                <Select onValueChange={(value) => setNovaConexao({...novaConexao, canal: value})}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione o canal" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {canais.map((canal) => (
-                      <SelectItem key={canal} value={canal}>{canal}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {novaConexao.canal && renderCanalConfig()}
 
               <div className="space-y-2">
-                <Label>Setores com Acesso</Label>
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() => setIsSetoresOpen(!isSetoresOpen)}
-                    className="w-full flex items-center justify-between px-3 py-2 border border-input bg-background rounded-md text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                  >
-                    <span>
-                      {novaConexao.setoresSelecionados.length === 0 
-                        ? "Selecione os setores" 
-                        : `${novaConexao.setoresSelecionados.length} setor(es) selecionado(s)`
-                      }
-                    </span>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-                  
-                  {isSetoresOpen && (
-                    <div className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-auto">
-                      {setores.map((setor) => (
-                        <div 
-                          key={setor.id} 
-                          className="flex items-center px-3 py-2 hover:bg-accent cursor-pointer"
-                          onClick={() => handleToggleSetor(setor.id)}
-                        >
-                          <div className="flex items-center justify-center w-4 h-4 mr-2 border border-input rounded">
-                            {novaConexao.setoresSelecionados.includes(setor.id) && (
-                              <Check className="w-3 h-3 text-primary" />
-                            )}
-                          </div>
-                          <span className="text-sm">{setor.nome}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                
-                {novaConexao.setoresSelecionados.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {novaConexao.setoresSelecionados.map((setorId) => {
-                      const setor = setores.find(s => s.id === setorId);
-                      return setor ? (
-                        <Badge key={setorId} variant="outline" className="text-xs flex items-center gap-1">
-                          {setor.nome}
-                          <X 
-                            className="w-3 h-3 cursor-pointer hover:text-destructive" 
-                            onClick={() => handleToggleSetor(setorId)}
-                          />
-                        </Badge>
-                      ) : null;
-                    })}
-                  </div>
-                )}
+                <Label htmlFor="identificador" className="brand-text-foreground">Identificador</Label>
+                <Input
+                  id="identificador"
+                  value={novaConexao.identificador}
+                  onChange={(e) => setNovaConexao({...novaConexao, identificador: e.target.value})}
+                  placeholder="Ex: +55 11 99999-9999"
+                  className="brand-input brand-border brand-text-foreground brand-placeholder-muted"
+                />
               </div>
-              
+
               <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 pt-4">
-                <Button variant="outline" onClick={handleCloseDialog} className="w-full sm:w-auto">
-                  Descartar
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsDialogOpen(false)}
+                  className="w-full sm:w-auto brand-border brand-text-foreground brand-hover-accent"
+                >
+                  Cancelar
                 </Button>
                 <Button 
-                  onClick={handleCriarConexao} 
-                  className="bg-black hover:bg-gray-800 text-white w-full sm:w-auto"
-                  disabled={!novaConexao.nome.trim() || !novaConexao.canal}
+                  onClick={handleAdicionarConexao}
+                  disabled={!novaConexao.nome || !novaConexao.identificador}
+                  className="brand-primary brand-hover-primary brand-text-background w-full sm:w-auto"
                 >
-                  Salvar
+                  Adicionar
                 </Button>
               </div>
             </div>
@@ -377,133 +260,132 @@ const Conexoes = () => {
         </Dialog>
       </div>
 
-      {/* Barra de Pesquisa */}
-      <div className="flex gap-4">
-        <div className="flex-1 max-w-md">
-          <Input
-            placeholder="Pesquisar conexões..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full"
-          />
-        </div>
+      {/* Alert de Status */}
+      <Alert className="brand-border">
+        <CheckCircle className="h-4 w-4" />
+        <AlertDescription className="brand-text-foreground">
+          {conexoes.filter(c => c.status === 'conectado').length} de {conexoes.length} conexões ativas
+        </AlertDescription>
+      </Alert>
+
+      {/* Grid de Conexões */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+        {conexoes.map((conexao) => (
+          <Card key={conexao.id} className="brand-card brand-border">
+            <CardHeader className="pb-3">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center space-x-3">
+                  {getTipoIcon(conexao.tipo)}
+                  <div>
+                    <CardTitle className="text-base brand-text-foreground">{conexao.nome}</CardTitle>
+                    <CardDescription className="brand-text-muted">{conexao.identificador}</CardDescription>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  {getStatusIcon(conexao.status)}
+                  <Switch 
+                    checked={conexao.ativa}
+                    onCheckedChange={() => handleToggleConexao(conexao.id)}
+                    className="data-[state=checked]:brand-primary data-[state=unchecked]:brand-input"
+                  />
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm brand-text-muted">Status:</span>
+                <Badge className={`text-xs ${getStatusColor(conexao.status)}`}>
+                  {conexao.status}
+                </Badge>
+              </div>
+
+              <div className="text-xs brand-text-muted">
+                Última atualização: {conexao.ultimaAtualizacao}
+              </div>
+
+              <div className="flex space-x-2">
+                {conexao.status === 'desconectado' || conexao.status === 'erro' ? (
+                  <Button 
+                    size="sm" 
+                    onClick={() => handleConectar(conexao.id)}
+                    className="flex-1 brand-success brand-hover-success brand-text-background"
+                  >
+                    Conectar
+                  </Button>
+                ) : (
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    onClick={() => handleDesconectar(conexao.id)}
+                    className="flex-1 brand-border brand-text-foreground brand-hover-accent"
+                  >
+                    Desconectar
+                  </Button>
+                )}
+                
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  className="brand-border brand-text-foreground brand-hover-accent"
+                >
+                  <Settings className="h-4 w-4" />
+                </Button>
+
+                {conexao.tipo === 'whatsapp' && (
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    className="brand-border brand-text-foreground brand-hover-accent"
+                  >
+                    <QrCode className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      {/* Cards de Conexões */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filtrarConexoes().length > 0 ? (
-          filtrarConexoes().map((conexao) => (
-            <Card key={conexao.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <img 
-                      src={getLogoUrl(conexao.canal)} 
-                      alt={conexao.canal}
-                      className="w-8 h-8 object-contain"
-                    />
-                    <div>
-                      <CardTitle className="text-base font-medium">{conexao.nome}</CardTitle>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{conexao.canal}</p>
-                    </div>
-                  </div>
-                  <div className={`w-3 h-3 rounded-full ${getStatusColor(conexao.status)}`} />
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Status:</p>
-                    <Badge 
-                      variant={conexao.status === 'conectado' ? 'default' : 'secondary'}
-                      className={conexao.status === 'conectado' ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600 text-white'}
-                    >
-                      {getStatusText(conexao.status)}
-                    </Badge>
-                  </div>
-                  
-                  <div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Setores:</p>
-                    <div className="flex flex-wrap gap-1">
-                      {conexao.setores.map((setor, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
-                          {setor}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-2">
-                    {/* Desktop actions */}
-                    <div className="hidden sm:flex items-center gap-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 hover:bg-blue-100 hover:text-blue-600"
-                      >
-                        <RotateCcw className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 hover:bg-orange-100 hover:text-orange-600"
-                      >
-                        <Unplug className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-
-                    {/* Mobile dropdown */}
-                    <div className="sm:hidden ml-auto">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                            <EllipsisVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuItem>
-                            <RotateCcw className="h-4 w-4 mr-2" />
-                            Reiniciar Conexão
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Unplug className="h-4 w-4 mr-2" />
-                            Desconectar
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Excluir
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))
-        ) : (
-          <div className="col-span-full">
-            <Card>
-              <CardContent className="text-center py-8">
-                <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                  <Link className="h-8 w-8 opacity-50" />
-                  <p>Nenhuma conexão encontrada</p>
-                  {searchTerm && (
-                    <p className="text-sm">Tente ajustar sua pesquisa</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+      {/* Card de Instrução */}
+      <Card className="brand-card brand-border">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 brand-text-foreground">
+            <Settings className="h-5 w-5" />
+            Como Configurar Conexões
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <h4 className="font-medium brand-text-foreground">WhatsApp Business</h4>
+              <p className="text-sm brand-text-muted">
+                Escaneie o código QR com seu WhatsApp para conectar a conta business
+              </p>
+            </div>
+            
+            <div className="space-y-2">
+              <h4 className="font-medium brand-text-foreground">Instagram Business</h4>
+              <p className="text-sm brand-text-muted">
+                Conecte sua conta business do Instagram através do Facebook Business
+              </p>
+            </div>
+            
+            <div className="space-y-2">
+              <h4 className="font-medium brand-text-foreground">Email</h4>
+              <p className="text-sm brand-text-muted">
+                Configure SMTP para envio e IMAP para recebimento de emails
+              </p>
+            </div>
+            
+            <div className="space-y-2">
+              <h4 className="font-medium brand-text-foreground">Telegram</h4>
+              <p className="text-sm brand-text-muted">
+                Crie um bot através do @BotFather e configure o webhook
+              </p>
+            </div>
           </div>
-        )}
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

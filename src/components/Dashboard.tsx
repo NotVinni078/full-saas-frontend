@@ -1,176 +1,295 @@
 
 import React from 'react';
-import InfrastructureDashboard from './InfrastructureDashboard';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { 
-  TrendingUp, 
+  MessageSquare, 
   Users, 
-  DollarSign, 
-  Activity,
-  ArrowUpRight,
-  ArrowDownRight,
-  Plus
+  TrendingUp, 
+  Clock, 
+  CheckCircle, 
+  AlertTriangle,
+  Calendar,
+  BarChart3,
+  Target,
+  Zap
 } from 'lucide-react';
 
-interface DashboardProps {
-  currentPage?: string;
-}
+const Dashboard = () => {
+  // Mock data para métricas
+  const metricas = {
+    conversasAbertas: 23,
+    conversasHoje: 45,
+    tempoMedioResposta: '2m 34s',
+    satisfacaoCliente: 4.8,
+    conversasResolvidas: 156,
+    taxaConversao: 12.5,
+    novosContatos: 18,
+    agendamentosHoje: 7
+  };
 
-const Dashboard = ({ currentPage }: DashboardProps) => {
-  // Se for o dashboard de infraestrutura, renderiza o componente específico
-  if (currentPage === 'dashboard-gerencial') {
-    return <InfrastructureDashboard />;
-  }
-
-  // Caso contrário, renderiza o dashboard padrão
-  const stats = [
-    {
-      title: "Receita Total",
-      value: "R$ 45.231",
-      change: "+20.1%",
-      changeType: "positive" as const,
-      icon: DollarSign,
-    },
-    {
-      title: "Usuários Ativos",
-      value: "2.350",
-      change: "+180.1%",
-      changeType: "positive" as const,
-      icon: Users,
-    },
-    {
-      title: "Taxa de Conversão",
-      value: "12.5%",
-      change: "-2.1%",
-      changeType: "negative" as const,
-      icon: Activity,
-    },
-    {
-      title: "Crescimento",
-      value: "+573",
-      change: "+15.3%",
-      changeType: "positive" as const,
-      icon: TrendingUp,
-    },
+  const conversasRecentes = [
+    { id: 1, nome: 'João Silva', plataforma: 'WhatsApp', status: 'ativo', tempo: '2min', mensagem: 'Preciso de ajuda com meu pedido' },
+    { id: 2, nome: 'Maria Santos', plataforma: 'Instagram', status: 'pendente', tempo: '15min', mensagem: 'Qual o horário de funcionamento?' },
+    { id: 3, nome: 'Pedro Costa', plataforma: 'WhatsApp', status: 'resolvido', tempo: '1h', mensagem: 'Obrigado pelo atendimento!' },
+    { id: 4, nome: 'Ana Oliveira', plataforma: 'Email', status: 'ativo', tempo: '5min', mensagem: 'Como faço para cancelar?' }
   ];
 
-  const recentActivity = [
-    { id: 1, user: "João Silva", action: "Fez upgrade para Pro", time: "2 min atrás", amount: "R$ 49" },
-    { id: 2, user: "Maria Santos", action: "Novo cadastro", time: "5 min atrás", amount: "R$ 0" },
-    { id: 3, user: "Pedro Lima", action: "Pagamento processado", time: "10 min atrás", amount: "R$ 99" },
-    { id: 4, user: "Ana Costa", action: "Cancelou assinatura", time: "15 min atrás", amount: "-R$ 29" },
+  const agendamentosHoje = [
+    { id: 1, cliente: 'Carlos Silva', horario: '09:00', tipo: 'Consulta', status: 'confirmado' },
+    { id: 2, cliente: 'Julia Santos', horario: '14:30', tipo: 'Reunião', status: 'pendente' },
+    { id: 3, cliente: 'Roberto Lima', horario: '16:00', tipo: 'Apresentação', status: 'confirmado' }
   ];
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'ativo':
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+      case 'pendente':
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+      case 'resolvido':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+      case 'confirmado':
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+    }
+  };
+
+  const getPlataformaIcon = (plataforma: string) => {
+    switch (plataforma) {
+      case 'WhatsApp':
+        return <MessageSquare className="h-4 w-4 text-green-600" />;
+      case 'Instagram':
+        return <div className="h-4 w-4 bg-pink-500 rounded" />;
+      case 'Email':
+        return <div className="h-4 w-4 bg-blue-500 rounded" />;
+      default:
+        return <MessageSquare className="h-4 w-4 text-gray-600" />;
+    }
+  };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 lg:p-6 space-y-4 lg:space-y-6 brand-background">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground mt-1">Visão geral do seu negócio</p>
-        </div>
-        <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-          <Plus className="h-4 w-4 mr-2" />
-          Novo Projeto
-        </Button>
+      <div>
+        <h1 className="text-xl lg:text-2xl font-bold brand-text-foreground">Dashboard</h1>
+        <p className="brand-text-muted mt-1 text-sm lg:text-base">Visão geral dos seus atendimentos e métricas</p>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <Card key={index} className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
-                    <p className="text-2xl font-bold text-foreground mt-2">{stat.value}</p>
-                  </div>
-                  <div className="h-12 w-12 bg-muted rounded-lg flex items-center justify-center">
-                    <Icon className="h-6 w-6 text-muted-foreground" />
-                  </div>
-                </div>
-                <div className="flex items-center mt-4">
-                  {stat.changeType === 'positive' ? (
-                    <ArrowUpRight className="h-4 w-4 text-green-500 mr-1" />
-                  ) : (
-                    <ArrowDownRight className="h-4 w-4 text-red-500 mr-1" />
-                  )}
-                  <span className={`text-sm font-medium ${
-                    stat.changeType === 'positive' ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {stat.change}
-                  </span>
-                  <span className="text-sm text-muted-foreground ml-1">vs mês anterior</span>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+      {/* Métricas Principais */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+        <Card className="brand-card brand-border">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium brand-text-muted">Conversas Abertas</CardTitle>
+            <MessageSquare className="h-4 w-4 brand-text-muted" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold brand-text-foreground">{metricas.conversasAbertas}</div>
+            <p className="text-xs brand-text-muted">+12% desde ontem</p>
+          </CardContent>
+        </Card>
+
+        <Card className="brand-card brand-border">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium brand-text-muted">Conversas Hoje</CardTitle>
+            <TrendingUp className="h-4 w-4 brand-text-muted" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold brand-text-foreground">{metricas.conversasHoje}</div>
+            <p className="text-xs brand-text-muted">+8% desde ontem</p>
+          </CardContent>
+        </Card>
+
+        <Card className="brand-card brand-border">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium brand-text-muted">Tempo Médio</CardTitle>
+            <Clock className="h-4 w-4 brand-text-muted" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold brand-text-foreground">{metricas.tempoMedioResposta}</div>
+            <p className="text-xs brand-text-muted">-15% desde ontem</p>
+          </CardContent>
+        </Card>
+
+        <Card className="brand-card brand-border">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium brand-text-muted">Satisfação</CardTitle>
+            <CheckCircle className="h-4 w-4 brand-text-muted" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold brand-text-foreground">{metricas.satisfacaoCliente}/5</div>
+            <p className="text-xs brand-text-muted">+0.2 desde ontem</p>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Activity */}
-        <Card className="lg:col-span-2">
+      {/* Métricas Secundárias */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+        <Card className="brand-card brand-border">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium brand-text-muted">Resolvidas</CardTitle>
+            <Target className="h-4 w-4 brand-text-muted" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold brand-text-foreground">{metricas.conversasResolvidas}</div>
+            <p className="text-xs brand-text-muted">Esta semana</p>
+          </CardContent>
+        </Card>
+
+        <Card className="brand-card brand-border">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium brand-text-muted">Taxa Conversão</CardTitle>
+            <BarChart3 className="h-4 w-4 brand-text-muted" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold brand-text-foreground">{metricas.taxaConversao}%</div>
+            <p className="text-xs brand-text-muted">+2.1% desde ontem</p>
+          </CardContent>
+        </Card>
+
+        <Card className="brand-card brand-border">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium brand-text-muted">Novos Contatos</CardTitle>
+            <Users className="h-4 w-4 brand-text-muted" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold brand-text-foreground">{metricas.novosContatos}</div>
+            <p className="text-xs brand-text-muted">Hoje</p>
+          </CardContent>
+        </Card>
+
+        <Card className="brand-card brand-border">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium brand-text-muted">Agendamentos</CardTitle>
+            <Calendar className="h-4 w-4 brand-text-muted" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold brand-text-foreground">{metricas.agendamentosHoje}</div>
+            <p className="text-xs brand-text-muted">Hoje</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Conversas Recentes e Agendamentos */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+        {/* Conversas Recentes */}
+        <Card className="brand-card brand-border">
           <CardHeader>
-            <CardTitle>Atividade Recente</CardTitle>
-            <CardDescription>Últimas ações dos usuários</CardDescription>
+            <CardTitle className="flex items-center gap-2 brand-text-foreground">
+              <MessageSquare className="h-5 w-5" />
+              Conversas Recentes
+            </CardTitle>
+            <CardDescription className="brand-text-muted">
+              Últimas conversas com clientes
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recentActivity.map((activity) => (
-                <div key={activity.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+              {conversasRecentes.map((conversa) => (
+                <div key={conversa.id} className="flex items-center justify-between p-3 rounded-lg brand-hover-accent border brand-border">
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold text-sm">
-                      {activity.user.split(' ').map(n => n[0]).join('')}
-                    </div>
+                    {getPlataformaIcon(conversa.plataforma)}
                     <div>
-                      <p className="font-medium text-foreground">{activity.user}</p>
-                      <p className="text-sm text-muted-foreground">{activity.action}</p>
+                      <p className="font-medium brand-text-foreground">{conversa.nome}</p>
+                      <p className="text-sm brand-text-muted truncate max-w-48">
+                        {conversa.mensagem}
+                      </p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm text-muted-foreground">{activity.time}</p>
-                    <Badge variant={activity.amount.includes('-') ? 'destructive' : 'default'}>
-                      {activity.amount}
+                  <div className="flex flex-col items-end space-y-1">
+                    <Badge className={`text-xs ${getStatusColor(conversa.status)}`}>
+                      {conversa.status}
+                    </Badge>
+                    <span className="text-xs brand-text-muted">{conversa.tempo}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4">
+              <Button variant="outline" className="w-full brand-border brand-text-foreground brand-hover-accent">
+                Ver Todas as Conversas
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Agendamentos de Hoje */}
+        <Card className="brand-card brand-border">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 brand-text-foreground">
+              <Calendar className="h-5 w-5" />
+              Agendamentos de Hoje
+            </CardTitle>
+            <CardDescription className="brand-text-muted">
+              Compromissos agendados para hoje
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {agendamentosHoje.map((agendamento) => (
+                <div key={agendamento.id} className="flex items-center justify-between p-3 rounded-lg brand-hover-accent border brand-border">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-2 h-2 rounded-full brand-primary"></div>
+                    <div>
+                      <p className="font-medium brand-text-foreground">{agendamento.cliente}</p>
+                      <p className="text-sm brand-text-muted">{agendamento.tipo}</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end space-y-1">
+                    <span className="font-medium brand-text-foreground">{agendamento.horario}</span>
+                    <Badge className={`text-xs ${getStatusColor(agendamento.status)}`}>
+                      {agendamento.status}
                     </Badge>
                   </div>
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Ações Rápidas</CardTitle>
-            <CardDescription>Principais funcionalidades</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Button variant="outline" className="w-full justify-start">
-              <Users className="h-4 w-4 mr-2" />
-              Gerenciar Usuários
-            </Button>
-            <Button variant="outline" className="w-full justify-start">
-              <DollarSign className="h-4 w-4 mr-2" />
-              Ver Faturamento
-            </Button>
-            <Button variant="outline" className="w-full justify-start">
-              <Activity className="h-4 w-4 mr-2" />
-              Análises Detalhadas
-            </Button>
-            <Button variant="outline" className="w-full justify-start">
-              <TrendingUp className="h-4 w-4 mr-2" />
-              Relatórios
-            </Button>
+            <div className="mt-4">
+              <Button variant="outline" className="w-full brand-border brand-text-foreground brand-hover-accent">
+                Ver Todos os Agendamentos
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Ações Rápidas */}
+      <Card className="brand-card brand-border">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 brand-text-foreground">
+            <Zap className="h-5 w-5" />
+            Ações Rápidas
+          </CardTitle>
+          <CardDescription className="brand-text-muted">
+            Acesso rápido às principais funcionalidades
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Button className="brand-primary brand-hover-primary brand-text-background h-20 flex flex-col space-y-2">
+              <MessageSquare className="h-6 w-6" />
+              <span className="text-sm">Nova Conversa</span>
+            </Button>
+            
+            <Button variant="outline" className="brand-border brand-text-foreground brand-hover-accent h-20 flex flex-col space-y-2">
+              <Calendar className="h-6 w-6" />
+              <span className="text-sm">Agendar</span>
+            </Button>
+            
+            <Button variant="outline" className="brand-border brand-text-foreground brand-hover-accent h-20 flex flex-col space-y-2">
+              <Users className="h-6 w-6" />
+              <span className="text-sm">Novo Contato</span>
+            </Button>
+            
+            <Button variant="outline" className="brand-border brand-text-foreground brand-hover-accent h-20 flex flex-col space-y-2">
+              <BarChart3 className="h-6 w-6" />
+              <span className="text-sm">Relatórios</span>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
