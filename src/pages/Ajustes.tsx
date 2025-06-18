@@ -33,16 +33,16 @@ const Ajustes = () => {
           <h1 className="text-2xl font-bold brand-text-foreground mb-6">Configurações</h1>
           
           <Tabs defaultValue="opcoes" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-6">
-              <TabsTrigger value="opcoes" className="flex items-center gap-2">
+            <TabsList className="grid w-full grid-cols-3 mb-6 brand-card brand-border">
+              <TabsTrigger value="opcoes" className="flex items-center gap-2 brand-text-foreground data-[state=active]:brand-primary">
                 <Settings className="w-4 h-4" />
                 Opções
               </TabsTrigger>
-              <TabsTrigger value="mensagens" className="flex items-center gap-2">
+              <TabsTrigger value="mensagens" className="flex items-center gap-2 brand-text-foreground data-[state=active]:brand-primary">
                 <MessageSquare className="w-4 h-4" />
                 Mensagens Padrões
               </TabsTrigger>
-              <TabsTrigger value="expediente" className="flex items-center gap-2">
+              <TabsTrigger value="expediente" className="flex items-center gap-2 brand-text-foreground data-[state=active]:brand-primary">
                 <Clock className="w-4 h-4" />
                 Expediente
               </TabsTrigger>
