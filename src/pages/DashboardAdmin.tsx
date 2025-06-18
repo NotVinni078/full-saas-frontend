@@ -1,12 +1,14 @@
 
 import React from 'react';
-import Dashboard from '@/components/Dashboard';
 import SidebarLayout from '@/components/SidebarLayout';
 
 const DashboardAdmin = () => {
   return (
     <SidebarLayout>
-      <Dashboard currentPage="dashboard-admin" />
+      <div className="p-6">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Dashboard Administrativo</h1>
+        <p className="text-gray-600 dark:text-gray-400">Esta página está em desenvolvimento.</p>
+      </div>
     </SidebarLayout>
   );
 };
