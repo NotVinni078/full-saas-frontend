@@ -1,8 +1,8 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppSidebar from '@/components/AppSidebar';
 import NavBar from '@/components/NavBar';
 import { useLocation } from 'react-router-dom';
+import { useBrand } from '@/contexts/BrandContext';
 
 interface SidebarLayoutProps {
   children: React.ReactNode;
@@ -13,6 +13,12 @@ const SidebarLayout = ({ children }: SidebarLayoutProps) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState('pt-BR');
+  const { brandConfig } = useBrand();
+
+  // Update document title when brand config changes
+  useEffect(() => {
+    document.title = brandConfig.pageTitle;
+  }, [brandConfig.pageTitle]);
 
   const handleLogout = () => {
     window.location.href = '/auth';

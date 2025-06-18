@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
@@ -44,6 +43,7 @@ import {
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useBrand } from '@/contexts/BrandContext';
 import {
   Collapsible,
   CollapsibleContent,
@@ -130,6 +130,7 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
   const location = useLocation();
   const [openGroups, setOpenGroups] = React.useState<string[]>(['dashboards']);
   const [userStatus, setUserStatus] = React.useState(true);
+  const { brandConfig } = useBrand();
 
   const toggleGroup = (groupId: string) => {
     setOpenGroups(prev => 
@@ -220,11 +221,13 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
             onClick={handleLogoClick}
             className="flex items-center space-x-3 hover:opacity-80 transition-opacity cursor-pointer"
           >
-            <div className="w-10 h-10 bg-gradient-to-r from-gray-700 to-black dark:from-gray-200 dark:to-white rounded-lg flex items-center justify-center">
-              <span className="text-white dark:text-black font-bold text-base">NE</span>
+            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+              <span className="text-primary-foreground font-bold text-base">
+                {brandConfig.companyName.split(' ').map(word => word[0]).join('').substring(0, 2).toUpperCase()}
+              </span>
             </div>
             <h1 className="text-lg font-bold text-card-foreground">
-              Nome da Empresa
+              {brandConfig.companyName}
             </h1>
           </button>
         )}
@@ -283,12 +286,12 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                           className={cn(
                             "w-full flex items-center space-x-2 px-2 py-1.5 ml-5 rounded-lg text-left transition-colors text-xs",
                             isActive 
-                              ? "bg-black text-white dark:bg-white dark:text-black" 
+                              ? "bg-primary text-primary-foreground" 
                               : "text-card-foreground hover:bg-accent"
                           )}
                         >
-                          <ItemIcon className={cn("h-3 w-3 flex-shrink-0", isActive ? "text-white dark:text-black" : "text-card-foreground")} />
-                          <span className={cn("text-xs", isActive ? "text-white dark:text-black" : "text-card-foreground")}>{subItem.label}</span>
+                          <ItemIcon className={cn("h-3 w-3 flex-shrink-0", isActive ? "text-primary-foreground" : "text-card-foreground")} />
+                          <span className={cn("text-xs", isActive ? "text-primary-foreground" : "text-card-foreground")}>{subItem.label}</span>
                         </button>
                       );
                     })}
@@ -308,13 +311,13 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                 className={cn(
                   "w-full flex items-center space-x-2 px-2 py-1.5 rounded-lg text-left transition-colors",
                   isActive 
-                    ? "bg-black text-white dark:bg-white dark:text-black" 
+                    ? "bg-primary text-primary-foreground" 
                     : "text-card-foreground hover:bg-accent",
                   isCollapsed && "md:justify-center"
                 )}
               >
-                <Icon className={cn("h-3.5 w-3.5 flex-shrink-0", isActive ? "text-white dark:text-black" : "text-card-foreground")} />
-                {(!isCollapsed || window.innerWidth < 768) && <span className={cn("font-medium text-xs", isActive ? "text-white dark:text-black" : "text-card-foreground")}>{singleItem.label}</span>}
+                <Icon className={cn("h-3.5 w-3.5 flex-shrink-0", isActive ? "text-primary-foreground" : "text-card-foreground")} />
+                {(!isCollapsed || window.innerWidth < 768) && <span className={cn("font-medium text-xs", isActive ? "text-primary-foreground" : "text-card-foreground")}>{singleItem.label}</span>}
               </button>
             );
           }
@@ -325,7 +328,7 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
       <div className="p-3 border-t border-border bg-card">
         {(!isCollapsed || window.innerWidth < 768) && (
           <div className="flex items-center space-x-2 mb-2">
-            <div className="w-7 h-7 bg-gradient-to-r from-gray-700 to-black dark:from-gray-200 dark:to-white rounded-full flex items-center justify-center text-white dark:text-black font-semibold">
+            <div className="w-7 h-7 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold">
               <span className="text-xs">U</span>
             </div>
             <div className="flex-1 min-w-0">
