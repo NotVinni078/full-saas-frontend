@@ -11,19 +11,34 @@ import { useBrand } from '@/contexts/BrandContext';
 import ColorPicker from '@/components/brand/ColorPicker';
 import ImageUpload from '@/components/brand/ImageUpload';
 import BrandPreview from '@/components/brand/BrandPreview';
-import { Palette, Image, Globe, Smartphone, Monitor, Download, Upload, RotateCcw, Apple } from 'lucide-react';
+import { Palette, Image, Globe, Smartphone, Monitor, Download, Upload, RotateCcw, Apple, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const GerenciarMarca = () => {
-  const { brandConfig, updateBrandConfig, updateColors, applyBrandColors } = useBrand();
+  const { 
+    tempBrandConfig, 
+    hasUnsavedChanges,
+    updateTempBrandConfig, 
+    updateTempColors, 
+    saveChanges,
+    discardChanges 
+  } = useBrand();
   const { toast } = useToast();
   const [activeTheme, setActiveTheme] = useState<'light' | 'dark'>('light');
 
   const handleSave = () => {
-    applyBrandColors();
+    saveChanges();
     toast({
       title: "Configurações salvas",
       description: "As personalizações da marca foram aplicadas com sucesso.",
+    });
+  };
+
+  const handleDiscard = () => {
+    discardChanges();
+    toast({
+      title: "Alterações descartadas",
+      description: "As configurações foram restauradas para os valores salvos.",
     });
   };
 
@@ -89,7 +104,7 @@ const GerenciarMarca = () => {
       }
     };
     
-    updateBrandConfig(defaultConfig);
+    updateTempBrandConfig(defaultConfig);
     toast({
       title: "Configurações restauradas",
       description: "As configurações foram restauradas para os valores padrão.",
@@ -97,7 +112,7 @@ const GerenciarMarca = () => {
   };
 
   const exportConfig = () => {
-    const dataStr = JSON.stringify(brandConfig, null, 2);
+    const dataStr = JSON.stringify(tempBrandConfig, null, 2);
     const dataBlob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(dataBlob);
     const link = document.createElement('a');
@@ -114,7 +129,7 @@ const GerenciarMarca = () => {
       reader.onload = (e) => {
         try {
           const config = JSON.parse(e.target?.result as string);
-          updateBrandConfig(config);
+          updateTempBrandConfig(config);
           toast({
             title: "Configurações importadas",
             description: "As configurações foram importadas com sucesso.",
@@ -140,8 +155,19 @@ const GerenciarMarca = () => {
             <p className="text-muted-foreground">
               Personalize a identidade visual e configurações de white label da sua empresa
             </p>
+            {hasUnsavedChanges && (
+              <div className="flex items-center gap-2 mt-2 text-warning">
+                <AlertTriangle className="w-4 h-4" />
+                <span className="text-sm">Você tem alterações não salvas</span>
+              </div>
+            )}
           </div>
           <div className="flex space-x-2">
+            {hasUnsavedChanges && (
+              <Button variant="outline" onClick={handleDiscard}>
+                Descartar Alterações
+              </Button>
+            )}
             <Button variant="outline" onClick={handleReset}>
               <RotateCcw className="w-4 h-4 mr-2" />
               Restaurar Padrão
@@ -164,7 +190,7 @@ const GerenciarMarca = () => {
                 className="hidden"
               />
             </label>
-            <Button onClick={handleSave}>
+            <Button onClick={handleSave} disabled={!hasUnsavedChanges}>
               Salvar Alterações
             </Button>
           </div>
@@ -200,8 +226,8 @@ const GerenciarMarca = () => {
                       <Label htmlFor="companyName">Nome da Empresa</Label>
                       <Input
                         id="companyName"
-                        value={brandConfig.companyName}
-                        onChange={(e) => updateBrandConfig({ companyName: e.target.value })}
+                        value={tempBrandConfig.companyName}
+                        onChange={(e) => updateTempBrandConfig({ companyName: e.target.value })}
                         placeholder="Digite o nome da empresa"
                       />
                       <p className="text-sm text-muted-foreground">
@@ -213,8 +239,8 @@ const GerenciarMarca = () => {
                       <Label htmlFor="pageTitle">Título da Página</Label>
                       <Input
                         id="pageTitle"
-                        value={brandConfig.pageTitle}
-                        onChange={(e) => updateBrandConfig({ pageTitle: e.target.value })}
+                        value={tempBrandConfig.pageTitle}
+                        onChange={(e) => updateTempBrandConfig({ pageTitle: e.target.value })}
                         placeholder="Digite o título que aparecerá na aba do navegador"
                       />
                       <p className="text-sm text-muted-foreground">
@@ -259,50 +285,50 @@ const GerenciarMarca = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <ColorPicker
                         label="Cor Primária"
-                        value={brandConfig.colors[activeTheme].primary}
-                        onChange={(color) => updateColors(activeTheme, { primary: color })}
+                        value={tempBrandConfig.colors[activeTheme].primary}
+                        onChange={(color) => updateTempColors(activeTheme, { primary: color })}
                         description="Cor principal dos botões e elementos destacados"
                       />
                       
                       <ColorPicker
                         label="Cor Secundária"
-                        value={brandConfig.colors[activeTheme].secondary}
-                        onChange={(color) => updateColors(activeTheme, { secondary: color })}
+                        value={tempBrandConfig.colors[activeTheme].secondary}
+                        onChange={(color) => updateTempColors(activeTheme, { secondary: color })}
                         description="Cor de fundo dos elementos secundários"
                       />
                       
                       <ColorPicker
                         label="Cor de Destaque"
-                        value={brandConfig.colors[activeTheme].accent}
-                        onChange={(color) => updateColors(activeTheme, { accent: color })}
+                        value={tempBrandConfig.colors[activeTheme].accent}
+                        onChange={(color) => updateTempColors(activeTheme, { accent: color })}
                         description="Cor para elementos em destaque"
                       />
                       
                       <ColorPicker
                         label="Cor de Fundo"
-                        value={brandConfig.colors[activeTheme].background}
-                        onChange={(color) => updateColors(activeTheme, { background: color })}
+                        value={tempBrandConfig.colors[activeTheme].background}
+                        onChange={(color) => updateTempColors(activeTheme, { background: color })}
                         description="Cor de fundo principal"
                       />
                       
                       <ColorPicker
                         label="Cor do Texto"
-                        value={brandConfig.colors[activeTheme].foreground}
-                        onChange={(color) => updateColors(activeTheme, { foreground: color })}
+                        value={tempBrandConfig.colors[activeTheme].foreground}
+                        onChange={(color) => updateTempColors(activeTheme, { foreground: color })}
                         description="Cor principal do texto"
                       />
                       
                       <ColorPicker
                         label="Cor Esmaecida"
-                        value={brandConfig.colors[activeTheme].muted}
-                        onChange={(color) => updateColors(activeTheme, { muted: color })}
+                        value={tempBrandConfig.colors[activeTheme].muted}
+                        onChange={(color) => updateTempColors(activeTheme, { muted: color })}
                         description="Cor para textos secundários"
                       />
                       
                       <ColorPicker
                         label="Cor das Bordas"
-                        value={brandConfig.colors[activeTheme].border}
-                        onChange={(color) => updateColors(activeTheme, { border: color })}
+                        value={tempBrandConfig.colors[activeTheme].border}
+                        onChange={(color) => updateTempColors(activeTheme, { border: color })}
                         description="Cor das bordas dos elementos"
                       />
                     </div>
@@ -319,8 +345,8 @@ const GerenciarMarca = () => {
                   <CardContent className="space-y-6">
                     <ImageUpload
                       label="Logotipo"
-                      value={brandConfig.logo}
-                      onChange={(url) => updateBrandConfig({ logo: url })}
+                      value={tempBrandConfig.logo}
+                      onChange={(url) => updateTempBrandConfig({ logo: url })}
                       description="Logotipo que aparecerá no sistema (recomendado: PNG com fundo transparente)"
                     />
                     
@@ -341,10 +367,10 @@ const GerenciarMarca = () => {
                           <p className="text-sm text-muted-foreground mb-3">
                             Ícone da aba do navegador (32x32px)
                           </p>
-                          {brandConfig.favicon && brandConfig.favicon !== '/favicon.ico' && (
+                          {tempBrandConfig.favicon && tempBrandConfig.favicon !== '/favicon.ico' && (
                             <div className="mb-3">
                               <img
-                                src={brandConfig.favicon}
+                                src={tempBrandConfig.favicon}
                                 alt="Favicon"
                                 className="w-8 h-8 object-contain border border-border rounded"
                               />
@@ -352,8 +378,8 @@ const GerenciarMarca = () => {
                           )}
                           <ImageUpload
                             label="Favicon"
-                            value={brandConfig.favicon}
-                            onChange={(url) => updateBrandConfig({ favicon: url })}
+                            value={tempBrandConfig.favicon}
+                            onChange={(url) => updateTempBrandConfig({ favicon: url })}
                             accept="image/png,image/x-icon,image/vnd.microsoft.icon"
                           />
                         </Card>
@@ -366,10 +392,10 @@ const GerenciarMarca = () => {
                           <p className="text-sm text-muted-foreground mb-3">
                             App instalado no iPhone/iPad (180x180px)
                           </p>
-                          {brandConfig.iosIcon && (
+                          {tempBrandConfig.iosIcon && (
                             <div className="mb-3">
                               <img
-                                src={brandConfig.iosIcon}
+                                src={tempBrandConfig.iosIcon}
                                 alt="iOS Icon"
                                 className="w-12 h-12 object-contain border border-border rounded"
                               />
@@ -377,8 +403,8 @@ const GerenciarMarca = () => {
                           )}
                           <ImageUpload
                             label="Ícone iOS"
-                            value={brandConfig.iosIcon}
-                            onChange={(url) => updateBrandConfig({ iosIcon: url })}
+                            value={tempBrandConfig.iosIcon}
+                            onChange={(url) => updateTempBrandConfig({ iosIcon: url })}
                             accept="image/png"
                           />
                         </Card>
@@ -391,10 +417,10 @@ const GerenciarMarca = () => {
                           <p className="text-sm text-muted-foreground mb-3">
                             App instalado no Android (192x192px)
                           </p>
-                          {brandConfig.androidIcon && (
+                          {tempBrandConfig.androidIcon && (
                             <div className="mb-3">
                               <img
-                                src={brandConfig.androidIcon}
+                                src={tempBrandConfig.androidIcon}
                                 alt="Android Icon"
                                 className="w-12 h-12 object-contain border border-border rounded"
                               />
@@ -402,8 +428,8 @@ const GerenciarMarca = () => {
                           )}
                           <ImageUpload
                             label="Ícone Android"
-                            value={brandConfig.androidIcon}
-                            onChange={(url) => updateBrandConfig({ androidIcon: url })}
+                            value={tempBrandConfig.androidIcon}
+                            onChange={(url) => updateTempBrandConfig({ androidIcon: url })}
                             accept="image/png"
                           />
                         </Card>

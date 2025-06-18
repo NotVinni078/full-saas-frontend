@@ -7,20 +7,20 @@ import { useBrand } from '@/contexts/BrandContext';
 import { MessageSquare, Users, Settings } from 'lucide-react';
 
 const BrandPreview: React.FC = () => {
-  const { brandConfig } = useBrand();
+  const { tempBrandConfig } = useBrand();
 
   return (
     <Card className="w-full">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center space-x-2 text-lg">
-          {brandConfig.logo && (
+          {tempBrandConfig.logo && (
             <img 
-              src={brandConfig.logo} 
+              src={tempBrandConfig.logo} 
               alt="Logo" 
               className="w-6 h-6 object-contain flex-shrink-0"
             />
           )}
-          <span className="truncate">{brandConfig.companyName}</span>
+          <span className="truncate">{tempBrandConfig.companyName}</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">

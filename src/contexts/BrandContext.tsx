@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface BrandColors {
@@ -42,9 +41,15 @@ interface BrandConfig {
 
 interface BrandContextType {
   brandConfig: BrandConfig;
+  tempBrandConfig: BrandConfig;
+  hasUnsavedChanges: boolean;
   updateBrandConfig: (config: Partial<BrandConfig>) => void;
+  updateTempBrandConfig: (config: Partial<BrandConfig>) => void;
   updateColors: (theme: 'light' | 'dark', colors: Partial<BrandColors>) => void;
+  updateTempColors: (theme: 'light' | 'dark', colors: Partial<BrandColors>) => void;
   applyBrandColors: () => void;
+  saveChanges: () => void;
+  discardChanges: () => void;
 }
 
 const defaultBrandConfig: BrandConfig = {
@@ -110,9 +115,15 @@ const defaultBrandConfig: BrandConfig = {
 
 const BrandContext = createContext<BrandContextType>({
   brandConfig: defaultBrandConfig,
+  tempBrandConfig: defaultBrandConfig,
+  hasUnsavedChanges: false,
   updateBrandConfig: () => {},
+  updateTempBrandConfig: () => {},
   updateColors: () => {},
-  applyBrandColors: () => {}
+  updateTempColors: () => {},
+  applyBrandColors: () => {},
+  saveChanges: () => {},
+  discardChanges: () => {}
 });
 
 export const useBrand = () => {
@@ -153,10 +164,21 @@ export const BrandProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return stored ? JSON.parse(stored) : defaultBrandConfig;
   });
 
+  const [tempBrandConfig, setTempBrandConfig] = useState<BrandConfig>(brandConfig);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
   const updateBrandConfig = (config: Partial<BrandConfig>) => {
     setBrandConfig(prev => {
       const updated = { ...prev, ...config };
       localStorage.setItem('brandConfig', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const updateTempBrandConfig = (config: Partial<BrandConfig>) => {
+    setTempBrandConfig(prev => {
+      const updated = { ...prev, ...config };
+      setHasUnsavedChanges(true);
       return updated;
     });
   };
@@ -186,9 +208,46 @@ export const BrandProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     });
   };
 
-  const applyBrandColors = () => {
+  const updateTempColors = (theme: 'light' | 'dark', colors: Partial<BrandColors>) => {
+    setTempBrandConfig(prev => {
+      const processedColors: Partial<BrandColors> = {};
+      
+      // Convert hex colors to HSL format
+      Object.entries(colors).forEach(([key, value]) => {
+        if (value && value.startsWith('#')) {
+          processedColors[key as keyof BrandColors] = hexToHsl(value);
+        } else {
+          processedColors[key as keyof BrandColors] = value;
+        }
+      });
+
+      const updated = {
+        ...prev,
+        colors: {
+          ...prev.colors,
+          [theme]: { ...prev.colors[theme], ...processedColors }
+        }
+      };
+      setHasUnsavedChanges(true);
+      return updated;
+    });
+  };
+
+  const saveChanges = () => {
+    setBrandConfig(tempBrandConfig);
+    localStorage.setItem('brandConfig', JSON.stringify(tempBrandConfig));
+    setHasUnsavedChanges(false);
+  };
+
+  const discardChanges = () => {
+    setTempBrandConfig(brandConfig);
+    setHasUnsavedChanges(false);
+  };
+
+  const applyBrandColors = (config?: BrandConfig) => {
+    const configToUse = config || tempBrandConfig;
     const isDark = document.documentElement.classList.contains('dark');
-    const colors = isDark ? brandConfig.colors.dark : brandConfig.colors.light;
+    const colors = isDark ? configToUse.colors.dark : configToUse.colors.light;
     
     const root = document.documentElement;
     
@@ -236,16 +295,16 @@ export const BrandProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     root.style.setProperty('--destructive-foreground', '210 40% 98%');
     
     // Update page title and favicon
-    document.title = brandConfig.pageTitle;
+    document.title = configToUse.pageTitle;
     const favicon = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
-    if (favicon && brandConfig.favicon) {
-      favicon.href = brandConfig.favicon;
+    if (favicon && configToUse.favicon) {
+      favicon.href = configToUse.favicon;
     }
   };
 
   useEffect(() => {
     applyBrandColors();
-  }, [brandConfig]);
+  }, [tempBrandConfig]);
 
   useEffect(() => {
     // Listen for theme changes
@@ -259,14 +318,20 @@ export const BrandProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     });
 
     return () => observer.disconnect();
-  }, [brandConfig]);
+  }, [tempBrandConfig]);
 
   return (
     <BrandContext.Provider value={{
       brandConfig,
+      tempBrandConfig,
+      hasUnsavedChanges,
       updateBrandConfig,
+      updateTempBrandConfig,
       updateColors,
-      applyBrandColors
+      updateTempColors,
+      applyBrandColors,
+      saveChanges,
+      discardChanges
     }}>
       {children}
     </BrandContext.Provider>
