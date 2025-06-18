@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -539,7 +538,7 @@ const AtendimentosOmnichannel = () => {
   const ConversasList = () => (
     <div className={`${conversaSelecionada ? 'md:w-1/3' : 'md:w-2/3 lg:w-1/2'} border-r border-gray-200 dark:border-gray-700 flex flex-col h-full relative`}>
       {/* Header da Lista */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0 bg-white dark:bg-[#000000]">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Atendimentos</h2>
         </div>
@@ -678,8 +677,8 @@ const AtendimentosOmnichannel = () => {
                           {conversa.cliente}
                           {conversa.isGrupo && <UsersRound className="inline h-3 w-3 ml-1" />}
                         </h3>
-                        <div className="flex gap-1 flex-wrap">
-                          {conversa.tags?.slice(0, 2).map((tag) => (
+                        <div className="flex gap-1">
+                          {conversa.tags?.map((tag) => (
                             <Badge key={tag} variant="secondary" className="text-xs px-1 py-0 h-4 text-[10px]">
                               {tag}
                             </Badge>
