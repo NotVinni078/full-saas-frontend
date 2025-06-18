@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import {
   ReactFlow,
   Background,
@@ -48,6 +48,38 @@ const FlowCanvas = ({ nodes: initialNodes, edges: initialEdges, onNodesChange, o
   const [edges, setEdges, onEdgesChangeInternal] = useEdgesState(initialEdges);
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
 
+  // Adicionar listener para tecla Delete
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === 'Delete' || event.key === 'Backspace') {
+        const selectedNodes = nodes.filter(node => node.selected);
+        const selectedEdges = edges.filter(edge => edge.selected);
+        
+        if (selectedNodes.length > 0 || selectedEdges.length > 0) {
+          // Remover nós selecionados
+          const remainingNodes = nodes.filter(node => !node.selected);
+          setNodes(remainingNodes);
+          onNodesChange(remainingNodes);
+          
+          // Remover arestas selecionadas e arestas conectadas aos nós removidos
+          const selectedNodeIds = selectedNodes.map(node => node.id);
+          const remainingEdges = edges.filter(edge => 
+            !edge.selected && 
+            !selectedNodeIds.includes(edge.source) && 
+            !selectedNodeIds.includes(edge.target)
+          );
+          setEdges(remainingEdges);
+          onEdgesChange(remainingEdges);
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyPress);
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [nodes, edges, setNodes, setEdges, onNodesChange, onEdgesChange]);
+
   const onConnect = useCallback(
     (params: Connection) => {
       const newEdges = addEdge(params, edges);
@@ -96,7 +128,6 @@ const FlowCanvas = ({ nodes: initialNodes, edges: initialEdges, onNodesChange, o
 
   const handleNodesChange = useCallback((changes: any) => {
     onNodesChangeInternal(changes);
-    // Aguarda o próximo tick para pegar os nós atualizados
     setTimeout(() => {
       setNodes(currentNodes => {
         onNodesChange(currentNodes);
@@ -132,6 +163,7 @@ const FlowCanvas = ({ nodes: initialNodes, edges: initialEdges, onNodesChange, o
           onDragOver={onDragOver}
           nodeTypes={nodeTypes}
           fitView
+          deleteKeyCode={['Delete', 'Backspace']}
         >
           <Background />
           <Controls />
