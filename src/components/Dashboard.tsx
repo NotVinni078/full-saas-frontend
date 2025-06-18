@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -16,7 +15,11 @@ import {
   Zap
 } from 'lucide-react';
 
-const Dashboard = () => {
+interface DashboardProps {
+  currentPage?: string;
+}
+
+const Dashboard = ({ currentPage }: DashboardProps) => {
   // Mock data para métricas
   const metricas = {
     conversasAbertas: 23,
