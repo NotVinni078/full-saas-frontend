@@ -113,7 +113,6 @@ const menuGroups = [
 ];
 
 const singleItems = [
-  { id: 'inicio', label: 'Início', icon: Home, route: '/inicio' },
   { id: 'atendimentos', label: 'Atendimentos', icon: MessageSquare, route: '/atendimentos' },
   { id: 'chat-interno', label: 'Chat Interno', icon: MessagesSquare, route: '/chat-interno' },
   { id: 'painel-atendimentos', label: 'Painel de Atendimentos', icon: MessageSquareCode, route: '/painel-atendimentos' },
@@ -149,22 +148,21 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
     onPageChange(pageId);
   };
 
+  const handleLogoClick = () => {
+    navigate('/inicio');
+    onPageChange('inicio');
+  };
+
   const renderMenuItems = () => {
     const orderedItems = [];
 
-    // 1. Início (item individual)
-    const inicioItem = singleItems.find(item => item.id === 'inicio');
-    if (inicioItem) {
-      orderedItems.push({ type: 'single', data: inicioItem });
-    }
-
-    // 2. Dashboards (grupo)
+    // 1. Dashboards (grupo)
     const dashboardsGroup = menuGroups.find(group => group.id === 'dashboards');
     if (dashboardsGroup) {
       orderedItems.push({ type: 'group', data: dashboardsGroup });
     }
 
-    // 3-9. Itens individuais na ordem especificada
+    // 2-8. Itens individuais na ordem especificada
     const orderedSingleItems = [
       'atendimentos',
       'chat-interno', 
@@ -182,7 +180,7 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
       }
     });
 
-    // 10-12. Grupos na ordem especificada
+    // 9-11. Grupos na ordem especificada
     const orderedGroups = ['gestao', 'administracao', 'financeiro'];
     orderedGroups.forEach(groupId => {
       const group = menuGroups.find(g => g.id === groupId);
@@ -191,7 +189,7 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
       }
     });
 
-    // 13-15. Itens individuais finais
+    // 12-14. Itens individuais finais
     const finalSingleItems = ['chatbot', 'conexoes', 'documentacao'];
     finalSingleItems.forEach(itemId => {
       const item = singleItems.find(single => single.id === itemId);
@@ -200,7 +198,7 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
       }
     });
 
-    // 16. Configurações (grupo)
+    // 15. Configurações (grupo)
     const configGroup = menuGroups.find(group => group.id === 'configuracoes');
     if (configGroup) {
       orderedItems.push({ type: 'group', data: configGroup });
@@ -212,22 +210,23 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
   return (
     <div className={cn(
       "bg-card border-r border-border flex flex-col transition-all duration-300 h-screen relative z-50",
-      // Em mobile, sempre ocupa a largura total quando visível
       "w-full md:w-64",
-      // Em desktop, respeita o estado collapsed
       isCollapsed && "md:w-16"
     )}>
-      {/* Header - matching navbar height */}
+      {/* Header - Logo clicável */}
       <div className="px-6 py-4 border-b border-border flex items-center justify-between h-20 bg-card">
         {(!isCollapsed || window.innerWidth < 768) && (
-          <div className="flex items-center space-x-3">
+          <button 
+            onClick={handleLogoClick}
+            className="flex items-center space-x-3 hover:opacity-80 transition-opacity cursor-pointer"
+          >
             <div className="w-10 h-10 bg-gradient-to-r from-gray-700 to-black dark:from-gray-200 dark:to-white rounded-lg flex items-center justify-center">
               <span className="text-white dark:text-black font-bold text-base">NE</span>
             </div>
             <h1 className="text-lg font-bold text-card-foreground">
               Nome da Empresa
             </h1>
-          </div>
+          </button>
         )}
         {/* Botão de toggle apenas visível no desktop */}
         <Button

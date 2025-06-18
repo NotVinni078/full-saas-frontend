@@ -38,8 +38,8 @@ const SidebarLayout = ({ children }: SidebarLayoutProps) => {
   // Determinar a página atual baseada na rota
   const getCurrentPage = () => {
     const path = location.pathname;
-    if (path === '/inicio') return 'anuncios';
-    return path.substring(1) || 'dashboard-gerencial';
+    // Remove a barra inicial e usa o restante como página atual
+    return path.substring(1) || 'inicio';
   };
 
   return (
