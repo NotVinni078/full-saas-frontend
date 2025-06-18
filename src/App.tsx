@@ -36,6 +36,8 @@ import Ajustes from "./pages/Ajustes";
 import GerenciarMarca from "./pages/GerenciarMarca";
 import Integracoes from "./pages/Integracoes";
 import NotFound from "./pages/NotFound";
+import TestesCores from "./pages/TestesCores";
+import TestesTema from "./pages/TestesTema";
 
 const queryClient = new QueryClient();
 
@@ -78,6 +80,8 @@ const App = () => (
                 <Route path="/ajustes" element={<Ajustes />} />
                 <Route path="/gerenciar-marca" element={<GerenciarMarca />} />
                 <Route path="/integracoes" element={<Integracoes />} />
+                <Route path="/testes-cores" element={<TestesCores />} />
+                <Route path="/testes-tema" element={<TestesTema />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

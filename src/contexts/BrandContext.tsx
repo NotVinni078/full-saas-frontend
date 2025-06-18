@@ -237,11 +237,15 @@ export const BrandProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setBrandConfig(tempBrandConfig);
     localStorage.setItem('brandConfig', JSON.stringify(tempBrandConfig));
     setHasUnsavedChanges(false);
+    // Force immediate application after save
+    applyBrandColors(tempBrandConfig);
   };
 
   const discardChanges = () => {
     setTempBrandConfig(brandConfig);
     setHasUnsavedChanges(false);
+    // Apply saved configuration
+    applyBrandColors(brandConfig);
   };
 
   const applyBrandColors = (config?: BrandConfig) => {
@@ -251,7 +255,12 @@ export const BrandProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     
     const root = document.documentElement;
     
-    // Apply all brand colors to CSS variables
+    // Apply all brand colors to CSS variables with immediate effect
+    Object.entries(colors).forEach(([colorKey, colorValue]) => {
+      root.style.setProperty(`--${colorKey.replace(/([A-Z])/g, '-$1').toLowerCase()}`, colorValue);
+    });
+    
+    // Ensure core shadcn variables are updated
     root.style.setProperty('--primary', colors.primary);
     root.style.setProperty('--secondary', colors.secondary);
     root.style.setProperty('--accent', colors.accent);
@@ -259,38 +268,18 @@ export const BrandProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     root.style.setProperty('--foreground', colors.foreground);
     root.style.setProperty('--muted', colors.muted);
     root.style.setProperty('--border', colors.border);
+    root.style.setProperty('--card', colors.background);
+    root.style.setProperty('--card-foreground', colors.foreground);
+    root.style.setProperty('--input', colors.secondary);
+    root.style.setProperty('--ring', colors.primary);
     
-    // Apply status colors
-    root.style.setProperty('--success', colors.success);
-    root.style.setProperty('--warning', colors.warning);
-    root.style.setProperty('--error', colors.error);
-    root.style.setProperty('--info', colors.info);
-    
-    // Apply gray scale colors
-    root.style.setProperty('--gray-50', colors.gray50);
-    root.style.setProperty('--gray-100', colors.gray100);
-    root.style.setProperty('--gray-200', colors.gray200);
-    root.style.setProperty('--gray-300', colors.gray300);
-    root.style.setProperty('--gray-400', colors.gray400);
-    root.style.setProperty('--gray-500', colors.gray500);
-    root.style.setProperty('--gray-600', colors.gray600);
-    root.style.setProperty('--gray-700', colors.gray700);
-    root.style.setProperty('--gray-800', colors.gray800);
-    root.style.setProperty('--gray-900', colors.gray900);
-    
-    // Update secondary and accent foreground colors based on background
+    // Update secondary/accent foreground colors
     root.style.setProperty('--secondary-foreground', colors.foreground);
     root.style.setProperty('--accent-foreground', colors.foreground);
     root.style.setProperty('--muted-foreground', colors.gray600);
-    
-    // Update card colors to match background
-    root.style.setProperty('--card', colors.background);
-    root.style.setProperty('--card-foreground', colors.foreground);
-    
-    // Update primary foreground for better contrast
     root.style.setProperty('--primary-foreground', isDark ? colors.background : '210 40% 98%');
     
-    // Update destructive colors
+    // Update destructive colors to use brand error
     root.style.setProperty('--destructive', colors.error);
     root.style.setProperty('--destructive-foreground', '210 40% 98%');
     
@@ -300,16 +289,28 @@ export const BrandProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (favicon && configToUse.favicon) {
       favicon.href = configToUse.favicon;
     }
+    
+    console.log('🎨 Brand colors applied:', { 
+      theme: isDark ? 'dark' : 'light', 
+      colors: colors,
+      timestamp: new Date().toISOString()
+    });
   };
 
+  // Apply colors whenever tempBrandConfig changes (for preview)
   useEffect(() => {
     applyBrandColors();
   }, [tempBrandConfig]);
 
+  // Listen for theme changes and reapply colors
   useEffect(() => {
-    // Listen for theme changes
-    const observer = new MutationObserver(() => {
-      applyBrandColors();
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+          // Theme changed, reapply colors with current config
+          setTimeout(() => applyBrandColors(), 50);
+        }
+      });
     });
     
     observer.observe(document.documentElement, {
