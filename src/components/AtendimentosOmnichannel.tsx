@@ -253,6 +253,7 @@ const AtendimentosOmnichannel = () => {
 
   const handleCloseConversation = () => {
     setConversaSelecionada('');
+    setShowChatMobile(false); // Adicionar esta linha para resetar o estado mobile
   };
 
   const handleContactClick = (conversa: Conversa) => {
