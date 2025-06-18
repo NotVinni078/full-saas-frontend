@@ -9,6 +9,22 @@ interface BrandColors {
   foreground: string;
   muted: string;
   border: string;
+  // Novas cores de status
+  success: string;
+  warning: string;
+  error: string;
+  info: string;
+  // Tons de cinza dinâmicos
+  gray50: string;
+  gray100: string;
+  gray200: string;
+  gray300: string;
+  gray400: string;
+  gray500: string;
+  gray600: string;
+  gray700: string;
+  gray800: string;
+  gray900: string;
 }
 
 interface BrandConfig {
@@ -46,7 +62,23 @@ const defaultBrandConfig: BrandConfig = {
       background: '0 0% 100%',
       foreground: '222.2 84% 4.9%',
       muted: '210 40% 96.1%',
-      border: '214.3 31.8% 91.4%'
+      border: '214.3 31.8% 91.4%',
+      // Cores de status
+      success: '142.1 76.2% 36.3%',
+      warning: '47.9 95.8% 53.1%',
+      error: '0 84.2% 60.2%',
+      info: '199.89 89.47% 49.41%',
+      // Tons de cinza
+      gray50: '210 40% 98%',
+      gray100: '210 40% 96.1%',
+      gray200: '214.3 31.8% 91.4%',
+      gray300: '213 27% 84%',
+      gray400: '215 20.2% 65.1%',
+      gray500: '215 16.3% 46.9%',
+      gray600: '215.4 16.3% 46.9%',
+      gray700: '215 25% 26.9%',
+      gray800: '217 32.6% 17.5%',
+      gray900: '222.2 84% 4.9%'
     },
     dark: {
       primary: '210 40% 98%',
@@ -55,7 +87,23 @@ const defaultBrandConfig: BrandConfig = {
       background: '0 0% 0%',
       foreground: '210 40% 98%',
       muted: '0 0% 5%',
-      border: '0 0% 10%'
+      border: '0 0% 10%',
+      // Cores de status para tema escuro
+      success: '142.1 70.6% 45.3%',
+      warning: '47.9 95.8% 53.1%',
+      error: '0 62.8% 50.6%',
+      info: '199.89 89.47% 49.41%',
+      // Tons de cinza para tema escuro
+      gray50: '0 0% 5%',
+      gray100: '0 0% 10%',
+      gray200: '0 0% 15%',
+      gray300: '0 0% 20%',
+      gray400: '0 0% 25%',
+      gray500: '0 0% 30%',
+      gray600: '0 0% 40%',
+      gray700: '0 0% 50%',
+      gray800: '0 0% 80%',
+      gray900: '210 40% 98%'
     }
   }
 };
@@ -153,10 +201,28 @@ export const BrandProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     root.style.setProperty('--muted', colors.muted);
     root.style.setProperty('--border', colors.border);
     
+    // Apply new status colors
+    root.style.setProperty('--success', colors.success);
+    root.style.setProperty('--warning', colors.warning);
+    root.style.setProperty('--error', colors.error);
+    root.style.setProperty('--info', colors.info);
+    
+    // Apply gray scale colors
+    root.style.setProperty('--gray-50', colors.gray50);
+    root.style.setProperty('--gray-100', colors.gray100);
+    root.style.setProperty('--gray-200', colors.gray200);
+    root.style.setProperty('--gray-300', colors.gray300);
+    root.style.setProperty('--gray-400', colors.gray400);
+    root.style.setProperty('--gray-500', colors.gray500);
+    root.style.setProperty('--gray-600', colors.gray600);
+    root.style.setProperty('--gray-700', colors.gray700);
+    root.style.setProperty('--gray-800', colors.gray800);
+    root.style.setProperty('--gray-900', colors.gray900);
+    
     // Update secondary and accent foreground colors based on background
     root.style.setProperty('--secondary-foreground', colors.foreground);
     root.style.setProperty('--accent-foreground', colors.foreground);
-    root.style.setProperty('--muted-foreground', colors.foreground);
+    root.style.setProperty('--muted-foreground', colors.gray600);
     
     // Update card colors to match background
     root.style.setProperty('--card', colors.background);
@@ -164,6 +230,10 @@ export const BrandProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     
     // Update primary foreground for better contrast
     root.style.setProperty('--primary-foreground', isDark ? colors.background : '210 40% 98%');
+    
+    // Update destructive colors
+    root.style.setProperty('--destructive', colors.error);
+    root.style.setProperty('--destructive-foreground', '210 40% 98%');
     
     // Update page title and favicon
     document.title = brandConfig.pageTitle;
