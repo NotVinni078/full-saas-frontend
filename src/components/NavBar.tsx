@@ -49,7 +49,7 @@ const NavBar = ({
               onClick={onToggleSidebar}
               variant="ghost"
               size="sm"
-              className="md:hidden p-2"
+              className="md:hidden p-2 text-foreground hover:bg-accent"
             >
               <PanelLeft className="h-4 w-4" />
             </Button>
@@ -61,9 +61,9 @@ const NavBar = ({
               variant="ghost"
               size="sm"
               onClick={handleCloseConversation}
-              className="p-2"
+              className="p-2 text-foreground hover:bg-accent"
             >
-              <ArrowLeft className="h-4 w-4 text-foreground" />
+              <ArrowLeft className="h-4 w-4" />
             </Button>
           )}
         </div>
@@ -72,14 +72,14 @@ const NavBar = ({
           {/* Notificações de Atendimentos */}
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="sm" className="relative p-2">
-                <MessageSquare className="h-5 w-5 text-muted-foreground" />
+              <Button variant="ghost" size="sm" className="relative p-2 text-muted-foreground hover:bg-accent hover:text-foreground">
+                <MessageSquare className="h-5 w-5" />
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   2
                 </span>
               </Button>
             </TooltipTrigger>
-            <TooltipContent>
+            <TooltipContent className="bg-popover text-popover-foreground border-border">
               <p>Notificações de Atendimentos</p>
             </TooltipContent>
           </Tooltip>
@@ -87,14 +87,14 @@ const NavBar = ({
           {/* Notificações de Chat Interno */}
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="sm" className="relative p-2">
-                <MessagesSquare className="h-5 w-5 text-muted-foreground" />
+              <Button variant="ghost" size="sm" className="relative p-2 text-muted-foreground hover:bg-accent hover:text-foreground">
+                <MessagesSquare className="h-5 w-5" />
                 <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   1
                 </span>
               </Button>
             </TooltipTrigger>
-            <TooltipContent>
+            <TooltipContent className="bg-popover text-popover-foreground border-border">
               <p>Notificações de Chat Interno</p>
             </TooltipContent>
           </Tooltip>
@@ -102,14 +102,14 @@ const NavBar = ({
           {/* Notificações de Faturas */}
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="sm" className="relative p-2">
-                <Receipt className="h-5 w-5 text-muted-foreground" />
+              <Button variant="ghost" size="sm" className="relative p-2 text-muted-foreground hover:bg-accent hover:text-foreground">
+                <Receipt className="h-5 w-5" />
                 <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   5
                 </span>
               </Button>
             </TooltipTrigger>
-            <TooltipContent>
+            <TooltipContent className="bg-popover text-popover-foreground border-border">
               <p>Notificações de Faturas</p>
             </TooltipContent>
           </Tooltip>
@@ -117,29 +117,29 @@ const NavBar = ({
           {/* Seletor de idioma */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="p-2">
-                <Globe className="h-5 w-5 text-muted-foreground" />
+              <Button variant="ghost" size="sm" className="p-2 text-muted-foreground hover:bg-accent hover:text-foreground">
+                <Globe className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onLanguageChange('pt-BR')}>
+            <DropdownMenuContent align="end" className="bg-card border-border">
+              <DropdownMenuItem onClick={() => onLanguageChange('pt-BR')} className="text-foreground hover:bg-accent">
                 🇧🇷 Português
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onLanguageChange('en-US')}>
+              <DropdownMenuItem onClick={() => onLanguageChange('en-US')} className="text-foreground hover:bg-accent">
                 🇺🇸 English
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onLanguageChange('es-ES')}>
+              <DropdownMenuItem onClick={() => onLanguageChange('es-ES')} className="text-foreground hover:bg-accent">
                 🇪🇸 Español
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
           {/* Toggle de tema */}
-          <Button variant="ghost" size="sm" onClick={onToggleTheme} className="p-2">
+          <Button variant="ghost" size="sm" onClick={onToggleTheme} className="p-2 text-muted-foreground hover:bg-accent hover:text-foreground">
             {isDarkMode ? (
-              <Sun className="h-5 w-5 text-muted-foreground" />
+              <Sun className="h-5 w-5" />
             ) : (
-              <Moon className="h-5 w-5 text-muted-foreground" />
+              <Moon className="h-5 w-5" />
             )}
           </Button>
         </div>
