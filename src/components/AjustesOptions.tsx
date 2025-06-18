@@ -104,7 +104,7 @@ const AjustesOptions = () => {
               </Tooltip>
             </div>
             <CardDescription className="text-xs sm:text-sm">
-              Define se o agendamento será por empresa ou por setor
+              Define se o agendamento será por empresa, setor ou cargo
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
@@ -116,6 +116,10 @@ const AjustesOptions = () => {
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="setor" id="agenda-setor" className="border-foreground text-foreground data-[state=checked]:bg-foreground data-[state=checked]:border-foreground" />
                 <Label htmlFor="agenda-setor" className="text-xs sm:text-sm text-foreground">Setor</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="cargo" id="agenda-cargo" className="border-foreground text-foreground data-[state=checked]:bg-foreground data-[state=checked]:border-foreground" />
+                <Label htmlFor="agenda-cargo" className="text-xs sm:text-sm text-foreground">Cargo</Label>
               </div>
             </RadioGroup>
           </CardContent>
