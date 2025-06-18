@@ -6,7 +6,9 @@ import SidebarLayout from '@/components/SidebarLayout';
 const DashboardGerencial = () => {
   return (
     <SidebarLayout>
-      <Dashboard currentPage="dashboard-gerencial" />
+      <div className="brand-background min-h-full">
+        <Dashboard currentPage="dashboard-gerencial" />
+      </div>
     </SidebarLayout>
   );
 };

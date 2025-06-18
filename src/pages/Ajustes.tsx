@@ -29,8 +29,8 @@ const Ajustes = () => {
   return (
     <AjustesContext.Provider value={{ agendamentoTipo, setAgendamentoTipo }}>
       <SidebarLayout>
-        <div className="p-6">
-          <h1 className="text-2xl font-bold mb-6">Configurações</h1>
+        <div className="p-6 brand-background min-h-full">
+          <h1 className="text-2xl font-bold brand-text-foreground mb-6">Configurações</h1>
           
           <Tabs defaultValue="opcoes" className="w-full">
             <TabsList className="grid w-full grid-cols-3 mb-6">

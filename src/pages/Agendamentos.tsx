@@ -6,7 +6,9 @@ import SidebarLayout from '@/components/SidebarLayout';
 const AgendamentosPage = () => {
   return (
     <SidebarLayout>
-      <Agendamentos />
+      <div className="brand-background min-h-full">
+        <Agendamentos />
+      </div>
     </SidebarLayout>
   );
 };

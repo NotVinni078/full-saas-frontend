@@ -6,7 +6,9 @@ import SidebarLayout from '@/components/SidebarLayout';
 const Atendimentos = () => {
   return (
     <SidebarLayout>
-      <AtendimentosOmnichannel />
+      <div className="brand-background min-h-full">
+        <AtendimentosOmnichannel />
+      </div>
     </SidebarLayout>
   );
 };

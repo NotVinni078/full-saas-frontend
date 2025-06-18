@@ -6,7 +6,9 @@ import SidebarLayout from '@/components/SidebarLayout';
 const ChatInternoPage = () => {
   return (
     <SidebarLayout>
-      <ChatInterno />
+      <div className="brand-background min-h-full">
+        <ChatInterno />
+      </div>
     </SidebarLayout>
   );
 };

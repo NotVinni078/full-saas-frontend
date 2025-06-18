@@ -36,11 +36,11 @@ const menuItems = [
 const Sidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, onLogout }: SidebarProps) => {
   return (
     <div className={cn(
-      "bg-card border-r border-border flex flex-col transition-all duration-300",
+      "brand-card border-r brand-border flex flex-col transition-all duration-300",
       isCollapsed ? "w-16" : "w-64"
     )}>
       {/* Header */}
-      <div className="p-4 border-b border-border flex items-center justify-between">
+      <div className="p-4 border-b brand-border flex items-center justify-between">
         {!isCollapsed && (
           <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             SaasFlow
@@ -69,8 +69,8 @@ const Sidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, onL
               className={cn(
                 "w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors",
                 isActive 
-                  ? "bg-primary text-primary-foreground" 
-                  : "text-foreground hover:bg-accent hover:text-accent-foreground",
+                  ? "brand-primary" 
+                  : "brand-text-foreground brand-hover-accent",
                 isCollapsed && "justify-center"
               )}
             >
@@ -82,15 +82,15 @@ const Sidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, onL
       </nav>
 
       {/* User section */}
-      <div className="p-4 border-t border-border">
+      <div className="p-4 border-t brand-border">
         {!isCollapsed && (
           <div className="flex items-center space-x-3 mb-3">
-            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold">
+            <div className="w-8 h-8 brand-primary rounded-full flex items-center justify-center font-semibold">
               U
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">Usuário</p>
-              <p className="text-xs text-muted-foreground truncate">usuario@exemplo.com</p>
+              <p className="text-sm font-medium brand-text-foreground truncate">Usuário</p>
+              <p className="text-xs brand-text-muted truncate">usuario@exemplo.com</p>
             </div>
           </div>
         )}

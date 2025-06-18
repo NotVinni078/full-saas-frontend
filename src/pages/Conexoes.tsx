@@ -6,7 +6,9 @@ import SidebarLayout from '@/components/SidebarLayout';
 const ConexoesPage = () => {
   return (
     <SidebarLayout>
-      <Conexoes />
+      <div className="brand-background min-h-full">
+        <Conexoes />
+      </div>
     </SidebarLayout>
   );
 };

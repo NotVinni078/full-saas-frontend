@@ -64,20 +64,22 @@ const ChatBot = () => {
 
   return (
     <SidebarLayout>
-      {currentView === 'list' ? (
-        <FluxosList 
-          fluxos={fluxos} 
-          onCreateFluxo={handleCreateFluxo}
-          onEditFluxo={handleEditFluxo}
-          onDeleteFluxo={(id) => setFluxos(fluxos.filter(f => f.id !== id))}
-        />
-      ) : (
-        <FluxoEditor 
-          fluxo={selectedFluxo}
-          onSave={handleSaveFluxo}
-          onBack={handleBackToList}
-        />
-      )}
+      <div className="brand-background min-h-full">
+        {currentView === 'list' ? (
+          <FluxosList 
+            fluxos={fluxos} 
+            onCreateFluxo={handleCreateFluxo}
+            onEditFluxo={handleEditFluxo}
+            onDeleteFluxo={(id) => setFluxos(fluxos.filter(f => f.id !== id))}
+          />
+        ) : (
+          <FluxoEditor 
+            fluxo={selectedFluxo}
+            onSave={handleSaveFluxo}
+            onBack={handleBackToList}
+          />
+        )}
+      </div>
     </SidebarLayout>
   );
 };
