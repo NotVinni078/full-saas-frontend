@@ -82,16 +82,16 @@ const MenuNode = memo(({ data, id }: any) => {
         
         <Handle
           type="target"
-          position={Position.Top}
+          position={Position.Left}
           className="w-3 h-3 bg-purple-500 border-2 border-white"
         />
         {options.map((_, index) => (
           <Handle
             key={index}
             type="source"
-            position={Position.Bottom}
+            position={Position.Right}
             id={`option-${index}`}
-            style={{ left: `${20 + (index * 60)}%` }}
+            style={{ top: `${30 + (index * 20)}%` }}
             className="w-3 h-3 bg-purple-500 border-2 border-white"
           />
         ))}
