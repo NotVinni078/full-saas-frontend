@@ -1,11 +1,11 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowRightLeft, X, Users, Clock, MessageSquare } from 'lucide-react';
+import { Input } from "@/components/ui/input";
+import { ArrowRightLeft, X, Search, Users, Clock, MessageSquare } from 'lucide-react';
 
 interface Atendimento {
   id: string;
@@ -27,6 +27,8 @@ interface Usuario {
 }
 
 const PainelAtendimentos = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+
   const usuarios: Usuario[] = [
     {
       id: '1',
@@ -289,6 +291,11 @@ const PainelAtendimentos = () => {
     console.log(`Fechando todos os atendimentos do usuário ${usuarioId}`);
   };
 
+  const filteredUsuarios = usuarios.filter(usuario =>
+    usuario.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    usuario.departamento.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const totalAtendimentos = usuarios.reduce((total, usuario) => total + usuario.atendimentos.length, 0);
 
   return (
@@ -299,21 +306,22 @@ const PainelAtendimentos = () => {
           <h1 className="text-2xl font-bold text-card-foreground">Painel de Atendimentos</h1>
           <p className="text-muted-foreground">Monitore todos os atendimentos em andamento</p>
         </div>
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <Users className="h-5 w-5 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">{usuarios.length} agentes</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <MessageSquare className="h-5 w-5 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">{totalAtendimentos} atendimentos</span>
-          </div>
+        
+        {/* Search Bar */}
+        <div className="relative w-80">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Pesquisar por usuário ou departamento..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
         </div>
       </div>
 
       {/* Grid de Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {usuarios.map((usuario) => (
+        {filteredUsuarios.map((usuario) => (
           <Card key={usuario.id} className="flex flex-col h-[500px]">
             <CardHeader className="pb-3">
               <div className="flex items-center space-x-3">
@@ -425,6 +433,13 @@ const PainelAtendimentos = () => {
           </Card>
         ))}
       </div>
+
+      {/* Mensagem quando não há resultados */}
+      {filteredUsuarios.length === 0 && searchTerm && (
+        <div className="text-center py-8">
+          <p className="text-muted-foreground">Nenhum usuário encontrado para "{searchTerm}"</p>
+        </div>
+      )}
     </div>
   );
 };
