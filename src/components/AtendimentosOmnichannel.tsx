@@ -34,7 +34,8 @@ import {
   PenOff,
   Zap,
   NotebookPen,
-  IdCard
+  IdCard,
+  Star
 } from 'lucide-react';
 import {
   Tooltip,
@@ -170,7 +171,7 @@ const AtendimentosOmnichannel = () => {
   const [conversaSelecionada, setConversaSelecionada] = useState<string>('');
   const [mensagens, setMensagens] = useState<Mensagem[]>(mensagensExemplo);
   const [novaMensagem, setNovaMensagem] = useState('');
-  const [filtroStatus, setFiltroStatus] = useState<string>('todos');
+  const [filtroStatus, setFiltroStatus] = useState<string>('atendendo'); // Mudança aqui: padrão "atendendo"
   const [filtroTipo, setFiltroTipo] = useState<string>('todos');
   const [busca, setBusca] = useState('');
   const [showChatMobile, setShowChatMobile] = useState(false);
@@ -314,6 +315,16 @@ const AtendimentosOmnichannel = () => {
               </TooltipTrigger>
               <TooltipContent>
                 <p>Retornar a Aguardando</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-6 w-6">
+                  <Star className="h-3 w-3" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Enviar pesquisa de satisfação</p>
               </TooltipContent>
             </Tooltip>
             <Tooltip>
@@ -733,6 +744,17 @@ const AtendimentosOmnichannel = () => {
 
                   <Tooltip>
                     <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <Star className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Enviar pesquisa de satisfação</p>
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
                       <Button 
                         variant="ghost" 
                         size="icon"
@@ -772,6 +794,10 @@ const AtendimentosOmnichannel = () => {
                         <Button variant="outline" className="w-full justify-start">
                           <ClockArrowDown className="h-4 w-4 mr-2" />
                           Retornar a aguardando
+                        </Button>
+                        <Button variant="outline" className="w-full justify-start">
+                          <Star className="h-4 w-4 mr-2" />
+                          Enviar pesquisa de satisfação
                         </Button>
                         <Button variant="outline" className="w-full justify-start">
                           <CircleCheckBig className="h-4 w-4 mr-2" />
