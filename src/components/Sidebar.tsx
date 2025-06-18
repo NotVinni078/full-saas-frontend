@@ -36,14 +36,13 @@ const menuItems = [
 const Sidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, onLogout }: SidebarProps) => {
   return (
     <div className={cn(
-      "bg-background border-r border-border flex flex-col transition-all duration-300",
-      "dark:bg-background dark:border-border",
+      "bg-card border-r border-border flex flex-col transition-all duration-300",
       isCollapsed ? "w-16" : "w-64"
     )}>
       {/* Header */}
-      <div className="p-4 border-b border-border flex items-center justify-between bg-background dark:bg-background">
+      <div className="p-4 border-b border-border flex items-center justify-between">
         {!isCollapsed && (
-          <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+          <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             SaasFlow
           </h1>
         )}
@@ -58,7 +57,7 @@ const Sidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, onL
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2 bg-background dark:bg-background">
+      <nav className="flex-1 p-4 space-y-2">
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isActive = currentPage === item.id;
@@ -70,8 +69,8 @@ const Sidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, onL
               className={cn(
                 "w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors",
                 isActive 
-                  ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white" 
-                  : "text-foreground hover:bg-accent dark:hover:bg-accent",
+                  ? "bg-primary text-primary-foreground" 
+                  : "text-foreground hover:bg-accent hover:text-accent-foreground",
                 isCollapsed && "justify-center"
               )}
             >
@@ -83,10 +82,10 @@ const Sidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, onL
       </nav>
 
       {/* User section */}
-      <div className="p-4 border-t border-border bg-background dark:bg-background">
+      <div className="p-4 border-t border-border">
         {!isCollapsed && (
           <div className="flex items-center space-x-3 mb-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
+            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold">
               U
             </div>
             <div className="flex-1 min-w-0">

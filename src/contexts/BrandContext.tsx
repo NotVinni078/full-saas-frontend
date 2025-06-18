@@ -9,7 +9,7 @@ interface BrandColors {
   foreground: string;
   muted: string;
   border: string;
-  // Novas cores de status
+  // Cores de status
   success: string;
   warning: string;
   error: string;
@@ -201,7 +201,7 @@ export const BrandProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     root.style.setProperty('--muted', colors.muted);
     root.style.setProperty('--border', colors.border);
     
-    // Apply new status colors
+    // Apply status colors
     root.style.setProperty('--success', colors.success);
     root.style.setProperty('--warning', colors.warning);
     root.style.setProperty('--error', colors.error);
