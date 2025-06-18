@@ -35,8 +35,8 @@ const AnunciosSlider = ({ items, onCardClick, title, icon, showDeleteButton = fa
 
   const getTypeColor = (tipo: string) => {
     return tipo === 'Nota de Atualização' 
-      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-      : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      ? 'brand-info brand-text-background'
+      : 'brand-success brand-text-background';
   };
 
   const handleDelete = (e: React.MouseEvent, item: CardData) => {
@@ -55,7 +55,7 @@ const AnunciosSlider = ({ items, onCardClick, title, icon, showDeleteButton = fa
       {title && (
         <div className="flex items-center space-x-2">
           {icon}
-          <h2 className="text-2xl font-semibold text-foreground">{title}</h2>
+          <h2 className="text-2xl font-semibold brand-text-foreground">{title}</h2>
         </div>
       )}
       
@@ -64,14 +64,14 @@ const AnunciosSlider = ({ items, onCardClick, title, icon, showDeleteButton = fa
           {items.map((item) => (
             <CarouselItem key={item.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
               <Card 
-                className="hover:shadow-md transition-shadow duration-200 cursor-pointer h-full relative overflow-hidden"
+                className="hover:shadow-md transition-shadow duration-200 cursor-pointer h-full relative overflow-hidden brand-card"
                 onClick={() => onCardClick(item)}
               >
                 {showDeleteButton && (
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="absolute top-2 right-2 h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50 z-10"
+                    className="absolute top-2 right-2 h-8 w-8 brand-text-error brand-hover-text-error brand-hover-error z-10"
                     onClick={(e) => handleDelete(e, item)}
                   >
                     <Trash className="h-4 w-4" />
@@ -104,11 +104,11 @@ const AnunciosSlider = ({ items, onCardClick, title, icon, showDeleteButton = fa
                       </span>
                     </div>
                   </div>
-                  <CardTitle className="text-lg line-clamp-2">{item.titulo}</CardTitle>
+                  <CardTitle className="text-lg line-clamp-2 brand-text-foreground">{item.titulo}</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <p className="text-sm text-muted-foreground mb-3 line-clamp-3">{item.descricao}</p>
-                  <p className="text-xs text-muted-foreground">{item.data}</p>
+                  <p className="text-sm brand-text-muted mb-3 line-clamp-3">{item.descricao}</p>
+                  <p className="text-xs brand-text-muted">{item.data}</p>
                 </CardContent>
               </Card>
             </CarouselItem>

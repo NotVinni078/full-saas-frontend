@@ -90,27 +90,27 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
           className="w-full h-full object-cover opacity-80 transition-transform duration-700 hover:scale-105"
         />
         <div className="absolute inset-0 bg-black/40"></div>
-        <div className="absolute bottom-8 left-8 text-white">
+        <div className="absolute bottom-8 left-8 brand-text-background">
           <h2 className="text-3xl font-bold mb-2">Gerencie seu negócio</h2>
           <p className="text-lg opacity-90">com inteligência e eficiência</p>
         </div>
       </div>
 
       {/* Lado direito - Formulário */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50 dark:bg-black transition-colors duration-300">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 brand-gray-50 dark:brand-background transition-colors duration-300">
         <div className="w-full max-w-md">
           {/* Logo e Nome da Empresa */}
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-black dark:bg-white rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-white dark:text-black font-bold text-xl">SF</span>
+            <div className="w-16 h-16 brand-primary dark:brand-background rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="brand-text-background dark:brand-text-foreground font-bold text-xl">SF</span>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-2xl font-bold brand-text-foreground">
               {t.companyName}
             </h1>
           </div>
 
           {/* Formulário */}
-          <Card className="border-0 shadow-lg dark:bg-gray-900">
+          <Card className="border-0 shadow-lg dark:brand-gray-900">
             <CardHeader className="text-center pb-6 relative">
               {/* Botões de tema e idioma */}
               <div className="absolute top-4 right-4 flex space-x-2">
@@ -118,7 +118,7 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
                   variant="outline"
                   size="icon"
                   onClick={toggleTheme}
-                  className="h-8 w-8 dark:border-gray-600 dark:hover:bg-gray-700"
+                  className="h-8 w-8 dark:brand-border-gray-600 dark:brand-hover-gray-700"
                 >
                   {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
                 </Button>
@@ -128,68 +128,68 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
                     <Button
                       variant="outline"
                       size="icon"
-                      className="h-8 w-8 dark:border-gray-600 dark:hover:bg-gray-700"
+                      className="h-8 w-8 dark:brand-border-gray-600 dark:brand-hover-gray-700"
                     >
                       <span className="text-sm">{currentLang?.flag}</span>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48 bg-white dark:bg-gray-800 border dark:border-gray-700">
+                  <DropdownMenuContent align="end" className="w-48 brand-background dark:brand-gray-800 brand-border dark:brand-border-gray-700">
                     {languages.map((language) => (
                       <DropdownMenuItem
                         key={language.code}
                         onClick={() => setCurrentLanguage(language.code)}
-                        className="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                        className="flex items-center space-x-2 cursor-pointer brand-hover-gray-100 dark:brand-hover-gray-700"
                       >
                         <span className="text-lg">{language.flag}</span>
-                        <span className="text-sm dark:text-white">{language.name}</span>
+                        <span className="text-sm dark:brand-text-background">{language.name}</span>
                       </DropdownMenuItem>
                     ))}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
               
-              <CardTitle className="text-2xl text-gray-900 dark:text-white">
+              <CardTitle className="text-2xl brand-text-foreground">
                 {t.welcome}
               </CardTitle>
-              <CardDescription className="text-gray-600 dark:text-gray-400">
+              <CardDescription className="brand-text-muted">
                 {t.loginDesc}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-gray-700 dark:text-gray-300">
+                  <Label htmlFor="email" className="brand-text-foreground">
                     {t.email}
                   </Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Mail className="absolute left-3 top-3 h-4 w-4 brand-text-muted" />
                     <Input
                       id="email"
                       type="email"
                       placeholder="seu@email.com"
-                      className="pl-10 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                      className="pl-10 dark:brand-gray-800 dark:brand-border-gray-600 dark:brand-text-background"
                       required
                     />
                   </div>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-gray-700 dark:text-gray-300">
+                  <Label htmlFor="password" className="brand-text-foreground">
                     {t.password}
                   </Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Lock className="absolute left-3 top-3 h-4 w-4 brand-text-muted" />
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
-                      className="pl-10 pr-10 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                      className="pl-10 pr-10 dark:brand-gray-800 dark:brand-border-gray-600 dark:brand-text-background"
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                      className="absolute right-3 top-3 brand-text-muted brand-hover-text-foreground"
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -199,7 +199,7 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
                 <div className="flex justify-end">
                   <button
                     type="button"
-                    className="text-sm text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors"
+                    className="text-sm brand-text-muted hover:brand-text-foreground transition-colors"
                   >
                     {t.forgotPassword}
                   </button>
@@ -207,7 +207,7 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
 
                 <Button
                   type="submit"
-                  className="w-full bg-black hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-black"
+                  className="w-full brand-primary brand-hover-primary brand-text-background"
                   disabled={isLoading}
                 >
                   {isLoading ? t.logging : t.login}
@@ -216,7 +216,7 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
             </CardContent>
           </Card>
 
-          <p className="text-center text-gray-500 dark:text-gray-400 text-sm mt-8">
+          <p className="text-center brand-text-muted text-sm mt-8">
             © 2024 SaasFlow. Todos os direitos reservados.
           </p>
         </div>
