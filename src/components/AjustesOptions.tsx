@@ -6,11 +6,12 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { MessageCircleQuestion } from 'lucide-react';
+import { useAjustes } from '@/pages/Ajustes';
 
 const AjustesOptions = () => {
+  const { agendamentoTipo, setAgendamentoTipo } = useAjustes();
   const [lgpdEnabled, setLgpdEnabled] = useState(true);
   const [npsEvaluation, setNpsEvaluation] = useState('manual');
-  const [agendamentoTipo, setAgendamentoTipo] = useState('empresa');
   const [mensagemAceitar, setMensagemAceitar] = useState(false);
   const [historicoMensagens, setHistoricoMensagens] = useState('completo');
   const [ignorarGrupos, setIgnorarGrupos] = useState(true);

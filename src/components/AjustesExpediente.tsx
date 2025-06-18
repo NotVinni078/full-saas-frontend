@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import HorariosTrabalho from './HorariosTrabalho';
+import { useAjustes } from '@/pages/Ajustes';
 
 interface HorarioTrabalho {
   ativo: boolean;
@@ -15,7 +16,7 @@ interface Setor {
 }
 
 const AjustesExpediente = () => {
-  const [tipoAgendamento, setTipoAgendamento] = useState<'empresa' | 'setor' | 'cargo'>('empresa');
+  const { agendamentoTipo } = useAjustes();
   const [horariosEmpresa, setHorariosEmpresa] = useState<Record<string, HorarioTrabalho>>({});
   const [setores, setSetores] = useState<Setor[]>([]);
   const [horariosCargos, setHorariosCargos] = useState<Record<string, Record<string, HorarioTrabalho>>>({});
@@ -50,13 +51,6 @@ const AjustesExpediente = () => {
     });
   }, []);
 
-  // Buscar tipo de agendamento das opções (simulado)
-  useEffect(() => {
-    // Aqui você buscaria o valor real das opções
-    // Por agora, usamos um valor padrão
-    setTipoAgendamento('empresa');
-  }, []);
-
   const handleHorarioEmpresaChange = (dia: string, horario: HorarioTrabalho) => {
     setHorariosEmpresa(prev => ({
       ...prev,
@@ -83,7 +77,7 @@ const AjustesExpediente = () => {
   };
 
   const renderContent = () => {
-    switch (tipoAgendamento) {
+    switch (agendamentoTipo) {
       case 'empresa':
         return (
           <HorariosTrabalho
@@ -133,7 +127,7 @@ const AjustesExpediente = () => {
       <div>
         <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-2">Expediente</h1>
         <p className="text-muted-foreground text-sm sm:text-base">
-          Configure os horários de expediente baseado no tipo selecionado em Opções: <span className="font-semibold capitalize">{tipoAgendamento}</span>
+          Configure os horários de expediente baseado no tipo selecionado em Opções: <span className="font-semibold capitalize">{agendamentoTipo}</span>
         </p>
       </div>
       
