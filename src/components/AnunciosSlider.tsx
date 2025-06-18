@@ -2,7 +2,9 @@
 import React from 'react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Bell } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { FileText, Bell, Trash } from 'lucide-react';
+import { useAnuncios } from '@/contexts/AnunciosContext';
 
 interface CardData {
   id: number;
@@ -17,9 +19,12 @@ interface AnunciosSliderProps {
   onCardClick: (card: CardData) => void;
   title: string;
   icon: React.ReactNode;
+  showDeleteButton?: boolean;
 }
 
-const AnunciosSlider = ({ items, onCardClick, title, icon }: AnunciosSliderProps) => {
+const AnunciosSlider = ({ items, onCardClick, title, icon, showDeleteButton = false }: AnunciosSliderProps) => {
+  const { deleteAnuncio, deleteNotaAtualizacao } = useAnuncios();
+
   const getIcon = (tipo: string) => {
     return tipo === 'Nota de Atualização' ? <FileText className="h-5 w-5" /> : <Bell className="h-5 w-5" />;
   };
@@ -30,23 +35,46 @@ const AnunciosSlider = ({ items, onCardClick, title, icon }: AnunciosSliderProps
       : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
   };
 
+  const handleDelete = (e: React.MouseEvent, item: CardData) => {
+    e.stopPropagation();
+    if (confirm(`Tem certeza que deseja excluir "${item.titulo}"?`)) {
+      if (item.tipo === 'Nota de Atualização') {
+        deleteNotaAtualizacao(item.id);
+      } else {
+        deleteAnuncio(item.id);
+      }
+    }
+  };
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center space-x-2">
-        {icon}
-        <h2 className="text-2xl font-semibold text-foreground">{title}</h2>
-      </div>
+      {title && (
+        <div className="flex items-center space-x-2">
+          {icon}
+          <h2 className="text-2xl font-semibold text-foreground">{title}</h2>
+        </div>
+      )}
       
       <Carousel className="w-full">
         <CarouselContent className="-ml-2 md:-ml-4">
           {items.map((item) => (
             <CarouselItem key={item.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
               <Card 
-                className="hover:shadow-md transition-shadow duration-200 cursor-pointer h-full"
+                className="hover:shadow-md transition-shadow duration-200 cursor-pointer h-full relative"
                 onClick={() => onCardClick(item)}
               >
+                {showDeleteButton && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-2 right-2 h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50 z-10"
+                    onClick={(e) => handleDelete(e, item)}
+                  >
+                    <Trash className="h-4 w-4" />
+                  </Button>
+                )}
                 <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-start justify-between pr-8">
                     <div className="flex items-center space-x-2">
                       {getIcon(item.tipo)}
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(item.tipo)}`}>

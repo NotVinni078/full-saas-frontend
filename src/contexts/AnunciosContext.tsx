@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 
 interface CardData {
@@ -14,6 +13,8 @@ interface AnunciosContextType {
   anuncios: CardData[];
   addAnuncio: (anuncio: Omit<CardData, 'id'>) => void;
   addNotaAtualizacao: (nota: Omit<CardData, 'id'>) => void;
+  deleteAnuncio: (id: number) => void;
+  deleteNotaAtualizacao: (id: number) => void;
 }
 
 const AnunciosContext = createContext<AnunciosContextType | undefined>(undefined);
@@ -105,11 +106,21 @@ export const AnunciosProvider = ({ children }: AnunciosProviderProps) => {
     setNotasAtualizacao(prev => [newNota, ...prev]);
   };
 
+  const deleteAnuncio = (id: number) => {
+    setAnuncios(prev => prev.filter(anuncio => anuncio.id !== id));
+  };
+
+  const deleteNotaAtualizacao = (id: number) => {
+    setNotasAtualizacao(prev => prev.filter(nota => nota.id !== id));
+  };
+
   const value = {
     notasAtualizacao,
     anuncios,
     addAnuncio,
-    addNotaAtualizacao
+    addNotaAtualizacao,
+    deleteAnuncio,
+    deleteNotaAtualizacao
   };
 
   return (

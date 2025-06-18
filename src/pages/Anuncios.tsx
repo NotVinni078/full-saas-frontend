@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Bell, FileText, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import SidebarLayout from '@/components/SidebarLayout';
 import AnunciosSlider from '@/components/AnunciosSlider';
 import CardModal from '@/components/CardModal';
@@ -57,42 +58,39 @@ const AnunciosContent = () => {
         </Button>
       </div>
 
-      {/* Estatísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-card border rounded-lg p-4">
-          <div className="flex items-center space-x-2">
-            <FileText className="h-5 w-5 text-blue-600" />
-            <span className="font-medium">Notas de Atualização</span>
-          </div>
-          <p className="text-2xl font-bold mt-2">{notasAtualizacao.length}</p>
-          <p className="text-sm text-muted-foreground">Total de notas publicadas</p>
-        </div>
-        
-        <div className="bg-card border rounded-lg p-4">
-          <div className="flex items-center space-x-2">
-            <Bell className="h-5 w-5 text-green-600" />
-            <span className="font-medium">Anúncios</span>
-          </div>
-          <p className="text-2xl font-bold mt-2">{anuncios.length}</p>
-          <p className="text-sm text-muted-foreground">Total de anúncios publicados</p>
-        </div>
-      </div>
+      {/* Navigation Tabs */}
+      <Tabs defaultValue="anuncios" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="anuncios" className="flex items-center space-x-2">
+            <Bell className="h-4 w-4" />
+            <span>Anúncios</span>
+          </TabsTrigger>
+          <TabsTrigger value="notas" className="flex items-center space-x-2">
+            <FileText className="h-4 w-4" />
+            <span>Notas de Atualização</span>
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Notas de Atualização */}
-      <AnunciosSlider
-        items={notasAtualizacao}
-        onCardClick={handleCardClick}
-        title="Notas de Atualização"
-        icon={<FileText className="h-6 w-6 text-blue-600" />}
-      />
+        <TabsContent value="anuncios" className="space-y-4">
+          <AnunciosSlider
+            items={anuncios}
+            onCardClick={handleCardClick}
+            title="Anúncios"
+            icon={<Bell className="h-6 w-6 text-green-600" />}
+            showDeleteButton={true}
+          />
+        </TabsContent>
 
-      {/* Anúncios */}
-      <AnunciosSlider
-        items={anuncios}
-        onCardClick={handleCardClick}
-        title="Anúncios"
-        icon={<Bell className="h-6 w-6 text-green-600" />}
-      />
+        <TabsContent value="notas" className="space-y-4">
+          <AnunciosSlider
+            items={notasAtualizacao}
+            onCardClick={handleCardClick}
+            title="Notas de Atualização"
+            icon={<FileText className="h-6 w-6 text-blue-600" />}
+            showDeleteButton={true}
+          />
+        </TabsContent>
+      </Tabs>
 
       {/* Modal de visualização de card */}
       <CardModal
