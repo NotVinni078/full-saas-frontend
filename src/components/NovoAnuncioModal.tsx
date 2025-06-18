@@ -42,7 +42,6 @@ const NovoAnuncioModal = ({ isOpen, onClose }: NovoAnuncioModalProps) => {
   const [formData, setFormData] = useState({
     titulo: '',
     descricao: '',
-    tipo: '',
     categoria: '', // 'anuncio' ou 'nota-atualizacao'
     icone: 'FileText'
   });
@@ -51,7 +50,7 @@ const NovoAnuncioModal = ({ isOpen, onClose }: NovoAnuncioModalProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.titulo || !formData.descricao || !formData.tipo || !formData.categoria) {
+    if (!formData.titulo || !formData.descricao || !formData.categoria) {
       alert('Por favor, preencha todos os campos obrigatórios.');
       return;
     }
@@ -64,7 +63,7 @@ const NovoAnuncioModal = ({ isOpen, onClose }: NovoAnuncioModalProps) => {
         month: 'long', 
         year: 'numeric' 
       }),
-      tipo: formData.tipo
+      tipo: formData.categoria === 'anuncio' ? 'Anúncio' : 'Nota de Atualização'
     };
 
     if (formData.categoria === 'anuncio') {
@@ -77,7 +76,6 @@ const NovoAnuncioModal = ({ isOpen, onClose }: NovoAnuncioModalProps) => {
     setFormData({
       titulo: '',
       descricao: '',
-      tipo: '',
       categoria: '',
       icone: 'FileText'
     });
@@ -137,34 +135,6 @@ const NovoAnuncioModal = ({ isOpen, onClose }: NovoAnuncioModalProps) => {
               <SelectContent>
                 <SelectItem value="nota-atualizacao">Nota de Atualização</SelectItem>
                 <SelectItem value="anuncio">Anúncio</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Tipo */}
-          <div className="space-y-2">
-            <Label htmlFor="tipo">Tipo *</Label>
-            <Select 
-              value={formData.tipo} 
-              onValueChange={(value) => setFormData(prev => ({ ...prev, tipo: value }))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione o tipo" />
-              </SelectTrigger>
-              <SelectContent>
-                {formData.categoria === 'nota-atualizacao' ? (
-                  <>
-                    <SelectItem value="Atualização">Atualização</SelectItem>
-                    <SelectItem value="Manutenção">Manutenção</SelectItem>
-                    <SelectItem value="Recurso">Recurso</SelectItem>
-                  </>
-                ) : (
-                  <>
-                    <SelectItem value="Evento">Evento</SelectItem>
-                    <SelectItem value="Produto">Produto</SelectItem>
-                    <SelectItem value="Parceria">Parceria</SelectItem>
-                  </>
-                )}
               </SelectContent>
             </Select>
           </div>
