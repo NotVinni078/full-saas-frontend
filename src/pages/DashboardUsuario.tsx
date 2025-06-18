@@ -1,9 +1,14 @@
 
 import React from 'react';
 import Dashboard from '@/components/Dashboard';
+import SidebarLayout from '@/components/SidebarLayout';
 
 const DashboardUsuario = () => {
-  return <Dashboard currentPage="dashboard-usuario" />;
+  return (
+    <SidebarLayout>
+      <Dashboard currentPage="dashboard-usuario" />
+    </SidebarLayout>
+  );
 };
 
 export default DashboardUsuario;

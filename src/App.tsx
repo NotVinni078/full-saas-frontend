@@ -21,6 +21,17 @@ import Conexoes from "./pages/Conexoes";
 import DashboardGerencial from "./pages/DashboardGerencial";
 import DashboardAdmin from "./pages/DashboardAdmin";
 import DashboardUsuario from "./pages/DashboardUsuario";
+import Avaliacao from "./pages/Avaliacao";
+import GestaoSetores from "./pages/GestaoSetores";
+import AdminEmpresas from "./pages/AdminEmpresas";
+import Faturas from "./pages/Faturas";
+import Planos from "./pages/Planos";
+import GestaoPlanos from "./pages/GestaoPlanos";
+import ChatBot from "./pages/ChatBot";
+import Documentacao from "./pages/Documentacao";
+import Ajustes from "./pages/Ajustes";
+import GerenciarMarca from "./pages/GerenciarMarca";
+import Integracoes from "./pages/Integracoes";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,6 +60,17 @@ const App = () => (
           <Route path="/dashboard-gerencial" element={<DashboardGerencial />} />
           <Route path="/dashboard-admin" element={<DashboardAdmin />} />
           <Route path="/dashboard-usuario" element={<DashboardUsuario />} />
+          <Route path="/avaliacao" element={<Avaliacao />} />
+          <Route path="/gestao-setores" element={<GestaoSetores />} />
+          <Route path="/admin-empresas" element={<AdminEmpresas />} />
+          <Route path="/faturas" element={<Faturas />} />
+          <Route path="/planos" element={<Planos />} />
+          <Route path="/gestao-planos" element={<GestaoPlanos />} />
+          <Route path="/chatbot" element={<ChatBot />} />
+          <Route path="/documentacao" element={<Documentacao />} />
+          <Route path="/ajustes" element={<Ajustes />} />
+          <Route path="/gerenciar-marca" element={<GerenciarMarca />} />
+          <Route path="/integracoes" element={<Integracoes />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

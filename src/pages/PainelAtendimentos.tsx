@@ -1,9 +1,14 @@
 
 import React from 'react';
 import PainelAtendimentos from '@/components/PainelAtendimentos';
+import SidebarLayout from '@/components/SidebarLayout';
 
 const PainelAtendimentosPage = () => {
-  return <PainelAtendimentos />;
+  return (
+    <SidebarLayout>
+      <PainelAtendimentos />
+    </SidebarLayout>
+  );
 };
 
 export default PainelAtendimentosPage;
