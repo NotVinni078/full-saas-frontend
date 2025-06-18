@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -112,28 +113,28 @@ const RespostasRapidas = () => {
   };
   const contadores = contarRespostas();
   return (
-    <div className="p-4 lg:p-6 space-y-4 lg:space-y-6 min-h-screen bg-background">
+    <div className="p-4 lg:p-6 space-y-4 lg:space-y-6 min-h-screen brand-background">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl lg:text-2xl font-bold text-foreground">Respostas Rápidas</h1>
-          <p className="text-muted-foreground mt-1 text-sm lg:text-base">Gerencie mensagens pré-definidas para atendimento</p>
+          <h1 className="text-xl lg:text-2xl font-bold brand-text-foreground">Respostas Rápidas</h1>
+          <p className="brand-text-muted mt-1 text-sm lg:text-base">Gerencie mensagens pré-definidas para atendimento</p>
         </div>
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-foreground hover:bg-foreground/90 text-background w-full sm:w-auto">
+            <Button className="brand-primary brand-hover-primary brand-text-background w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
               Criar Resposta Rápida
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px] mx-4 bg-card border-border">
+          <DialogContent className="sm:max-w-[500px] mx-4 brand-card brand-border">
             <DialogHeader>
-              <DialogTitle className="text-card-foreground">Criar Nova Resposta Rápida</DialogTitle>
+              <DialogTitle className="brand-text-foreground">Criar Nova Resposta Rápida</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="titulo" className="text-card-foreground">Título da Resposta Rápida</Label>
+                <Label htmlFor="titulo" className="brand-text-foreground">Título da Resposta Rápida</Label>
                 <Input 
                   id="titulo" 
                   value={novaResposta.titulo} 
@@ -142,12 +143,12 @@ const RespostasRapidas = () => {
                     titulo: e.target.value
                   })} 
                   placeholder="Digite o título da resposta" 
-                  className="bg-background border-border text-foreground placeholder-muted-foreground" 
+                  className="brand-background brand-border brand-text-foreground brand-placeholder-muted" 
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="atalho" className="text-card-foreground">Atalho da Resposta Rápida</Label>
+                <Label htmlFor="atalho" className="brand-text-foreground">Atalho da Resposta Rápida</Label>
                 <Input 
                   id="atalho" 
                   value={novaResposta.atalho} 
@@ -156,12 +157,12 @@ const RespostasRapidas = () => {
                     atalho: e.target.value
                   })} 
                   placeholder="/atalho" 
-                  className="bg-background border-border text-foreground placeholder-muted-foreground" 
+                  className="brand-background brand-border brand-text-foreground brand-placeholder-muted" 
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="conteudo" className="text-card-foreground">Conteúdo da Resposta Rápida</Label>
+                <Label htmlFor="conteudo" className="brand-text-foreground">Conteúdo da Resposta Rápida</Label>
                 <Textarea 
                   id="conteudo" 
                   value={novaResposta.conteudo} 
@@ -171,7 +172,7 @@ const RespostasRapidas = () => {
                   })} 
                   placeholder="Digite o conteúdo da mensagem" 
                   rows={4} 
-                  className="bg-background border-border text-foreground placeholder-muted-foreground" 
+                  className="brand-background brand-border brand-text-foreground brand-placeholder-muted" 
                 />
               </div>
               
@@ -179,7 +180,7 @@ const RespostasRapidas = () => {
                 <Button 
                   variant="outline" 
                   onClick={() => setIsDialogOpen(false)} 
-                  className="w-full sm:w-auto border-border text-foreground hover:bg-accent"
+                  className="w-full sm:w-auto brand-border brand-text-foreground brand-hover-accent"
                 >
                   Descartar
                 </Button>
@@ -193,14 +194,14 @@ const RespostasRapidas = () => {
                       visivelParaTodos: checked
                     })} 
                   />
-                  <Label htmlFor="visibility" className="text-card-foreground text-sm">
+                  <Label htmlFor="visibility" className="brand-text-foreground text-sm">
                     Visível para todos
                   </Label>
                 </div>
                 
                 <Button 
                   onClick={handleCriarResposta} 
-                  className="bg-foreground hover:bg-foreground/90 text-background w-full sm:w-auto"
+                  className="brand-primary brand-hover-primary brand-text-background w-full sm:w-auto"
                 >
                   Salvar
                 </Button>
@@ -213,12 +214,12 @@ const RespostasRapidas = () => {
       {/* Barra de pesquisa */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 brand-text-muted h-4 w-4" />
           <Input 
             placeholder="Buscar respostas rápidas..." 
             value={searchTerm} 
             onChange={e => setSearchTerm(e.target.value)} 
-            className="pl-10 bg-background border-border text-foreground placeholder-muted-foreground" 
+            className="pl-10 brand-background brand-border brand-text-foreground brand-placeholder-muted" 
           />
         </div>
       </div>
@@ -230,8 +231,8 @@ const RespostasRapidas = () => {
           onClick={() => setFiltroAtivo('minhas')} 
           className={`text-xs sm:text-sm ${
             filtroAtivo === 'minhas' 
-              ? 'bg-foreground hover:bg-foreground/90 text-background' 
-              : 'border-border text-foreground hover:bg-accent'
+              ? 'brand-primary brand-hover-primary brand-text-background' 
+              : 'brand-border brand-text-foreground brand-hover-accent'
           }`}
         >
           <MessageSquare className="h-4 w-4 mr-1" />
@@ -242,8 +243,8 @@ const RespostasRapidas = () => {
           onClick={() => setFiltroAtivo('todas')} 
           className={`text-xs sm:text-sm ${
             filtroAtivo === 'todas' 
-              ? 'bg-foreground hover:bg-foreground/90 text-background' 
-              : 'border-border text-foreground hover:bg-accent'
+              ? 'brand-primary brand-hover-primary brand-text-background' 
+              : 'brand-border brand-text-foreground brand-hover-accent'
           }`}
         >
           <MessageSquare className="h-4 w-4 mr-1" />
@@ -254,20 +255,20 @@ const RespostasRapidas = () => {
       {/* Lista de Respostas */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
         {filtrarRespostas().map(resposta => (
-          <Card key={resposta.id} className="bg-card border-border hover:shadow-lg transition-shadow">
+          <Card key={resposta.id} className="brand-card brand-border brand-hover-shadow transition-shadow">
             <CardHeader className="pb-3">
               <div className="flex justify-between items-start gap-2">
                 <div className="flex-1">
-                  <CardTitle className="text-card-foreground text-lg break-words">{resposta.titulo}</CardTitle>
+                  <CardTitle className="brand-text-foreground text-lg break-words">{resposta.titulo}</CardTitle>
                   <div className="flex items-center gap-2 mt-2">
-                    <Badge className="bg-muted text-muted-foreground border-border">
+                    <Badge className="brand-muted brand-text-muted brand-border">
                       <Hash className="h-3 w-3 mr-1" />
                       {resposta.atalho}
                     </Badge>
                     <Badge className={`${
                       resposta.visivelParaTodos 
-                        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' 
-                        : 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300'
+                        ? 'brand-success-subtle brand-text-success brand-border-success' 
+                        : 'brand-warning-subtle brand-text-warning brand-border-warning'
                     }`}>
                       {resposta.visivelParaTodos ? (
                         <Eye className="h-3 w-3 mr-1" />
@@ -283,7 +284,7 @@ const RespostasRapidas = () => {
                     variant="ghost" 
                     size="sm" 
                     onClick={() => handleEditarResposta(resposta.id)} 
-                    className="text-muted-foreground hover:text-foreground hover:bg-accent p-2"
+                    className="brand-text-muted brand-hover-text-foreground brand-hover-accent p-2"
                   >
                     <Edit className="h-4 w-4" />
                   </Button>
@@ -291,7 +292,7 @@ const RespostasRapidas = () => {
                     variant="ghost" 
                     size="sm" 
                     onClick={() => handleExcluirResposta(resposta.id)} 
-                    className="text-muted-foreground hover:text-destructive hover:bg-accent p-2"
+                    className="brand-text-muted brand-hover-text-error brand-hover-accent p-2"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -299,12 +300,12 @@ const RespostasRapidas = () => {
               </div>
             </CardHeader>
             <CardContent className="pt-0">
-              <p className="text-muted-foreground text-sm leading-relaxed break-words">
+              <p className="brand-text-muted text-sm leading-relaxed break-words">
                 {resposta.conteudo}
               </p>
-              <div className="mt-3 pt-3 border-t border-border">
-                <p className="text-xs text-muted-foreground">
-                  Criado por: <span className="text-foreground">{resposta.criadoPor}</span>
+              <div className="mt-3 pt-3 border-t brand-border">
+                <p className="text-xs brand-text-muted">
+                  Criado por: <span className="brand-text-foreground">{resposta.criadoPor}</span>
                 </p>
               </div>
             </CardContent>
@@ -313,12 +314,12 @@ const RespostasRapidas = () => {
       </div>
 
       {filtrarRespostas().length === 0 && (
-        <Card className="bg-card border-border">
+        <Card className="brand-card brand-border">
           <CardContent className="p-8 text-center">
-            <div className="text-muted-foreground">
+            <div className="brand-text-muted">
               <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p className="text-lg font-medium text-foreground">Nenhuma resposta rápida encontrada</p>
-              <p className="text-sm mt-1 text-muted-foreground">Tente ajustar os filtros ou criar uma nova resposta rápida</p>
+              <p className="text-lg font-medium brand-text-foreground">Nenhuma resposta rápida encontrada</p>
+              <p className="text-sm mt-1 brand-text-muted">Tente ajustar os filtros ou criar uma nova resposta rápida</p>
             </div>
           </CardContent>
         </Card>

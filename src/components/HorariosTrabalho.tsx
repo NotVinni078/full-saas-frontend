@@ -37,10 +37,10 @@ const HorariosTrabalho: React.FC<HorariosTrabalhoProps> = ({ titulo, horarios, o
   };
 
   return (
-    <Card className="bg-card border-border">
+    <Card className="brand-card brand-border">
       <CardHeader className="pb-3 sm:pb-6">
-        <CardTitle className="text-base sm:text-lg text-card-foreground">{titulo}</CardTitle>
-        <CardDescription className="text-xs sm:text-sm">
+        <CardTitle className="text-base sm:text-lg brand-text-foreground">{titulo}</CardTitle>
+        <CardDescription className="text-xs sm:text-sm brand-text-muted">
           Configure os horários de funcionamento para cada dia da semana
         </CardDescription>
       </CardHeader>
@@ -48,14 +48,14 @@ const HorariosTrabalho: React.FC<HorariosTrabalhoProps> = ({ titulo, horarios, o
         {diasSemana.map((dia) => (
           <div key={dia.key} className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label className="text-sm font-medium text-foreground">{dia.label}</Label>
+              <Label className="text-sm font-medium brand-text-foreground">{dia.label}</Label>
               <div className="flex items-center space-x-2">
                 <Switch
                   checked={horarios[dia.key]?.ativo || false}
                   onCheckedChange={(checked) => handleToggle(dia.key, checked)}
-                  className="data-[state=checked]:bg-foreground data-[state=unchecked]:bg-input"
+                  className="data-[state=checked]:brand-primary data-[state=unchecked]:brand-input"
                 />
-                <span className="text-xs text-muted-foreground">
+                <span className="text-xs brand-text-muted">
                   {horarios[dia.key]?.ativo ? 'Ativo' : 'Inativo'}
                 </span>
               </div>
@@ -64,7 +64,7 @@ const HorariosTrabalho: React.FC<HorariosTrabalhoProps> = ({ titulo, horarios, o
             {horarios[dia.key]?.ativo && (
               <div className="grid grid-cols-2 gap-4 pl-4">
                 <div className="space-y-2">
-                  <Label htmlFor={`${dia.key}-inicio`} className="text-xs text-muted-foreground">
+                  <Label htmlFor={`${dia.key}-inicio`} className="text-xs brand-text-muted">
                     Início
                   </Label>
                   <Input
@@ -76,7 +76,7 @@ const HorariosTrabalho: React.FC<HorariosTrabalhoProps> = ({ titulo, horarios, o
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor={`${dia.key}-fim`} className="text-xs text-muted-foreground">
+                  <Label htmlFor={`${dia.key}-fim`} className="text-xs brand-text-muted">
                     Fim
                   </Label>
                   <Input

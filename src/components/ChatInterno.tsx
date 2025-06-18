@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Search, Smile, Paperclip, UserPlus, ArrowLeft } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -438,10 +437,10 @@ const ChatInterno = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'online': return 'bg-green-500';
-      case 'away': return 'bg-yellow-500';
-      case 'offline': return 'bg-gray-400';
-      default: return 'bg-gray-400';
+      case 'online': return 'brand-success';
+      case 'away': return 'brand-warning';
+      case 'offline': return 'brand-muted';
+      default: return 'brand-muted';
     }
   };
 
@@ -459,42 +458,42 @@ const ChatInterno = () => {
   }, [currentMessages]);
 
   return (
-    <div className="h-full bg-background flex">
+    <div className="h-full brand-background flex">
       {/* Lista de Contatos - Mobile e Tablet: condicional, Desktop (lg+): sempre visível */}
-      <div className={`w-full lg:w-80 border-r border-border bg-card flex flex-col ${showChat ? 'hidden lg:flex' : 'flex'}`}>
+      <div className={`w-full lg:w-80 border-r brand-border brand-card flex flex-col ${showChat ? 'hidden lg:flex' : 'flex'}`}>
         {/* Header da lista */}
-        <div className="p-4 border-b border-border">
+        <div className="p-4 border-b brand-border">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-card-foreground">Chat Interno</h2>
+            <h2 className="text-lg font-semibold brand-text-foreground">Chat Interno</h2>
             <Dialog open={showNewChatDialog} onOpenChange={setShowNewChatDialog}>
               <DialogTrigger asChild>
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" className="brand-text-muted brand-hover-text-foreground">
                   <UserPlus className="h-4 w-4" />
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
+              <DialogContent className="sm:max-w-md brand-card brand-border">
                 <DialogHeader>
-                  <DialogTitle>Iniciar Nova Conversa</DialogTitle>
+                  <DialogTitle className="brand-text-foreground">Iniciar Nova Conversa</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-2 max-h-60 overflow-y-auto">
                   {availableUsers.map((user) => (
                     <button
                       key={user.id}
                       onClick={() => handleStartNewChat(user.id)}
-                      className="w-full p-3 rounded-lg text-left transition-colors hover:bg-muted flex items-center space-x-3"
+                      className="w-full p-3 rounded-lg text-left transition-colors brand-hover-muted flex items-center space-x-3"
                     >
                       <div className="relative">
                         <Avatar className="h-8 w-8">
                           <AvatarImage src={user.avatar} />
-                          <AvatarFallback className="bg-muted text-muted-foreground text-xs">
+                          <AvatarFallback className="brand-muted brand-text-muted text-xs">
                             {user.name.split(' ').map(n => n[0]).join('')}
                           </AvatarFallback>
                         </Avatar>
-                        <div className={`absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border border-card ${getStatusColor(user.status)}`} />
+                        <div className={`absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border brand-border ${getStatusColor(user.status)}`} />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-medium text-sm text-card-foreground">{user.name}</h3>
-                        <p className="text-xs text-muted-foreground">{user.department}</p>
+                        <h3 className="font-medium text-sm brand-text-foreground">{user.name}</h3>
+                        <p className="text-xs brand-text-muted">{user.department}</p>
                       </div>
                     </button>
                   ))}
@@ -505,12 +504,12 @@ const ChatInterno = () => {
           
           {/* Busca */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 brand-text-muted" />
             <Input
               placeholder="Buscar usuário"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 brand-background brand-border brand-text-foreground brand-placeholder-muted"
             />
           </div>
         </div>
@@ -524,31 +523,31 @@ const ChatInterno = () => {
                 onClick={() => handleSelectContact(contact.id)}
                 className={`w-full p-3 rounded-lg text-left transition-colors ${
                   selectedContact === contact.id 
-                    ? 'bg-black text-white dark:bg-white dark:text-black' 
-                    : 'hover:bg-muted'
+                    ? 'brand-primary brand-text-background' 
+                    : 'brand-hover-muted'
                 }`}
               >
                 <div className="flex items-center space-x-3">
                   <div className="relative">
                     <Avatar className="h-10 w-10">
                       <AvatarImage src={contact.avatar} />
-                      <AvatarFallback className="bg-muted text-muted-foreground">
+                      <AvatarFallback className="brand-muted brand-text-muted">
                         {contact.name.split(' ').map(n => n[0]).join('')}
                       </AvatarFallback>
                     </Avatar>
-                    <div className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-card ${getStatusColor(contact.status)}`} />
+                    <div className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 brand-border ${getStatusColor(contact.status)}`} />
                   </div>
                   
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                       <div className="flex-1 min-w-0">
                         <h3 className={`font-medium text-sm truncate ${
-                          selectedContact === contact.id ? 'text-white dark:text-black' : 'text-card-foreground'
+                          selectedContact === contact.id ? 'brand-text-background' : 'brand-text-foreground'
                         }`}>
                           {contact.name}
                         </h3>
                         <p className={`text-xs truncate ${
-                          selectedContact === contact.id ? 'text-white/70 dark:text-black/70' : 'text-muted-foreground'
+                          selectedContact === contact.id ? 'brand-text-background opacity-70' : 'brand-text-muted'
                         }`}>
                           {contact.department}
                         </p>
@@ -556,13 +555,13 @@ const ChatInterno = () => {
                       <div className="flex items-center space-x-1 ml-2">
                         {contact.lastMessageTime && (
                           <span className={`text-xs ${
-                            selectedContact === contact.id ? 'text-white/70 dark:text-black/70' : 'text-muted-foreground'
+                            selectedContact === contact.id ? 'brand-text-background opacity-70' : 'brand-text-muted'
                           }`}>
                             {contact.lastMessageTime}
                           </span>
                         )}
                         {contact.unreadCount && (
-                          <Badge variant="destructive" className="h-5 w-5 p-0 text-xs flex items-center justify-center">
+                          <Badge variant="destructive" className="h-5 w-5 p-0 text-xs flex items-center justify-center brand-error brand-text-background">
                             {contact.unreadCount}
                           </Badge>
                         )}
@@ -570,7 +569,7 @@ const ChatInterno = () => {
                     </div>
                     {contact.lastMessage && (
                       <p className={`text-xs truncate mt-1 ${
-                        selectedContact === contact.id ? 'text-white/70 dark:text-black/70' : 'text-muted-foreground'
+                        selectedContact === contact.id ? 'brand-text-background opacity-70' : 'brand-text-muted'
                       }`}>
                         {contact.lastMessage}
                       </p>
@@ -584,16 +583,16 @@ const ChatInterno = () => {
       </div>
 
       {/* Área de Chat - Mobile e Tablet: condicional, Desktop (lg+): sempre visível */}
-      <div className={`flex-1 flex flex-col bg-background ${!showChat ? 'hidden lg:flex' : 'flex'}`}>
+      <div className={`flex-1 flex flex-col brand-background ${!showChat ? 'hidden lg:flex' : 'flex'}`}>
         {currentContact ? (
           <>
             {/* Header do chat */}
-            <div className="p-4 border-b border-border bg-card flex items-center">
+            <div className="p-4 border-b brand-border brand-card flex items-center">
               {/* Botão voltar - mobile e tablet */}
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="lg:hidden mr-2"
+                className="lg:hidden mr-2 brand-text-muted brand-hover-text-foreground"
                 onClick={handleBackToList}
               >
                 <ArrowLeft className="h-4 w-4" />
@@ -605,7 +604,7 @@ const ChatInterno = () => {
                   variant="ghost" 
                   size="sm"
                   onClick={handleCloseChat}
-                  className="hidden lg:flex text-muted-foreground hover:text-card-foreground"
+                  className="hidden lg:flex brand-text-muted brand-hover-text-foreground"
                 >
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
@@ -613,15 +612,15 @@ const ChatInterno = () => {
                 <div className="relative">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={currentContact.avatar} />
-                    <AvatarFallback className="bg-muted text-muted-foreground text-sm">
+                    <AvatarFallback className="brand-muted brand-text-muted text-sm">
                       {currentContact.name.split(' ').map(n => n[0]).join('')}
                     </AvatarFallback>
                   </Avatar>
-                  <div className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border border-card ${getStatusColor(currentContact.status)}`} />
+                  <div className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border brand-border ${getStatusColor(currentContact.status)}`} />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-medium text-card-foreground">{currentContact.name}</h3>
-                  <p className="text-xs text-muted-foreground">{currentContact.department} • {getStatusText(currentContact.status)}</p>
+                  <h3 className="font-medium brand-text-foreground">{currentContact.name}</h3>
+                  <p className="text-xs brand-text-muted">{currentContact.department} • {getStatusText(currentContact.status)}</p>
                 </div>
               </div>
             </div>
@@ -636,18 +635,18 @@ const ChatInterno = () => {
                   >
                     <div className={`max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl ${msg.isOwn ? 'order-2' : ''}`}>
                       {!msg.isOwn && (
-                        <p className="text-xs text-muted-foreground mb-1 ml-1">{msg.sender}</p>
+                        <p className="text-xs brand-text-muted mb-1 ml-1">{msg.sender}</p>
                       )}
                       <div
                         className={`rounded-lg px-3 py-2 ${
                           msg.isOwn
-                            ? 'bg-black text-white dark:bg-white dark:text-black'
-                            : 'bg-muted text-card-foreground'
+                            ? 'brand-primary brand-text-background'
+                            : 'brand-muted brand-text-foreground'
                         }`}
                       >
                         <p className="text-sm">{msg.content}</p>
                         <p className={`text-xs mt-1 ${
-                          msg.isOwn ? 'text-white/70 dark:text-black/70' : 'text-muted-foreground'
+                          msg.isOwn ? 'brand-text-background opacity-70' : 'brand-text-muted'
                         }`}>
                           {msg.timestamp}
                         </p>
@@ -660,12 +659,12 @@ const ChatInterno = () => {
             </ScrollArea>
 
             {/* Input de mensagem */}
-            <div className="p-4 border-t border-border bg-card">
+            <div className="p-4 border-t brand-border brand-card">
               <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" className="brand-text-muted brand-hover-text-foreground">
                   <Paperclip className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" className="brand-text-muted brand-hover-text-foreground">
                   <Smile className="h-4 w-4" />
                 </Button>
                 <div className="flex-1">
@@ -674,13 +673,13 @@ const ChatInterno = () => {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    className="resize-none"
+                    className="resize-none brand-background brand-border brand-text-foreground brand-placeholder-muted"
                   />
                 </div>
                 <Button 
                   onClick={handleSendMessage}
                   disabled={!message.trim()}
-                  className="bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+                  className="brand-primary brand-text-background brand-hover-primary"
                 >
                   <Send className="h-4 w-4" />
                 </Button>
@@ -688,11 +687,11 @@ const ChatInterno = () => {
             </div>
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center bg-background">
+          <div className="flex-1 flex items-center justify-center brand-background">
             <div className="text-center">
-              <UserPlus className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-card-foreground mb-2">Selecione um usuário</h3>
-              <p className="text-muted-foreground">Escolha uma conversa para começar a conversar</p>
+              <UserPlus className="h-12 w-12 brand-text-muted mx-auto mb-4" />
+              <h3 className="text-lg font-medium brand-text-foreground mb-2">Selecione um usuário</h3>
+              <p className="brand-text-muted">Escolha uma conversa para começar a conversar</p>
             </div>
           </div>
         )}

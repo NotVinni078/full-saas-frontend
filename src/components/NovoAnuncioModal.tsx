@@ -101,9 +101,9 @@ const NovoAnuncioModal = ({ isOpen, onClose }: NovoAnuncioModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto brand-card brand-border">
         <DialogHeader>
-          <DialogTitle className="flex items-center space-x-2">
+          <DialogTitle className="flex items-center space-x-2 brand-text-foreground">
             <SelectedIcon className="h-5 w-5" />
             <span>Novo Anúncio</span>
           </DialogTitle>
@@ -119,6 +119,7 @@ const NovoAnuncioModal = ({ isOpen, onClose }: NovoAnuncioModalProps) => {
               onChange={(e) => setFormData(prev => ({ ...prev, titulo: e.target.value }))}
               placeholder="Digite o título do anúncio"
               required
+              className="brand-background brand-border brand-text-foreground brand-placeholder-muted"
             />
           </div>
 
@@ -129,19 +130,19 @@ const NovoAnuncioModal = ({ isOpen, onClose }: NovoAnuncioModalProps) => {
               value={formData.categoria} 
               onValueChange={(value) => setFormData(prev => ({ ...prev, categoria: value }))}
             >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione a categoria" />
+              <SelectTrigger className="brand-background brand-border brand-text-foreground">
+                <SelectValue placeholder="Selecione a categoria" className="brand-placeholder-muted" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="nota-atualizacao">Nota de Atualização</SelectItem>
-                <SelectItem value="anuncio">Anúncio</SelectItem>
+              <SelectContent className="brand-card brand-border">
+                <SelectItem value="nota-atualizacao" className="brand-text-foreground brand-hover-accent">Nota de Atualização</SelectItem>
+                <SelectItem value="anuncio" className="brand-text-foreground brand-hover-accent">Anúncio</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {/* Seleção de Ícone */}
           <div className="space-y-2">
-            <Label>Ícone</Label>
+            <Label className="brand-text-foreground">Ícone</Label>
             <div className="grid grid-cols-4 gap-2">
               {iconOptions.map((option) => {
                 const IconComponent = option.icon;
@@ -152,12 +153,12 @@ const NovoAnuncioModal = ({ isOpen, onClose }: NovoAnuncioModalProps) => {
                     onClick={() => setFormData(prev => ({ ...prev, icone: option.value }))}
                     className={`p-3 rounded-lg border-2 transition-colors flex flex-col items-center space-y-1 ${
                       formData.icone === option.value 
-                        ? 'border-primary bg-primary/10' 
-                        : 'border-border hover:border-primary/50'
+                        ? 'brand-border-primary brand-primary-subtle' 
+                        : 'brand-border brand-hover-border-primary'
                     }`}
                   >
-                    <IconComponent className="h-5 w-5" />
-                    <span className="text-xs">{option.label}</span>
+                    <IconComponent className="h-5 w-5 brand-text-foreground" />
+                    <span className="text-xs brand-text-foreground">{option.label}</span>
                   </button>
                 );
               })}
@@ -172,15 +173,15 @@ const NovoAnuncioModal = ({ isOpen, onClose }: NovoAnuncioModalProps) => {
               value={formData.descricao}
               onChange={(e) => setFormData(prev => ({ ...prev, descricao: e.target.value }))}
               placeholder="Digite o conteúdo completo do anúncio..."
-              className="min-h-[200px] resize-none"
+              className="min-h-[200px] resize-none brand-background brand-border brand-text-foreground brand-placeholder-muted"
               required
             />
           </div>
 
           {/* Upload de Imagens */}
           <div className="space-y-2">
-            <Label>Anexar Fotos</Label>
-            <div className="border-2 border-dashed border-border rounded-lg p-4">
+            <Label className="brand-text-foreground">Anexar Fotos</Label>
+            <div className="border-2 border-dashed brand-border rounded-lg p-4">
               <input
                 type="file"
                 id="image-upload"
@@ -191,7 +192,7 @@ const NovoAnuncioModal = ({ isOpen, onClose }: NovoAnuncioModalProps) => {
               />
               <label
                 htmlFor="image-upload"
-                className="cursor-pointer flex flex-col items-center space-y-2 text-muted-foreground hover:text-foreground transition-colors"
+                className="cursor-pointer flex flex-col items-center space-y-2 brand-text-muted brand-hover-text-foreground transition-colors"
               >
                 <Upload className="h-8 w-8" />
                 <span className="text-sm">Clique para selecionar imagens</span>
@@ -201,19 +202,19 @@ const NovoAnuncioModal = ({ isOpen, onClose }: NovoAnuncioModalProps) => {
             {/* Preview das imagens anexadas */}
             {attachedImages.length > 0 && (
               <div className="space-y-2">
-                <Label>Imagens Anexadas:</Label>
+                <Label className="brand-text-foreground">Imagens Anexadas:</Label>
                 <div className="grid grid-cols-2 gap-2">
                   {attachedImages.map((file, index) => (
-                    <Card key={index} className="relative">
+                    <Card key={index} className="relative brand-card brand-border">
                       <CardContent className="p-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm truncate">{file.name}</span>
+                          <span className="text-sm truncate brand-text-foreground">{file.name}</span>
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
                             onClick={() => removeImage(index)}
-                            className="h-6 w-6 p-0"
+                            className="h-6 w-6 p-0 brand-text-muted brand-hover-text-error"
                           >
                             <X className="h-4 w-4" />
                           </Button>
@@ -227,11 +228,19 @@ const NovoAnuncioModal = ({ isOpen, onClose }: NovoAnuncioModalProps) => {
           </div>
 
           {/* Botões */}
-          <div className="flex justify-end space-x-2 pt-4 border-t">
-            <Button type="button" variant="outline" onClick={onClose}>
+          <div className="flex justify-end space-x-2 pt-4 border-t brand-border">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onClose}
+              className="brand-border brand-text-foreground brand-hover-accent"
+            >
               Cancelar
             </Button>
-            <Button type="submit">
+            <Button 
+              type="submit"
+              className="brand-primary brand-hover-primary brand-text-background"
+            >
               Criar Anúncio
             </Button>
           </div>
