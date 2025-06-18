@@ -143,6 +143,8 @@ export const BrandProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const colors = isDark ? brandConfig.colors.dark : brandConfig.colors.light;
     
     const root = document.documentElement;
+    
+    // Apply all brand colors to CSS variables
     root.style.setProperty('--primary', colors.primary);
     root.style.setProperty('--secondary', colors.secondary);
     root.style.setProperty('--accent', colors.accent);
@@ -150,6 +152,18 @@ export const BrandProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     root.style.setProperty('--foreground', colors.foreground);
     root.style.setProperty('--muted', colors.muted);
     root.style.setProperty('--border', colors.border);
+    
+    // Update secondary and accent foreground colors based on background
+    root.style.setProperty('--secondary-foreground', colors.foreground);
+    root.style.setProperty('--accent-foreground', colors.foreground);
+    root.style.setProperty('--muted-foreground', colors.foreground);
+    
+    // Update card colors to match background
+    root.style.setProperty('--card', colors.background);
+    root.style.setProperty('--card-foreground', colors.foreground);
+    
+    // Update primary foreground for better contrast
+    root.style.setProperty('--primary-foreground', isDark ? colors.background : '210 40% 98%');
     
     // Update page title and favicon
     document.title = brandConfig.pageTitle;

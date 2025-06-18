@@ -11,50 +11,62 @@ const BrandPreview: React.FC = () => {
 
   return (
     <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex items-center space-x-2">
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center space-x-2 text-lg">
           {brandConfig.logo && (
             <img 
               src={brandConfig.logo} 
               alt="Logo" 
-              className="w-8 h-8 object-contain"
+              className="w-6 h-6 object-contain flex-shrink-0"
             />
           )}
-          <span>{brandConfig.companyName}</span>
+          <span className="truncate">{brandConfig.companyName}</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <h3 className="font-medium">Preview dos Elementos</h3>
+      <CardContent className="space-y-6">
+        <div className="space-y-3">
+          <h3 className="font-medium text-sm">Preview dos Elementos</h3>
           
           {/* Buttons Preview */}
-          <div className="flex space-x-2">
-            <Button>Botão Primário</Button>
-            <Button variant="secondary">Botão Secundário</Button>
-            <Button variant="outline">Botão Outline</Button>
+          <div className="space-y-2">
+            <p className="text-xs text-muted-foreground">Botões</p>
+            <div className="flex flex-wrap gap-2">
+              <Button size="sm" className="text-xs">Botão Primário</Button>
+              <Button variant="secondary" size="sm" className="text-xs">Botão Secundário</Button>
+              <Button variant="outline" size="sm" className="text-xs">Botão Outline</Button>
+            </div>
           </div>
           
           {/* Icons Preview */}
-          <div className="flex space-x-4 py-2">
-            <MessageSquare className="w-5 h-5 text-primary" />
-            <Users className="w-5 h-5 text-secondary-foreground" />
-            <Settings className="w-5 h-5 text-muted-foreground" />
+          <div className="space-y-2">
+            <p className="text-xs text-muted-foreground">Ícones</p>
+            <div className="flex space-x-3">
+              <MessageSquare className="w-4 h-4 text-primary" />
+              <Users className="w-4 h-4 text-secondary-foreground" />
+              <Settings className="w-4 h-4 text-muted-foreground" />
+            </div>
           </div>
           
           {/* Badges Preview */}
-          <div className="flex space-x-2">
-            <Badge>Badge Padrão</Badge>
-            <Badge variant="secondary">Badge Secundário</Badge>
-            <Badge variant="outline">Badge Outline</Badge>
+          <div className="space-y-2">
+            <p className="text-xs text-muted-foreground">Badges</p>
+            <div className="flex flex-wrap gap-2">
+              <Badge className="text-xs">Badge Padrão</Badge>
+              <Badge variant="secondary" className="text-xs">Badge Secundário</Badge>
+              <Badge variant="outline" className="text-xs">Badge Outline</Badge>
+            </div>
           </div>
           
           {/* Card Preview */}
-          <Card className="p-4">
-            <h4 className="font-medium mb-2">Card de Exemplo</h4>
-            <p className="text-muted-foreground text-sm">
-              Este é um exemplo de como os cards aparecerão com as cores personalizadas.
-            </p>
-          </Card>
+          <div className="space-y-2">
+            <p className="text-xs text-muted-foreground">Card de Exemplo</p>
+            <Card className="p-3 bg-card border-border">
+              <h4 className="font-medium text-sm mb-1 text-card-foreground">Card de Exemplo</h4>
+              <p className="text-muted-foreground text-xs leading-relaxed">
+                Este é um exemplo de como os cards aparecerão com as cores personalizadas aplicadas.
+              </p>
+            </Card>
+          </div>
         </div>
       </CardContent>
     </Card>
