@@ -60,20 +60,27 @@
   
   /* Custom brand colors that can be dynamically updated */
   .brand-primary {
-    background-color: var(--primary);
-    color: var(--primary-foreground);
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
   }
   
   .brand-secondary {
-    background-color: var(--secondary);
-    color: var(--secondary-foreground);
+    background-color: hsl(var(--secondary));
+    color: hsl(var(--secondary-foreground));
   }
   
   .brand-accent {
-    background-color: var(--accent);
-    color: var(--accent-foreground);
+    background-color: hsl(var(--accent));
+    color: hsl(var(--accent-foreground));
   }
   
-  .bran
-
-
+  .brand-background {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+  
+  .brand-muted {
+    background-color: hsl(var(--muted));
+    color: hsl(var(--muted-foreground));
+  }
+}
