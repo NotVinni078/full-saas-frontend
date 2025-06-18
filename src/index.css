@@ -141,7 +141,7 @@
     color: white;
   }
   
-  /* Brand gray utilities */
+  /* COMPLETE Brand gray utilities - all background variants */
   .brand-gray-50 { background-color: hsl(var(--gray-50)); }
   .brand-gray-100 { background-color: hsl(var(--gray-100)); }
   .brand-gray-200 { background-color: hsl(var(--gray-200)); }
@@ -153,7 +153,15 @@
   .brand-gray-800 { background-color: hsl(var(--gray-800)); }
   .brand-gray-900 { background-color: hsl(var(--gray-900)); }
   
-  /* Text colors */
+  /* Text colors - all variants */
+  .brand-text-primary { color: hsl(var(--primary)); }
+  .brand-text-secondary { color: hsl(var(--secondary)); }
+  .brand-text-muted { color: hsl(var(--muted-foreground)); }
+  .brand-text-foreground { color: hsl(var(--foreground)); }
+  .brand-text-success { color: hsl(var(--success)); }
+  .brand-text-warning { color: hsl(var(--warning)); }
+  .brand-text-error { color: hsl(var(--error)); }
+  .brand-text-info { color: hsl(var(--info)); }
   .brand-text-gray-50 { color: hsl(var(--gray-50)); }
   .brand-text-gray-100 { color: hsl(var(--gray-100)); }
   .brand-text-gray-200 { color: hsl(var(--gray-200)); }
@@ -165,14 +173,87 @@
   .brand-text-gray-800 { color: hsl(var(--gray-800)); }
   .brand-text-gray-900 { color: hsl(var(--gray-900)); }
   
-  /* Border colors */
+  /* Border colors - all variants */
+  .brand-border { border-color: hsl(var(--border)); }
+  .brand-border-primary { border-color: hsl(var(--primary)); }
+  .brand-border-secondary { border-color: hsl(var(--secondary)); }
+  .brand-border-muted { border-color: hsl(var(--muted)); }
+  .brand-border-gray-50 { border-color: hsl(var(--gray-50)); }
   .brand-border-gray-100 { border-color: hsl(var(--gray-100)); }
   .brand-border-gray-200 { border-color: hsl(var(--gray-200)); }
   .brand-border-gray-300 { border-color: hsl(var(--gray-300)); }
+  .brand-border-gray-400 { border-color: hsl(var(--gray-400)); }
+  .brand-border-gray-500 { border-color: hsl(var(--gray-500)); }
+  .brand-border-gray-600 { border-color: hsl(var(--gray-600)); }
+  .brand-border-gray-700 { border-color: hsl(var(--gray-700)); }
+  .brand-border-gray-800 { border-color: hsl(var(--gray-800)); }
+  .brand-border-gray-900 { border-color: hsl(var(--gray-900)); }
   
-  /* Hover states */
+  /* Hover states - all variants */
+  .brand-hover-primary:hover { background-color: hsl(var(--primary) / 0.9); }
+  .brand-hover-secondary:hover { background-color: hsl(var(--secondary) / 0.9); }
+  .brand-hover-accent:hover { background-color: hsl(var(--accent) / 0.9); }
+  .brand-hover-muted:hover { background-color: hsl(var(--muted) / 0.9); }
   .brand-hover-success:hover { background-color: hsl(var(--success) / 0.9); }
   .brand-hover-warning:hover { background-color: hsl(var(--warning) / 0.9); }
   .brand-hover-error:hover { background-color: hsl(var(--error) / 0.9); }
   .brand-hover-info:hover { background-color: hsl(var(--info) / 0.9); }
+  .brand-hover-gray-50:hover { background-color: hsl(var(--gray-50) / 0.9); }
+  .brand-hover-gray-100:hover { background-color: hsl(var(--gray-100) / 0.9); }
+  .brand-hover-gray-200:hover { background-color: hsl(var(--gray-200) / 0.9); }
+  .brand-hover-gray-300:hover { background-color: hsl(var(--gray-300) / 0.9); }
+  .brand-hover-gray-400:hover { background-color: hsl(var(--gray-400) / 0.9); }
+  .brand-hover-gray-500:hover { background-color: hsl(var(--gray-500) / 0.9); }
+  .brand-hover-gray-600:hover { background-color: hsl(var(--gray-600) / 0.9); }
+  .brand-hover-gray-700:hover { background-color: hsl(var(--gray-700) / 0.9); }
+  .brand-hover-gray-800:hover { background-color: hsl(var(--gray-800) / 0.9); }
+  .brand-hover-gray-900:hover { background-color: hsl(var(--gray-900) / 0.9); }
+
+  /* Ring/Focus states */
+  .brand-ring-primary:focus { ring-color: hsl(var(--primary)); }
+  .brand-ring-secondary:focus { ring-color: hsl(var(--secondary)); }
+  .brand-ring-success:focus { ring-color: hsl(var(--success)); }
+  .brand-ring-warning:focus { ring-color: hsl(var(--warning)); }
+  .brand-ring-error:focus { ring-color: hsl(var(--error)); }
+  .brand-ring-info:focus { ring-color: hsl(var(--info)); }
+
+  /* Placeholder text colors */
+  .brand-placeholder-gray-400::placeholder { color: hsl(var(--gray-400)); }
+  .brand-placeholder-gray-500::placeholder { color: hsl(var(--gray-500)); }
+  .brand-placeholder-muted::placeholder { color: hsl(var(--muted-foreground)); }
+
+  /* Special utility classes for common patterns */
+  .brand-card {
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+    border-color: hsl(var(--border));
+  }
+
+  .brand-input {
+    background-color: hsl(var(--input));
+    border-color: hsl(var(--border));
+    color: hsl(var(--foreground));
+  }
+
+  .brand-input:focus {
+    ring-color: hsl(var(--ring));
+  }
+
+  /* Scrollbar customization for brand colors */
+  .brand-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .brand-scrollbar::-webkit-scrollbar-track {
+    background-color: hsl(var(--gray-100));
+  }
+
+  .brand-scrollbar::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--gray-300));
+    border-radius: 4px;
+  }
+
+  .brand-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--gray-400));
+  }
 }
