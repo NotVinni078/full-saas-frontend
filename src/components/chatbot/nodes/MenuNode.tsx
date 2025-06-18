@@ -1,11 +1,10 @@
-
 import React, { memo, useState } from 'react';
-import { Handle, Position } from '@xyflow/react';
+import { Handle, Position, useReactFlow } from '@xyflow/react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Menu, Plus, X, MessageSquare } from 'lucide-react';
+import { Menu, Plus, X, MessageSquare, Trash2 } from 'lucide-react';
 
 const MenuNode = memo(({ data, id }: any) => {
   const [title, setTitle] = useState(data.title || 'Escolha uma opção:');
@@ -15,6 +14,7 @@ const MenuNode = memo(({ data, id }: any) => {
     { id: '2', title: 'Opção 2', description: 'Descrição da opção 2' }
   ]);
   const [buttonText, setButtonText] = useState(data.buttonText || 'Ver opções');
+  const { setNodes, setEdges } = useReactFlow();
 
   const handleTitleChange = (value: string) => {
     setTitle(value);
@@ -57,14 +57,29 @@ const MenuNode = memo(({ data, id }: any) => {
     }
   };
 
+  const handleDelete = () => {
+    setNodes((nodes) => nodes.filter((node) => node.id !== id));
+    setEdges((edges) => edges.filter((edge) => edge.source !== id && edge.target !== id));
+  };
+
   return (
     <Card className="w-96 shadow-lg">
       <CardContent className="p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
-            <Menu className="w-4 h-4 text-white" />
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
+              <Menu className="w-4 h-4 text-white" />
+            </div>
+            <span className="font-medium">Menu Interativo</span>
           </div>
-          <span className="font-medium">Menu Interativo</span>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleDelete}
+            className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
         </div>
         
         <div className="space-y-3">

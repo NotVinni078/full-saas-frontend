@@ -1,14 +1,15 @@
-
 import React, { memo, useState } from 'react';
-import { Handle, Position } from '@xyflow/react';
+import { Handle, Position, useReactFlow } from '@xyflow/react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Clock } from 'lucide-react';
+import { Clock, Trash2 } from 'lucide-react';
 
 const DelayNode = memo(({ data, id }: any) => {
   const [delayValue, setDelayValue] = useState(data.delayValue || 5);
   const [delayUnit, setDelayUnit] = useState(data.delayUnit || 'seconds');
+  const { setNodes, setEdges } = useReactFlow();
 
   const handleDelayValueChange = (value: string) => {
     const numValue = parseInt(value) || 1;
@@ -19,6 +20,11 @@ const DelayNode = memo(({ data, id }: any) => {
   const handleDelayUnitChange = (value: string) => {
     setDelayUnit(value);
     data.delayUnit = value;
+  };
+
+  const handleDelete = () => {
+    setNodes((nodes) => nodes.filter((node) => node.id !== id));
+    setEdges((edges) => edges.filter((edge) => edge.source !== id && edge.target !== id));
   };
 
   const getDelayInSeconds = () => {
@@ -35,11 +41,21 @@ const DelayNode = memo(({ data, id }: any) => {
   return (
     <Card className="w-80 shadow-lg">
       <CardContent className="p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-            <Clock className="w-4 h-4 text-white" />
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
+              <Clock className="w-4 h-4 text-white" />
+            </div>
+            <span className="font-medium">Tempo de Espera</span>
           </div>
-          <span className="font-medium">Tempo de Espera</span>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleDelete}
+            className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
         </div>
         
         <div className="space-y-3">
