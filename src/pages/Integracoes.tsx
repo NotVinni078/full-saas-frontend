@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import SidebarLayout from '@/components/SidebarLayout';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -7,7 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Zap, CreditCard, Mail, Bot, Webhook, MessageSquare, Workflow } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Zap, CreditCard, Mail, Bot, Webhook, MessageSquare, Workflow, DollarSign } from 'lucide-react';
 
 const Integracoes = () => {
   const [n8nConfig, setN8nConfig] = useState({
@@ -38,6 +40,29 @@ const Integracoes = () => {
       conversationStarted: false,
       conversationClosed: false
     }
+  });
+
+  const [asaasConfig, setAsaasConfig] = useState({
+    apiKey: '',
+    environment: 'sandbox',
+    webhookUrl: ''
+  });
+
+  const [mercadoPagoConfig, setMercadoPagoConfig] = useState({
+    accessToken: '',
+    publicKey: '',
+    webhookUrl: '',
+    environment: 'sandbox'
+  });
+
+  const [smtpConfig, setSmtpConfig] = useState({
+    host: '',
+    port: '',
+    username: '',
+    password: '',
+    secure: true,
+    fromName: '',
+    fromEmail: ''
   });
 
   return (
@@ -299,45 +324,202 @@ const Integracoes = () => {
           </TabsContent>
 
           <TabsContent value="pagamento" className="space-y-4">
-            <div className="bg-white rounded-lg border p-6">
-              <h2 className="text-xl font-semibold mb-3">Integrações de Pagamento</h2>
-              <p className="text-gray-600 mb-4">
-                Configure gateways de pagamento para processar transações diretamente no chat.
-              </p>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                  <h3 className="font-medium mb-2">Mercado Pago</h3>
-                  <p className="text-sm text-gray-600">Integre com Mercado Pago para processar pagamentos via PIX, cartão e boleto.</p>
-                </div>
-                <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                  <h3 className="font-medium mb-2">Stripe</h3>
-                  <p className="text-sm text-gray-600">Configure Stripe para aceitar pagamentos internacionais com cartão de crédito.</p>
-                </div>
-                <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                  <h3 className="font-medium mb-2">PagSeguro</h3>
-                  <p className="text-sm text-gray-600">Integre com PagSeguro para oferecer múltiplas opções de pagamento.</p>
-                </div>
-              </div>
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* ASAAS Integration */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <DollarSign className="w-5 h-5" />
+                    ASAAS
+                  </CardTitle>
+                  <CardDescription>
+                    Configure ASAAS para processar pagamentos PIX, boleto e cartão
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label htmlFor="asaas-api-key">API Key ASAAS</Label>
+                    <Input
+                      id="asaas-api-key"
+                      type="password"
+                      placeholder="$aact_YTU5YjQ0..."
+                      value={asaasConfig.apiKey}
+                      onChange={(e) => setAsaasConfig({...asaasConfig, apiKey: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="asaas-environment">Ambiente</Label>
+                    <Select 
+                      value={asaasConfig.environment} 
+                      onValueChange={(value) => setAsaasConfig({...asaasConfig, environment: value})}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o ambiente" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="sandbox">Sandbox (Testes)</SelectItem>
+                        <SelectItem value="production">Produção</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="asaas-webhook">Webhook URL</Label>
+                    <Input
+                      id="asaas-webhook"
+                      placeholder="https://seusite.com/webhook/asaas"
+                      value={asaasConfig.webhookUrl}
+                      onChange={(e) => setAsaasConfig({...asaasConfig, webhookUrl: e.target.value})}
+                    />
+                  </div>
+                  <Button className="w-full">Salvar Configuração ASAAS</Button>
+                </CardContent>
+              </Card>
+
+              {/* Mercado Pago Integration */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CreditCard className="w-5 h-5" />
+                    Mercado Pago
+                  </CardTitle>
+                  <CardDescription>
+                    Configure Mercado Pago para processar pagamentos PIX, cartão e boleto
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label htmlFor="mp-access-token">Access Token</Label>
+                    <Input
+                      id="mp-access-token"
+                      type="password"
+                      placeholder="APP_USR-..."
+                      value={mercadoPagoConfig.accessToken}
+                      onChange={(e) => setMercadoPagoConfig({...mercadoPagoConfig, accessToken: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="mp-public-key">Public Key</Label>
+                    <Input
+                      id="mp-public-key"
+                      placeholder="APP_USR-..."
+                      value={mercadoPagoConfig.publicKey}
+                      onChange={(e) => setMercadoPagoConfig({...mercadoPagoConfig, publicKey: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="mp-environment">Ambiente</Label>
+                    <Select 
+                      value={mercadoPagoConfig.environment} 
+                      onValueChange={(value) => setMercadoPagoConfig({...mercadoPagoConfig, environment: value})}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o ambiente" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="sandbox">Sandbox (Testes)</SelectItem>
+                        <SelectItem value="production">Produção</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="mp-webhook">Webhook URL</Label>
+                    <Input
+                      id="mp-webhook"
+                      placeholder="https://seusite.com/webhook/mercadopago"
+                      value={mercadoPagoConfig.webhookUrl}
+                      onChange={(e) => setMercadoPagoConfig({...mercadoPagoConfig, webhookUrl: e.target.value})}
+                    />
+                  </div>
+                  <Button className="w-full">Salvar Configuração Mercado Pago</Button>
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
 
           <TabsContent value="smtp" className="space-y-4">
-            <div className="bg-white rounded-lg border p-6">
-              <h2 className="text-xl font-semibold mb-3">Configuração SMTP</h2>
-              <p className="text-gray-600 mb-4">
-                Configure seu servidor de email para envio de notificações e relatórios.
-              </p>
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                  <h3 className="font-medium mb-2">Gmail SMTP</h3>
-                  <p className="text-sm text-gray-600">Configure Gmail para envio de emails através do sistema.</p>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Mail className="w-5 h-5" />
+                  Configuração SMTP
+                </CardTitle>
+                <CardDescription>
+                  Configure seu servidor de email para envio de notificações e relatórios
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <Label htmlFor="smtp-host">Servidor SMTP</Label>
+                    <Input
+                      id="smtp-host"
+                      placeholder="smtp.gmail.com"
+                      value={smtpConfig.host}
+                      onChange={(e) => setSmtpConfig({...smtpConfig, host: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="smtp-port">Porta</Label>
+                    <Input
+                      id="smtp-port"
+                      placeholder="587"
+                      value={smtpConfig.port}
+                      onChange={(e) => setSmtpConfig({...smtpConfig, port: e.target.value})}
+                    />
+                  </div>
                 </div>
-                <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                  <h3 className="font-medium mb-2">Servidor Personalizado</h3>
-                  <p className="text-sm text-gray-600">Configure um servidor SMTP personalizado para seu domínio.</p>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <Label htmlFor="smtp-username">Usuário/Email</Label>
+                    <Input
+                      id="smtp-username"
+                      placeholder="seu-email@gmail.com"
+                      value={smtpConfig.username}
+                      onChange={(e) => setSmtpConfig({...smtpConfig, username: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="smtp-password">Senha/Token</Label>
+                    <Input
+                      id="smtp-password"
+                      type="password"
+                      placeholder="sua-senha-ou-token"
+                      value={smtpConfig.password}
+                      onChange={(e) => setSmtpConfig({...smtpConfig, password: e.target.value})}
+                    />
+                  </div>
                 </div>
-              </div>
-            </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <Label htmlFor="smtp-from-name">Nome do Remetente</Label>
+                    <Input
+                      id="smtp-from-name"
+                      placeholder="Sua Empresa"
+                      value={smtpConfig.fromName}
+                      onChange={(e) => setSmtpConfig({...smtpConfig, fromName: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="smtp-from-email">Email do Remetente</Label>
+                    <Input
+                      id="smtp-from-email"
+                      placeholder="noreply@suaempresa.com"
+                      value={smtpConfig.fromEmail}
+                      onChange={(e) => setSmtpConfig({...smtpConfig, fromEmail: e.target.value})}
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="smtp-secure"
+                    checked={smtpConfig.secure}
+                    onCheckedChange={(checked) => setSmtpConfig({...smtpConfig, secure: !!checked})}
+                  />
+                  <Label htmlFor="smtp-secure">Usar conexão segura (TLS/SSL)</Label>
+                </div>
+                <Button className="w-full">Salvar Configuração SMTP</Button>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
