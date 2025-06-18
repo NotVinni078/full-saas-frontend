@@ -1,9 +1,11 @@
 
 import React, { useState, createContext, useContext } from 'react';
 import SidebarLayout from '@/components/SidebarLayout';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import AjustesOptions from '@/components/AjustesOptions';
 import AjustesMensagensPadroes from '@/components/AjustesMensagensPadroes';
 import AjustesExpediente from '@/components/AjustesExpediente';
+import { Settings, MessageSquare, Clock } from 'lucide-react';
 
 // Contexto para compartilhar configurações entre componentes
 interface AjustesContextType {
@@ -22,61 +24,42 @@ export const useAjustes = () => {
 };
 
 const Ajustes = () => {
-  const [activeSection, setActiveSection] = useState('opcoes');
   const [agendamentoTipo, setAgendamentoTipo] = useState<'empresa' | 'setor' | 'cargo'>('empresa');
-
-  const menuItems = [
-    { id: 'opcoes', label: 'Opções' },
-    { id: 'mensagens', label: 'Mensagens Padrões' },
-    { id: 'expediente', label: 'Expediente' }
-  ];
-
-  const renderContent = () => {
-    switch (activeSection) {
-      case 'opcoes':
-        return <AjustesOptions />;
-      case 'mensagens':
-        return <AjustesMensagensPadroes />;
-      case 'expediente':
-        return <AjustesExpediente />;
-      default:
-        return <AjustesOptions />;
-    }
-  };
 
   return (
     <AjustesContext.Provider value={{ agendamentoTipo, setAgendamentoTipo }}>
       <SidebarLayout>
-        <div className="h-full flex flex-col">
-          {/* Header da página */}
-          <div className="bg-background border-b border-border px-4 sm:px-6 py-4">
-            <h1 className="text-xl sm:text-2xl font-bold text-foreground">Configurações</h1>
-            <p className="text-muted-foreground mt-1 text-sm sm:text-base">Gerencie as configurações do sistema</p>
-          </div>
+        <div className="p-6">
+          <h1 className="text-2xl font-bold mb-6">Configurações</h1>
+          
+          <Tabs defaultValue="opcoes" className="w-full">
+            <TabsList className="grid w-full grid-cols-3 mb-6">
+              <TabsTrigger value="opcoes" className="flex items-center gap-2">
+                <Settings className="w-4 h-4" />
+                Opções
+              </TabsTrigger>
+              <TabsTrigger value="mensagens" className="flex items-center gap-2">
+                <MessageSquare className="w-4 h-4" />
+                Mensagens Padrões
+              </TabsTrigger>
+              <TabsTrigger value="expediente" className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                Expediente
+              </TabsTrigger>
+            </TabsList>
 
-          {/* Menu Slider Horizontal */}
-          <div className="bg-background border-b border-border px-4 sm:px-6 overflow-x-auto">
-            <nav className="flex space-x-4 sm:space-x-8 min-w-max">
-              {menuItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveSection(item.id)}
-                  className={`py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm transition-colors whitespace-nowrap ${
-                    activeSection === item.id
-                      ? 'border-foreground text-foreground'
-                      : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground'
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </nav>
-          </div>
+            <TabsContent value="opcoes">
+              <AjustesOptions />
+            </TabsContent>
 
-          {/* Conteúdo Principal */}
-          <div className="flex-1 p-4 sm:p-6 overflow-auto bg-muted/30">
-            {renderContent()}
-          </div>
+            <TabsContent value="mensagens">
+              <AjustesMensagensPadroes />
+            </TabsContent>
+
+            <TabsContent value="expediente">
+              <AjustesExpediente />
+            </TabsContent>
+          </Tabs>
         </div>
       </SidebarLayout>
     </AjustesContext.Provider>
