@@ -1,10 +1,10 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { GlobalDataProvider } from "@/contexts/GlobalDataContext";
+import { AnunciosProvider } from "@/contexts/AnunciosContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Inicio from "./pages/Inicio";
@@ -41,44 +41,46 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <GlobalDataProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/inicio" element={<Inicio />} />
-            <Route path="/anuncios" element={<Anuncios />} />
-            <Route path="/atendimentos" element={<Atendimentos />} />
-            <Route path="/chat-interno" element={<ChatInterno />} />
-            <Route path="/painel-atendimentos" element={<PainelAtendimentos />} />
-            <Route path="/agendamentos" element={<Agendamentos />} />
-            <Route path="/respostas-rapidas" element={<RespostasRapidas />} />
-            <Route path="/tarefas" element={<Tarefas />} />
-            <Route path="/campanhas" element={<Campanhas />} />
-            <Route path="/gestao-contatos" element={<GestaoContatos />} />
-            <Route path="/tags" element={<Tags />} />
-            <Route path="/gestao-usuarios" element={<GestaoUsuarios />} />
-            <Route path="/conexoes" element={<Conexoes />} />
-            <Route path="/dashboard-gerencial" element={<DashboardGerencial />} />
-            <Route path="/dashboard-admin" element={<DashboardAdmin />} />
-            <Route path="/dashboard-usuario" element={<DashboardUsuario />} />
-            <Route path="/avaliacao" element={<Avaliacao />} />
-            <Route path="/gestao-setores" element={<GestaoSetores />} />
-            <Route path="/admin-empresas" element={<AdminEmpresas />} />
-            <Route path="/faturas" element={<Faturas />} />
-            <Route path="/planos" element={<Planos />} />
-            <Route path="/gestao-planos" element={<GestaoPlanos />} />
-            <Route path="/chatbot" element={<ChatBot />} />
-            <Route path="/documentacao" element={<Documentacao />} />
-            <Route path="/ajustes" element={<Ajustes />} />
-            <Route path="/gerenciar-marca" element={<GerenciarMarca />} />
-            <Route path="/integracoes" element={<Integracoes />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      <AnunciosProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/inicio" element={<Inicio />} />
+              <Route path="/anuncios" element={<Anuncios />} />
+              <Route path="/atendimentos" element={<Atendimentos />} />
+              <Route path="/chat-interno" element={<ChatInterno />} />
+              <Route path="/painel-atendimentos" element={<PainelAtendimentos />} />
+              <Route path="/agendamentos" element={<Agendamentos />} />
+              <Route path="/respostas-rapidas" element={<RespostasRapidas />} />
+              <Route path="/tarefas" element={<Tarefas />} />
+              <Route path="/campanhas" element={<Campanhas />} />
+              <Route path="/gestao-contatos" element={<GestaoContatos />} />
+              <Route path="/tags" element={<Tags />} />
+              <Route path="/gestao-usuarios" element={<GestaoUsuarios />} />
+              <Route path="/conexoes" element={<Conexoes />} />
+              <Route path="/dashboard-gerencial" element={<DashboardGerencial />} />
+              <Route path="/dashboard-admin" element={<DashboardAdmin />} />
+              <Route path="/dashboard-usuario" element={<DashboardUsuario />} />
+              <Route path="/avaliacao" element={<Avaliacao />} />
+              <Route path="/gestao-setores" element={<GestaoSetores />} />
+              <Route path="/admin-empresas" element={<AdminEmpresas />} />
+              <Route path="/faturas" element={<Faturas />} />
+              <Route path="/planos" element={<Planos />} />
+              <Route path="/gestao-planos" element={<GestaoPlanos />} />
+              <Route path="/chatbot" element={<ChatBot />} />
+              <Route path="/documentacao" element={<Documentacao />} />
+              <Route path="/ajustes" element={<Ajustes />} />
+              <Route path="/gerenciar-marca" element={<GerenciarMarca />} />
+              <Route path="/integracoes" element={<Integracoes />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AnunciosProvider>
     </GlobalDataProvider>
   </QueryClientProvider>
 );
