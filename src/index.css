@@ -57,10 +57,23 @@
   body {
     @apply bg-background text-foreground;
   }
-}
-
-@layer components {
-  .card-hover {
-    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+  
+  /* Custom brand colors that can be dynamically updated */
+  .brand-primary {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
   }
-}
+  
+  .brand-secondary {
+    background-color: var(--secondary);
+    color: var(--secondary-foreground);
+  }
+  
+  .brand-accent {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
+  }
+  
+  .bran
+
+
