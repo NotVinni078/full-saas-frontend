@@ -13,7 +13,7 @@ interface AjustesContextType {
   setAgendamentoTipo: (tipo: 'empresa' | 'setor' | 'cargo') => void;
 }
 
-const AjustesContext = createContext<AjustesContextType | undefined>(undefined);
+const AjustesContext = createContext<AjustesContextType | null>(null);
 
 export const useAjustes = () => {
   const context = useContext(AjustesContext);
@@ -26,12 +26,17 @@ export const useAjustes = () => {
 const Ajustes = () => {
   const [agendamentoTipo, setAgendamentoTipo] = useState<'empresa' | 'setor' | 'cargo'>('empresa');
 
+  const contextValue: AjustesContextType = {
+    agendamentoTipo,
+    setAgendamentoTipo
+  };
+
   return (
-    <AjustesContext.Provider value={{ agendamentoTipo, setAgendamentoTipo }}>
-      <SidebarLayout>
-        <div className="p-6 brand-background min-h-full">
-          <h1 className="text-2xl font-bold brand-text-foreground mb-6">Configurações</h1>
-          
+    <SidebarLayout>
+      <div className="p-6 brand-background min-h-full">
+        <h1 className="text-2xl font-bold brand-text-foreground mb-6">Configurações</h1>
+        
+        <AjustesContext.Provider value={contextValue}>
           <Tabs defaultValue="opcoes" className="w-full">
             <TabsList className="grid w-full grid-cols-3 mb-6 brand-card brand-border">
               <TabsTrigger value="opcoes" className="flex items-center gap-2 brand-text-foreground data-[state=active]:brand-primary">
@@ -60,9 +65,9 @@ const Ajustes = () => {
               <AjustesExpediente />
             </TabsContent>
           </Tabs>
-        </div>
-      </SidebarLayout>
-    </AjustesContext.Provider>
+        </AjustesContext.Provider>
+      </div>
+    </SidebarLayout>
   );
 };
 
