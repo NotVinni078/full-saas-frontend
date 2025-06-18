@@ -4,6 +4,8 @@ import { Switch } from '@/components/ui/switch';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { MessageCircleQuestion } from 'lucide-react';
 
 const AjustesOptions = () => {
   const [lgpdEnabled, setLgpdEnabled] = useState(true);
@@ -15,166 +17,242 @@ const AjustesOptions = () => {
   const [ligacoesWhatsapp, setLigacoesWhatsapp] = useState(true);
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-2">Opções</h1>
-        <p className="text-muted-foreground text-sm sm:text-base">Configure as opções gerais do sistema</p>
+    <TooltipProvider>
+      <div className="space-y-4 sm:space-y-6">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-2">Opções</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">Configure as opções gerais do sistema</p>
+        </div>
+
+        {/* LGPD */}
+        <Card className="bg-card border-border">
+          <CardHeader className="pb-3 sm:pb-6">
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-base sm:text-lg text-card-foreground">LGPD - Lei Geral de Proteção de Dados</CardTitle>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <MessageCircleQuestion className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p>Mensagens apagadas por clientes, nos atendimentos, serão apagadas para usuários com permissão de Atendente e Supervisor</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <CardDescription className="text-xs sm:text-sm">
+              Controla a aplicação das regras de proteção de dados pessoais
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="lgpd"
+                checked={lgpdEnabled}
+                onCheckedChange={setLgpdEnabled}
+                className="data-[state=checked]:bg-foreground data-[state=unchecked]:bg-input"
+              />
+              <Label htmlFor="lgpd" className="text-xs sm:text-sm font-medium text-foreground">
+                {lgpdEnabled ? 'Habilitado' : 'Desabilitado'}
+              </Label>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Avaliações NPS */}
+        <Card className="bg-card border-border">
+          <CardHeader className="pb-3 sm:pb-6">
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-base sm:text-lg text-card-foreground">Avaliações de NPS</CardTitle>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <MessageCircleQuestion className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p>Se habilitado, ao finalizar o atendimento o atendente será obrigado a enviar uma das pesquisas de satisfação, se Desabilitado o envio é opcional.</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <CardDescription className="text-xs sm:text-sm">
+              Define como as avaliações de NPS serão enviadas aos clientes
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <RadioGroup value={npsEvaluation} onValueChange={setNpsEvaluation}>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="automatico" id="nps-auto" className="border-foreground text-foreground data-[state=checked]:bg-foreground data-[state=checked]:border-foreground" />
+                <Label htmlFor="nps-auto" className="text-xs sm:text-sm text-foreground">Enviar ao final do atendimento</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="manual" id="nps-manual" className="border-foreground text-foreground data-[state=checked]:bg-foreground data-[state=checked]:border-foreground" />
+                <Label htmlFor="nps-manual" className="text-xs sm:text-sm text-foreground">Enviar manualmente</Label>
+              </div>
+            </RadioGroup>
+          </CardContent>
+        </Card>
+
+        {/* Tipo de Agendamento */}
+        <Card className="bg-card border-border">
+          <CardHeader className="pb-3 sm:pb-6">
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-base sm:text-lg text-card-foreground">Tipo de Agendamento de Expediente</CardTitle>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <MessageCircleQuestion className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p>Se selecionado Empresa, todos os usuários com permissão de Atendente, e supervisor só conseguirão usar a plataforma no horário permitido, se selecionado Setor, o horário de funcionamento dos usuários Atendente e Supervisor, será de acordo ao seu setor, se Selecionado Cargo, fará a mesma regra, porém por cargo. Não se aplica a Cargo de Gestor.</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <CardDescription className="text-xs sm:text-sm">
+              Define se o agendamento será por empresa ou por setor
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <RadioGroup value={agendamentoTipo} onValueChange={setAgendamentoTipo}>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="empresa" id="agenda-empresa" className="border-foreground text-foreground data-[state=checked]:bg-foreground data-[state=checked]:border-foreground" />
+                <Label htmlFor="agenda-empresa" className="text-xs sm:text-sm text-foreground">Empresa</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="setor" id="agenda-setor" className="border-foreground text-foreground data-[state=checked]:bg-foreground data-[state=checked]:border-foreground" />
+                <Label htmlFor="agenda-setor" className="text-xs sm:text-sm text-foreground">Setor</Label>
+              </div>
+            </RadioGroup>
+          </CardContent>
+        </Card>
+
+        {/* Mensagem ao Aceitar Atendimento */}
+        <Card className="bg-card border-border">
+          <CardHeader className="pb-3 sm:pb-6">
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-base sm:text-lg text-card-foreground">Mensagem ao Aceitar Atendimento</CardTitle>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <MessageCircleQuestion className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p>Se hablitado, sempre que um atendente iniciar um atendimento que estava em aguardando será disparado a mensagem configurada nas Mensagens padrões.</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <CardDescription className="text-xs sm:text-sm">
+              Envia mensagem automática quando o atendimento for aceito
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="mensagem-aceitar"
+                checked={mensagemAceitar}
+                onCheckedChange={setMensagemAceitar}
+                className="data-[state=checked]:bg-foreground data-[state=unchecked]:bg-input"
+              />
+              <Label htmlFor="mensagem-aceitar" className="text-xs sm:text-sm font-medium text-foreground">
+                {mensagemAceitar ? 'Habilitado' : 'Desabilitado'}
+              </Label>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Histórico de Mensagens */}
+        <Card className="bg-card border-border">
+          <CardHeader className="pb-3 sm:pb-6">
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-base sm:text-lg text-card-foreground">Histórico de Mensagens</CardTitle>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <MessageCircleQuestion className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p>Se exibir por setor, cada usuario da plataforma, só verá as conversas do atendimento, quando o cliente estava em um setor atrelado a esse usuario, se selecionado completo, o atendente verá todo o historico de conversa, de todos os setores (recomendado).</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <CardDescription className="text-xs sm:text-sm">
+              Define o escopo do histórico de mensagens visualizado
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <RadioGroup value={historicoMensagens} onValueChange={setHistoricoMensagens}>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="completo" id="historico-completo" className="border-foreground text-foreground data-[state=checked]:bg-foreground data-[state=checked]:border-foreground" />
+                <Label htmlFor="historico-completo" className="text-xs sm:text-sm text-foreground">Completo</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="setor" id="historico-setor" className="border-foreground text-foreground data-[state=checked]:bg-foreground data-[state=checked]:border-foreground" />
+                <Label htmlFor="historico-setor" className="text-xs sm:text-sm text-foreground">Setor</Label>
+              </div>
+            </RadioGroup>
+          </CardContent>
+        </Card>
+
+        {/* Ignorar Mensagens de Grupos */}
+        <Card className="bg-card border-border">
+          <CardHeader className="pb-3 sm:pb-6">
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-base sm:text-lg text-card-foreground">Ignorar Mensagens de Grupos</CardTitle>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <MessageCircleQuestion className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p>Se habilitado, o sistema irá notificar mensagens de grupos, Desabilitar é o mesmo que silenciar os grupos.</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <CardDescription className="text-xs sm:text-sm">
+              Define se mensagens de grupos do WhatsApp devem ser ignoradas
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="ignorar-grupos"
+                checked={ignorarGrupos}
+                onCheckedChange={setIgnorarGrupos}
+                className="data-[state=checked]:bg-foreground data-[state=unchecked]:bg-input"
+              />
+              <Label htmlFor="ignorar-grupos" className="text-xs sm:text-sm font-medium text-foreground">
+                {ignorarGrupos ? 'Habilitado' : 'Desabilitado'}
+              </Label>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Ligações WhatsApp */}
+        <Card className="bg-card border-border">
+          <CardHeader className="pb-3 sm:pb-6">
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-base sm:text-lg text-card-foreground">Ligações WhatsApp</CardTitle>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <MessageCircleQuestion className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p>Se Desabilitado, ao receber uma ligação via WhatsApp, a mesma será recusada automaticamente, e enviada a mensagem cadastrada em Mensagens padrões(Deixe vazia em caso de não enviar nenhuma mensagem).Se Habiltiado, as ligações de WhatsApp poderão ser atendidas no dispositivo movel.</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <CardDescription className="text-xs sm:text-sm">
+              Permite ou bloqueia ligações através do WhatsApp
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="ligacoes-whatsapp"
+                checked={ligacoesWhatsapp}
+                onCheckedChange={setLigacoesWhatsapp}
+                className="data-[state=checked]:bg-foreground data-[state=unchecked]:bg-input"
+              />
+              <Label htmlFor="ligacoes-whatsapp" className="text-xs sm:text-sm font-medium text-foreground">
+                {ligacoesWhatsapp ? 'Habilitado' : 'Desabilitado'}
+              </Label>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-
-      {/* LGPD */}
-      <Card className="bg-card border-border">
-        <CardHeader className="pb-3 sm:pb-6">
-          <CardTitle className="text-base sm:text-lg text-card-foreground">LGPD - Lei Geral de Proteção de Dados</CardTitle>
-          <CardDescription className="text-xs sm:text-sm">
-            Controla a aplicação das regras de proteção de dados pessoais
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="lgpd"
-              checked={lgpdEnabled}
-              onCheckedChange={setLgpdEnabled}
-            />
-            <Label htmlFor="lgpd" className="text-xs sm:text-sm font-medium text-foreground">
-              {lgpdEnabled ? 'Habilitado' : 'Desabilitado'}
-            </Label>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Avaliações NPS */}
-      <Card className="bg-card border-border">
-        <CardHeader className="pb-3 sm:pb-6">
-          <CardTitle className="text-base sm:text-lg text-card-foreground">Avaliações de NPS</CardTitle>
-          <CardDescription className="text-xs sm:text-sm">
-            Define como as avaliações de NPS serão enviadas aos clientes
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <RadioGroup value={npsEvaluation} onValueChange={setNpsEvaluation}>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="automatico" id="nps-auto" />
-              <Label htmlFor="nps-auto" className="text-xs sm:text-sm text-foreground">Enviar ao final do atendimento</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="manual" id="nps-manual" />
-              <Label htmlFor="nps-manual" className="text-xs sm:text-sm text-foreground">Enviar manualmente</Label>
-            </div>
-          </RadioGroup>
-        </CardContent>
-      </Card>
-
-      {/* Tipo de Agendamento */}
-      <Card className="bg-card border-border">
-        <CardHeader className="pb-3 sm:pb-6">
-          <CardTitle className="text-base sm:text-lg text-card-foreground">Tipo de Agendamento de Expediente</CardTitle>
-          <CardDescription className="text-xs sm:text-sm">
-            Define se o agendamento será por empresa ou por setor
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <RadioGroup value={agendamentoTipo} onValueChange={setAgendamentoTipo}>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="empresa" id="agenda-empresa" />
-              <Label htmlFor="agenda-empresa" className="text-xs sm:text-sm text-foreground">Empresa</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="setor" id="agenda-setor" />
-              <Label htmlFor="agenda-setor" className="text-xs sm:text-sm text-foreground">Setor</Label>
-            </div>
-          </RadioGroup>
-        </CardContent>
-      </Card>
-
-      {/* Mensagem ao Aceitar Atendimento */}
-      <Card className="bg-card border-border">
-        <CardHeader className="pb-3 sm:pb-6">
-          <CardTitle className="text-base sm:text-lg text-card-foreground">Mensagem ao Aceitar Atendimento</CardTitle>
-          <CardDescription className="text-xs sm:text-sm">
-            Envia mensagem automática quando o atendimento for aceito
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="mensagem-aceitar"
-              checked={mensagemAceitar}
-              onCheckedChange={setMensagemAceitar}
-            />
-            <Label htmlFor="mensagem-aceitar" className="text-xs sm:text-sm font-medium text-foreground">
-              {mensagemAceitar ? 'Habilitado' : 'Desabilitado'}
-            </Label>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Histórico de Mensagens */}
-      <Card className="bg-card border-border">
-        <CardHeader className="pb-3 sm:pb-6">
-          <CardTitle className="text-base sm:text-lg text-card-foreground">Histórico de Mensagens</CardTitle>
-          <CardDescription className="text-xs sm:text-sm">
-            Define o escopo do histórico de mensagens visualizado
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <RadioGroup value={historicoMensagens} onValueChange={setHistoricoMensagens}>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="completo" id="historico-completo" />
-              <Label htmlFor="historico-completo" className="text-xs sm:text-sm text-foreground">Completo</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="setor" id="historico-setor" />
-              <Label htmlFor="historico-setor" className="text-xs sm:text-sm text-foreground">Setor</Label>
-            </div>
-          </RadioGroup>
-        </CardContent>
-      </Card>
-
-      {/* Ignorar Mensagens de Grupos */}
-      <Card className="bg-card border-border">
-        <CardHeader className="pb-3 sm:pb-6">
-          <CardTitle className="text-base sm:text-lg text-card-foreground">Ignorar Mensagens de Grupos</CardTitle>
-          <CardDescription className="text-xs sm:text-sm">
-            Define se mensagens de grupos do WhatsApp devem ser ignoradas
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="ignorar-grupos"
-              checked={ignorarGrupos}
-              onCheckedChange={setIgnorarGrupos}
-            />
-            <Label htmlFor="ignorar-grupos" className="text-xs sm:text-sm font-medium text-foreground">
-              {ignorarGrupos ? 'Habilitado' : 'Desabilitado'}
-            </Label>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Ligações WhatsApp */}
-      <Card className="bg-card border-border">
-        <CardHeader className="pb-3 sm:pb-6">
-          <CardTitle className="text-base sm:text-lg text-card-foreground">Ligações WhatsApp</CardTitle>
-          <CardDescription className="text-xs sm:text-sm">
-            Permite ou bloqueia ligações através do WhatsApp
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="ligacoes-whatsapp"
-              checked={ligacoesWhatsapp}
-              onCheckedChange={setLigacoesWhatsapp}
-            />
-            <Label htmlFor="ligacoes-whatsapp" className="text-xs sm:text-sm font-medium text-foreground">
-              {ligacoesWhatsapp ? 'Habilitado' : 'Desabilitado'}
-            </Label>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    </TooltipProvider>
   );
 };
 
