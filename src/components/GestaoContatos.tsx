@@ -141,12 +141,12 @@ const GestaoContatos = () => {
   const TagSelector = ({ selectedTags, onToggleTag }: { selectedTags: string[], onToggleTag: (tag: string) => void }) => (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="w-full justify-between border-gray-300">
+        <Button variant="outline" className="w-full justify-between brand-border-gray-300">
           {selectedTags.length > 0 ? `${selectedTags.length} tags selecionadas` : "Selecionar tags"}
           <ChevronDown className="h-4 w-4" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0 bg-white border border-gray-300 shadow-lg">
+      <PopoverContent className="w-full p-0 brand-background brand-border-gray-300 shadow-lg">
         <div className="p-2 space-y-2">
           {availableTags.map((tag) => (
             <div key={tag} className="flex items-center space-x-2">
@@ -167,21 +167,21 @@ const GestaoContatos = () => {
 
   return (
     <TooltipProvider>
-      <div className="p-3 sm:p-6 bg-white min-h-screen">
+      <div className="p-3 sm:p-6 brand-background min-h-screen">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold text-black mb-4 sm:mb-6">
+          <h1 className="text-xl sm:text-2xl font-bold brand-text-foreground mb-4 sm:mb-6">
             Gestão de Contatos ({totalContacts})
           </h1>
 
           {/* Barra de pesquisa */}
           <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 brand-text-gray-400 h-4 w-4" />
             <Input
               placeholder="Pesquisar contatos"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 border-gray-300"
+              className="pl-10 brand-border-gray-300"
             />
           </div>
 
@@ -189,10 +189,10 @@ const GestaoContatos = () => {
           <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center mb-6">
             <div className="min-w-48">
               <Select value={tagFilter} onValueChange={setTagFilter}>
-                <SelectTrigger className="border-gray-300 bg-white">
+                <SelectTrigger className="brand-border-gray-300 brand-background">
                   <SelectValue placeholder="Filtrar por Tag" />
                 </SelectTrigger>
-                <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
+                <SelectContent className="brand-background brand-border-gray-300 shadow-lg z-50">
                   <SelectItem value="todos">Todas as Tags</SelectItem>
                   {availableTags.map((tag) => (
                     <SelectItem key={tag} value={tag}>
@@ -205,10 +205,10 @@ const GestaoContatos = () => {
 
             <div className="min-w-64">
               <Select value={channelFilter} onValueChange={setChannelFilter}>
-                <SelectTrigger className="border-gray-300 bg-white">
+                <SelectTrigger className="brand-border-gray-300 brand-background">
                   <SelectValue placeholder="Filtrar por Canal de atendimento" />
                 </SelectTrigger>
-                <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
+                <SelectContent className="brand-background brand-border-gray-300 shadow-lg z-50">
                   <SelectItem value="todos">Todos os Canais</SelectItem>
                   {availableChannels.map((channel) => (
                     <SelectItem key={channel} value={channel}>
@@ -221,12 +221,12 @@ const GestaoContatos = () => {
 
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-black text-white hover:bg-gray-800">
+                <Button className="brand-primary brand-hover-primary text-white">
                   <Plus className="h-4 w-4 mr-2" />
                   Adicionar Contato
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-md bg-white max-h-[90vh] overflow-y-auto">
+              <DialogContent className="sm:max-w-md brand-background max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Adicionar Contato</DialogTitle>
                 </DialogHeader>
@@ -237,7 +237,7 @@ const GestaoContatos = () => {
                       value={newContact.name}
                       onChange={(e) => setNewContact({...newContact, name: e.target.value})}
                       placeholder="Nome do contato"
-                      className="border-gray-300"
+                      className="brand-border-gray-300"
                     />
                   </div>
                   <div>
@@ -246,7 +246,7 @@ const GestaoContatos = () => {
                       value={newContact.phone}
                       onChange={(e) => setNewContact({...newContact, phone: e.target.value})}
                       placeholder="Número do contato"
-                      className="border-gray-300"
+                      className="brand-border-gray-300"
                     />
                   </div>
                   <div>
@@ -255,7 +255,7 @@ const GestaoContatos = () => {
                       value={newContact.email}
                       onChange={(e) => setNewContact({...newContact, email: e.target.value})}
                       placeholder="Email do contato"
-                      className="border-gray-300"
+                      className="brand-border-gray-300"
                     />
                   </div>
                   <div>
@@ -264,7 +264,7 @@ const GestaoContatos = () => {
                       value={newContact.observations}
                       onChange={(e) => setNewContact({...newContact, observations: e.target.value})}
                       placeholder="Observações livres"
-                      className="border-gray-300"
+                      className="brand-border-gray-300"
                     />
                   </div>
                   <div>
@@ -276,7 +276,7 @@ const GestaoContatos = () => {
                     {newContact.tags.length > 0 && (
                       <div className="flex gap-1 flex-wrap mt-2">
                         {newContact.tags.map((tag, index) => (
-                          <span key={index} className="px-2 py-1 bg-gray-100 text-xs rounded-full border border-gray-200">
+                          <span key={index} className="px-2 py-1 brand-gray-100 text-xs rounded-full brand-border-gray-200 border">
                             {tag}
                           </span>
                         ))}
@@ -287,14 +287,14 @@ const GestaoContatos = () => {
                     <Button
                       variant="outline"
                       onClick={handleDiscardContact}
-                      className="border-gray-300"
+                      className="brand-border-gray-300"
                     >
                       <X className="h-4 w-4 mr-2" />
                       Descartar
                     </Button>
                     <Button
                       onClick={handleSaveContact}
-                      className="bg-black text-white hover:bg-gray-800"
+                      className="brand-primary brand-hover-primary text-white"
                     >
                       <Save className="h-4 w-4 mr-2" />
                       Salvar
@@ -309,7 +309,7 @@ const GestaoContatos = () => {
         {/* Tabela responsiva */}
         <div className="overflow-x-auto">
           {/* Cabeçalho da tabela - escondido em mobile */}
-          <div className="hidden md:grid grid-cols-12 gap-4 p-4 bg-gray-50 border-b border-gray-200 font-medium text-gray-700 min-w-[800px]">
+          <div className="hidden md:grid grid-cols-12 gap-4 p-4 brand-gray-50 brand-border-gray-200 border-b font-medium brand-text-gray-700 min-w-[800px]">
             <div className="col-span-1"></div>
             <div className="col-span-3">Nome</div>
             <div className="col-span-3">Número</div>
@@ -322,24 +322,24 @@ const GestaoContatos = () => {
             {filteredContacts.map((contact, index) => (
               <div key={contact.id}>
                 {/* Layout mobile */}
-                <div className="md:hidden p-4 bg-white border border-gray-200 rounded-lg space-y-3">
+                <div className="md:hidden p-4 brand-background brand-border-gray-200 border rounded-lg space-y-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
-                      <span className="text-sm font-medium text-gray-600">
+                    <div className="w-12 h-12 brand-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-sm font-medium brand-text-gray-600">
                         {contact.name.charAt(0)}
                       </span>
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-medium text-black">{contact.name}</h3>
-                      <p className="text-sm text-gray-600">{contact.phone}</p>
+                      <h3 className="font-medium brand-text-foreground">{contact.name}</h3>
+                      <p className="text-sm brand-text-gray-600">{contact.phone}</p>
                     </div>
                   </div>
                   
                   <div>
-                    <span className="text-xs text-gray-500 uppercase tracking-wide">Tags</span>
+                    <span className="text-xs brand-text-gray-500 uppercase tracking-wide">Tags</span>
                     <div className="flex gap-1 flex-wrap mt-1">
                       {contact.tags.map((tag, tagIndex) => (
-                        <span key={tagIndex} className="px-2 py-1 bg-gray-100 text-xs rounded-full border border-gray-200">
+                        <span key={tagIndex} className="px-2 py-1 brand-gray-100 text-xs rounded-full brand-border-gray-200 border">
                           {tag}
                         </span>
                       ))}
@@ -377,27 +377,27 @@ const GestaoContatos = () => {
                 </div>
 
                 {/* Layout desktop */}
-                <div className="hidden md:grid grid-cols-12 gap-4 items-center p-4 hover:bg-gray-50 transition-colors min-w-[800px]">
+                <div className="hidden md:grid grid-cols-12 gap-4 items-center p-4 brand-hover-gray-50 transition-colors min-w-[800px]">
                   <div className="col-span-1">
-                    <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
-                      <span className="text-sm font-medium text-gray-600">
+                    <div className="w-10 h-10 brand-gray-300 rounded-full flex items-center justify-center">
+                      <span className="text-sm font-medium brand-text-gray-600">
                         {contact.name.charAt(0)}
                       </span>
                     </div>
                   </div>
                   
                   <div className="col-span-3">
-                    <h3 className="font-medium text-black">{contact.name}</h3>
+                    <h3 className="font-medium brand-text-foreground">{contact.name}</h3>
                   </div>
 
                   <div className="col-span-3">
-                    <p className="text-sm text-gray-600">{contact.phone}</p>
+                    <p className="text-sm brand-text-gray-600">{contact.phone}</p>
                   </div>
 
                   <div className="col-span-3">
                     <div className="flex gap-1 flex-wrap">
                       {contact.tags.map((tag, tagIndex) => (
-                        <span key={tagIndex} className="px-2 py-1 bg-gray-100 text-xs rounded-full border border-gray-200">
+                        <span key={tagIndex} className="px-2 py-1 brand-gray-100 text-xs rounded-full brand-border-gray-200 border">
                           {tag}
                         </span>
                       ))}
@@ -436,7 +436,7 @@ const GestaoContatos = () => {
 
                 {/* Linha divisória */}
                 {index < filteredContacts.length - 1 && (
-                  <div className="hidden md:block border-b border-gray-200"></div>
+                  <div className="hidden md:block brand-border-gray-200 border-b"></div>
                 )}
               </div>
             ))}
@@ -445,7 +445,7 @@ const GestaoContatos = () => {
 
         {/* Dialog de Editar Contato */}
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent className="sm:max-w-md bg-white max-h-[90vh] overflow-y-auto">
+          <DialogContent className="sm:max-w-md brand-background max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Editar Contato</DialogTitle>
             </DialogHeader>
@@ -457,7 +457,7 @@ const GestaoContatos = () => {
                     value={selectedContact.name}
                     onChange={(e) => setSelectedContact({...selectedContact, name: e.target.value})}
                     placeholder="Nome do contato"
-                    className="border-gray-300"
+                    className="brand-border-gray-300"
                   />
                 </div>
                 <div>
@@ -466,7 +466,7 @@ const GestaoContatos = () => {
                     value={selectedContact.phone}
                     onChange={(e) => setSelectedContact({...selectedContact, phone: e.target.value})}
                     placeholder="Número do contato"
-                    className="border-gray-300"
+                    className="brand-border-gray-300"
                   />
                 </div>
                 <div>
@@ -475,7 +475,7 @@ const GestaoContatos = () => {
                     value={selectedContact.email || ''}
                     onChange={(e) => setSelectedContact({...selectedContact, email: e.target.value})}
                     placeholder="Email do contato"
-                    className="border-gray-300"
+                    className="brand-border-gray-300"
                   />
                 </div>
                 <div>
@@ -484,7 +484,7 @@ const GestaoContatos = () => {
                     value={selectedContact.observations || ''}
                     onChange={(e) => setSelectedContact({...selectedContact, observations: e.target.value})}
                     placeholder="Observações livres"
-                    className="border-gray-300"
+                    className="brand-border-gray-300"
                   />
                 </div>
                 <div>
@@ -496,7 +496,7 @@ const GestaoContatos = () => {
                   {selectedContact.tags.length > 0 && (
                     <div className="flex gap-1 flex-wrap mt-2">
                       {selectedContact.tags.map((tag, index) => (
-                        <span key={index} className="px-2 py-1 bg-gray-100 text-xs rounded-full border border-gray-200">
+                        <span key={index} className="px-2 py-1 brand-gray-100 text-xs rounded-full brand-border-gray-200 border">
                           {tag}
                         </span>
                       ))}
@@ -507,14 +507,14 @@ const GestaoContatos = () => {
                   <Button
                     variant="outline"
                     onClick={handleDiscardEditContact}
-                    className="border-gray-300"
+                    className="brand-border-gray-300"
                   >
                     <X className="h-4 w-4 mr-2" />
                     Descartar
                   </Button>
                   <Button
                     onClick={handleSaveEditContact}
-                    className="bg-black text-white hover:bg-gray-800"
+                    className="brand-primary brand-hover-primary text-white"
                   >
                     <Save className="h-4 w-4 mr-2" />
                     Salvar

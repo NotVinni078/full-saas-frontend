@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -147,13 +146,13 @@ const GestaoSetores = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl lg:text-2xl font-bold text-foreground">Gestão de Setores</h1>
-          <p className="text-muted-foreground mt-1 text-sm lg:text-base">Gerencie os setores e departamentos da empresa</p>
+          <h1 className="text-xl lg:text-2xl font-bold brand-text-foreground">Gestão de Setores</h1>
+          <p className="brand-text-muted mt-1 text-sm lg:text-base">Gerencie os setores e departamentos da empresa</p>
         </div>
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground w-full sm:w-auto">
+            <Button className="brand-primary brand-hover-primary text-white w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
               Novo Setor
             </Button>
@@ -198,7 +197,7 @@ const GestaoSetores = () => {
                 </Button>
                 <Button 
                   onClick={handleCriarSetor} 
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground w-full sm:w-auto"
+                  className="brand-primary brand-hover-primary text-white w-full sm:w-auto"
                   disabled={!novoSetor.nome.trim()}
                 >
                   {isEditMode ? 'Salvar Alterações' : 'Salvar'}
@@ -242,7 +241,7 @@ const GestaoSetores = () => {
               <TableBody>
                 {filtrarSetores().length > 0 ? (
                   filtrarSetores().map((setor) => (
-                    <TableRow key={setor.id} className="hover:bg-muted/50">
+                    <TableRow key={setor.id} className="brand-hover-muted">
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <Badge 
@@ -264,7 +263,7 @@ const GestaoSetores = () => {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleAdicionarUsuarios(setor)}
-                              className="h-8 w-8 p-0 hover:bg-accent hover:text-accent-foreground"
+                              className="h-8 w-8 p-0 brand-hover-accent"
                             >
                               <UserPlus className="h-4 w-4" />
                             </Button>
@@ -272,7 +271,7 @@ const GestaoSetores = () => {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleEditarSetor(setor)}
-                              className="h-8 w-8 p-0 hover:bg-accent hover:text-accent-foreground"
+                              className="h-8 w-8 p-0 brand-hover-accent"
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
@@ -317,7 +316,7 @@ const GestaoSetores = () => {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={3} className="text-center py-8">
-                      <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                      <div className="flex flex-col items-center gap-2 brand-text-muted">
                         <Building2 className="h-8 w-8 opacity-50" />
                         <p>Nenhum setor encontrado</p>
                         {searchTerm && (
@@ -362,7 +361,7 @@ const GestaoSetores = () => {
                         <Button
                           size="sm"
                           onClick={() => handleSelecionarUsuario(usuario.id)}
-                          className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                          className="brand-primary brand-hover-primary text-white"
                         >
                           <Plus className="h-4 w-4 mr-2" />
                           Adicionar

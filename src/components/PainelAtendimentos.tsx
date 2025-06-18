@@ -244,10 +244,10 @@ const PainelAtendimentos = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'online': return 'bg-green-500';
-      case 'away': return 'bg-yellow-500';
-      case 'offline': return 'bg-gray-400';
-      default: return 'bg-gray-400';
+      case 'online': return 'brand-success';
+      case 'away': return 'brand-warning';
+      case 'offline': return 'brand-gray-400';
+      default: return 'brand-gray-400';
     }
   };
 
@@ -262,10 +262,10 @@ const PainelAtendimentos = () => {
 
   const getPrioridadeColor = (prioridade: string) => {
     switch (prioridade) {
-      case 'alta': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
-      case 'media': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
-      case 'baixa': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+      case 'alta': return 'brand-error';
+      case 'media': return 'brand-warning';
+      case 'baixa': return 'brand-success';
+      default: return 'brand-gray-200';
     }
   };
 
@@ -303,13 +303,13 @@ const PainelAtendimentos = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-card-foreground">Painel de Atendimentos</h1>
-          <p className="text-muted-foreground">Monitore todos os atendimentos em andamento</p>
+          <h1 className="text-2xl font-bold brand-text-foreground">Painel de Atendimentos</h1>
+          <p className="brand-text-muted">Monitore todos os atendimentos em andamento</p>
         </div>
         
         {/* Search Bar */}
         <div className="relative w-80">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 brand-text-muted" />
           <Input
             placeholder="Pesquisar por usuário ou departamento..."
             value={searchTerm}
@@ -328,16 +328,16 @@ const PainelAtendimentos = () => {
                 <div className="relative">
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={usuario.avatar} />
-                    <AvatarFallback className="bg-muted text-muted-foreground">
+                    <AvatarFallback className="brand-muted brand-text-muted">
                       {usuario.nome.split(' ').map(n => n[0]).join('')}
                     </AvatarFallback>
                   </Avatar>
-                  <div className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-card ${getStatusColor(usuario.status)}`} />
+                  <div className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full brand-border-card border-2 ${getStatusColor(usuario.status)}`} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <CardTitle className="text-base truncate">{usuario.nome}</CardTitle>
-                  <p className="text-xs text-muted-foreground">{usuario.departamento}</p>
-                  <p className="text-xs text-muted-foreground">{getStatusText(usuario.status)}</p>
+                  <p className="text-xs brand-text-muted">{usuario.departamento}</p>
+                  <p className="text-xs brand-text-muted">{getStatusText(usuario.status)}</p>
                 </div>
               </div>
               
@@ -370,12 +370,12 @@ const PainelAtendimentos = () => {
                       {usuario.atendimentos.map((atendimento) => (
                         <div
                           key={atendimento.id}
-                          className="p-3 rounded-lg bg-muted/50 border border-border/50"
+                          className="p-3 rounded-lg brand-muted/50 brand-border border"
                         >
                           <div className="flex items-start justify-between mb-2">
                             <div className="flex-1 min-w-0">
                               <h4 className="text-sm font-medium truncate">{atendimento.cliente}</h4>
-                              <p className="text-xs text-muted-foreground truncate">{atendimento.assunto}</p>
+                              <p className="text-xs brand-text-muted truncate">{atendimento.assunto}</p>
                             </div>
                             <Button
                               variant="ghost"
@@ -390,7 +390,7 @@ const PainelAtendimentos = () => {
                           <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-2">
                               <span className="text-xs">{getCanalIcon(atendimento.canal)}</span>
-                              <span className="text-xs text-muted-foreground">{atendimento.canal}</span>
+                              <span className="text-xs brand-text-muted">{atendimento.canal}</span>
                             </div>
                             <div className="flex items-center space-x-2">
                               <Badge
@@ -400,8 +400,8 @@ const PainelAtendimentos = () => {
                                 {atendimento.prioridade}
                               </Badge>
                               <div className="flex items-center space-x-1">
-                                <Clock className="h-3 w-3 text-muted-foreground" />
-                                <span className="text-xs text-muted-foreground">{atendimento.tempo}</span>
+                                <Clock className="h-3 w-3 brand-text-muted" />
+                                <span className="text-xs brand-text-muted">{atendimento.tempo}</span>
                               </div>
                             </div>
                           </div>
@@ -424,8 +424,8 @@ const PainelAtendimentos = () => {
               ) : (
                 <div className="text-center py-8 flex-1 flex items-center justify-center">
                   <div>
-                    <MessageSquare className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                    <p className="text-sm text-muted-foreground">Nenhum atendimento ativo</p>
+                    <MessageSquare className="h-8 w-8 brand-text-muted mx-auto mb-2" />
+                    <p className="text-sm brand-text-muted">Nenhum atendimento ativo</p>
                   </div>
                 </div>
               )}
@@ -437,7 +437,7 @@ const PainelAtendimentos = () => {
       {/* Mensagem quando não há resultados */}
       {filteredUsuarios.length === 0 && searchTerm && (
         <div className="text-center py-8">
-          <p className="text-muted-foreground">Nenhum usuário encontrado para "{searchTerm}"</p>
+          <p className="brand-text-muted">Nenhum usuário encontrado para "{searchTerm}"</p>
         </div>
       )}
     </div>
