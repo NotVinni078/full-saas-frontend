@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
@@ -112,6 +113,7 @@ const menuGroups = [
 ];
 
 const singleItems = [
+  { id: 'inicio', label: 'Início', icon: Home, route: '/inicio' },
   { id: 'atendimentos', label: 'Atendimentos', icon: MessageSquare, route: '/atendimentos' },
   { id: 'chat-interno', label: 'Chat Interno', icon: MessagesSquare, route: '/chat-interno' },
   { id: 'painel-atendimentos', label: 'Painel de Atendimentos', icon: MessageSquareCode, route: '/painel-atendimentos' },
@@ -150,13 +152,19 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
   const renderMenuItems = () => {
     const orderedItems = [];
 
-    // 1. Dashboards (grupo)
+    // 1. Início (item individual)
+    const inicioItem = singleItems.find(item => item.id === 'inicio');
+    if (inicioItem) {
+      orderedItems.push({ type: 'single', data: inicioItem });
+    }
+
+    // 2. Dashboards (grupo)
     const dashboardsGroup = menuGroups.find(group => group.id === 'dashboards');
     if (dashboardsGroup) {
       orderedItems.push({ type: 'group', data: dashboardsGroup });
     }
 
-    // 2-8. Itens individuais na ordem especificada
+    // 3-9. Itens individuais na ordem especificada
     const orderedSingleItems = [
       'atendimentos',
       'chat-interno', 
@@ -174,7 +182,7 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
       }
     });
 
-    // 9-11. Grupos na ordem especificada
+    // 10-12. Grupos na ordem especificada
     const orderedGroups = ['gestao', 'administracao', 'financeiro'];
     orderedGroups.forEach(groupId => {
       const group = menuGroups.find(g => g.id === groupId);
@@ -183,7 +191,7 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
       }
     });
 
-    // 12-14. Itens individuais finais
+    // 13-15. Itens individuais finais
     const finalSingleItems = ['chatbot', 'conexoes', 'documentacao'];
     finalSingleItems.forEach(itemId => {
       const item = singleItems.find(single => single.id === itemId);
@@ -192,7 +200,7 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
       }
     });
 
-    // 15. Configurações (grupo)
+    // 16. Configurações (grupo)
     const configGroup = menuGroups.find(group => group.id === 'configuracoes');
     if (configGroup) {
       orderedItems.push({ type: 'group', data: configGroup });

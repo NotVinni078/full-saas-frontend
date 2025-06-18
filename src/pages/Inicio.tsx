@@ -1,82 +1,94 @@
 
 import React, { useState } from 'react';
-import AppSidebar from '@/components/AppSidebar';
-import NavBar from '@/components/NavBar';
-import Dashboard from '@/components/Dashboard';
-import PageContent from '@/components/PageContent';
+import { FileText } from 'lucide-react';
+import SidebarLayout from '@/components/SidebarLayout';
+import AnunciosSlider from '@/components/AnunciosSlider';
+import CardModal from '@/components/CardModal';
 
-const Inicio = () => {
-  const [currentPage, setCurrentPage] = useState('dashboard-gerencial');
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState('pt-BR');
+interface CardData {
+  id: number;
+  titulo: string;
+  descricao: string;
+  data: string;
+  tipo: string;
+}
 
-  const handleLogout = () => {
-    window.location.href = '/auth';
+const InicioContent = () => {
+  const [selectedCard, setSelectedCard] = useState<CardData | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const notasAtualizacao = [
+    {
+      id: 1,
+      titulo: "Nova versão 2.5.0 disponível",
+      descricao: "Implementamos melhorias no sistema de atendimento e correções de bugs importantes. Esta atualização inclui novos recursos de automação, melhor performance e interface mais intuitiva para uma experiência ainda melhor.",
+      data: "15 de Janeiro, 2024",
+      tipo: "Atualização"
+    },
+    {
+      id: 2,
+      titulo: "Manutenção programada",
+      descricao: "Sistema ficará em manutenção no dia 20/01 das 02:00 às 06:00 para melhorias na infraestrutura. Durante este período, algumas funcionalidades podem ficar temporariamente indisponíveis.",
+      data: "12 de Janeiro, 2024",
+      tipo: "Manutenção"
+    },
+    {
+      id: 3,
+      titulo: "Novas funcionalidades de IA",
+      descricao: "Adicionamos respostas automáticas inteligentes e análise de sentimento em tempo real. Agora o sistema pode identificar automaticamente o tom das conversas e sugerir as melhores respostas.",
+      data: "08 de Janeiro, 2024",
+      tipo: "Recurso"
+    },
+    {
+      id: 4,
+      titulo: "Correções de segurança",
+      descricao: "Implementamos importantes correções de segurança para proteger ainda mais seus dados e conversas.",
+      data: "05 de Janeiro, 2024",
+      tipo: "Atualização"
+    }
+  ];
+
+  const handleCardClick = (card: CardData) => {
+    setSelectedCard(card);
+    setIsModalOpen(true);
   };
 
-  const handlePageChange = (page: string) => {
-    setCurrentPage(page);
-  };
-
-  const toggleSidebar = () => {
-    setSidebarCollapsed(!sidebarCollapsed);
-  };
-
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    document.documentElement.classList.toggle('dark');
-  };
-
-  const handleLanguageChange = (language: string) => {
-    setCurrentLanguage(language);
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedCard(null);
   };
 
   return (
-    <div className={`h-screen bg-background flex w-full overflow-hidden ${isDarkMode ? 'dark' : ''}`}>
-      {/* Sidebar - comportamento responsivo corrigido */}
-      <div className={`
-        fixed inset-y-0 left-0 z-50 md:relative md:z-auto
-        ${sidebarCollapsed ? '-translate-x-full md:translate-x-0' : 'translate-x-0'} 
-        transition-transform duration-300 ease-in-out
-      `}>
-        <AppSidebar
-          currentPage={currentPage}
-          onPageChange={handlePageChange}
-          isCollapsed={sidebarCollapsed}
-          onToggleCollapse={toggleSidebar}
-          onLogout={handleLogout}
-        />
+    <div className="container mx-auto p-6 space-y-8">
+      {/* Header */}
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold text-foreground">Bem-vindo ao Sistema</h1>
+        <p className="text-muted-foreground">Confira as últimas atualizações e novidades</p>
       </div>
 
-      {/* Overlay para fechar sidebar em mobile */}
-      {!sidebarCollapsed && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-          onClick={toggleSidebar}
-        />
-      )}
-      
-      {/* Conteúdo principal */}
-      <div className="flex-1 flex flex-col min-w-0 h-full bg-background">
-        <NavBar
-          isDarkMode={isDarkMode}
-          onToggleTheme={toggleTheme}
-          currentLanguage={currentLanguage}
-          onLanguageChange={handleLanguageChange}
-          onToggleSidebar={toggleSidebar}
-          isSidebarCollapsed={sidebarCollapsed}
-        />
-        
-        <main className="flex-1 overflow-auto bg-background min-h-0">
-          {currentPage.includes('dashboard') ? (
-            <Dashboard currentPage={currentPage} />
-          ) : (
-            <PageContent page={currentPage} />
-          )}
-        </main>
-      </div>
+      {/* Notas de Atualização */}
+      <AnunciosSlider
+        items={notasAtualizacao}
+        onCardClick={handleCardClick}
+        title="Notas de Atualização"
+        icon={<FileText className="h-6 w-6 text-blue-600" />}
+      />
+
+      {/* Modal */}
+      <CardModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        card={selectedCard}
+      />
     </div>
+  );
+};
+
+const Inicio = () => {
+  return (
+    <SidebarLayout>
+      <InicioContent />
+    </SidebarLayout>
   );
 };
 

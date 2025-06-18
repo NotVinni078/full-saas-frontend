@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { GlobalDataProvider } from "@/contexts/GlobalDataContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import Inicio from "./pages/Inicio";
 import Anuncios from "./pages/Anuncios";
 import Atendimentos from "./pages/Atendimentos";
 import ChatInterno from "./pages/ChatInterno";
@@ -47,7 +48,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/inicio" element={<Anuncios />} />
+            <Route path="/inicio" element={<Inicio />} />
             <Route path="/anuncios" element={<Anuncios />} />
             <Route path="/atendimentos" element={<Atendimentos />} />
             <Route path="/chat-interno" element={<ChatInterno />} />
