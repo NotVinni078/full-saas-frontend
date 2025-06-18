@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import SidebarLayout from '@/components/SidebarLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -44,7 +43,23 @@ const GerenciarMarca = () => {
           background: '0 0% 100%',
           foreground: '222.2 84% 4.9%',
           muted: '210 40% 96.1%',
-          border: '214.3 31.8% 91.4%'
+          border: '214.3 31.8% 91.4%',
+          // Cores de status
+          success: '142.1 76.2% 36.3%',
+          warning: '47.9 95.8% 53.1%',
+          error: '0 84.2% 60.2%',
+          info: '199.89 89.47% 49.41%',
+          // Tons de cinza
+          gray50: '210 40% 98%',
+          gray100: '210 40% 96.1%',
+          gray200: '214.3 31.8% 91.4%',
+          gray300: '213 27% 84%',
+          gray400: '215 20.2% 65.1%',
+          gray500: '215 16.3% 46.9%',
+          gray600: '215.4 16.3% 46.9%',
+          gray700: '215 25% 26.9%',
+          gray800: '217 32.6% 17.5%',
+          gray900: '222.2 84% 4.9%'
         },
         dark: {
           primary: '210 40% 98%',
@@ -53,7 +68,23 @@ const GerenciarMarca = () => {
           background: '0 0% 0%',
           foreground: '210 40% 98%',
           muted: '0 0% 5%',
-          border: '0 0% 10%'
+          border: '0 0% 10%',
+          // Cores de status para tema escuro
+          success: '142.1 70.6% 45.3%',
+          warning: '47.9 95.8% 53.1%',
+          error: '0 62.8% 50.6%',
+          info: '199.89 89.47% 49.41%',
+          // Tons de cinza para tema escuro
+          gray50: '0 0% 5%',
+          gray100: '0 0% 10%',
+          gray200: '0 0% 15%',
+          gray300: '0 0% 20%',
+          gray400: '0 0% 25%',
+          gray500: '0 0% 30%',
+          gray600: '0 0% 40%',
+          gray700: '0 0% 50%',
+          gray800: '0 0% 80%',
+          gray900: '210 40% 98%'
         }
       }
     };
