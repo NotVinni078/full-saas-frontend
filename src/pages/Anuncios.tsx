@@ -1,31 +1,50 @@
 
-import React from 'react';
-import { Bell, FileText, Calendar, Star } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState } from 'react';
+import { Bell, FileText } from 'lucide-react';
 import SidebarLayout from '@/components/SidebarLayout';
+import AnunciosSlider from '@/components/AnunciosSlider';
+import CardModal from '@/components/CardModal';
+
+interface CardData {
+  id: number;
+  titulo: string;
+  descricao: string;
+  data: string;
+  tipo: string;
+}
 
 const AnunciosContent = () => {
+  const [selectedCard, setSelectedCard] = useState<CardData | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const notasAtualizacao = [
     {
       id: 1,
       titulo: "Nova versão 2.5.0 disponível",
-      descricao: "Implementamos melhorias no sistema de atendimento e correções de bugs importantes.",
+      descricao: "Implementamos melhorias no sistema de atendimento e correções de bugs importantes. Esta atualização inclui novos recursos de automação, melhor performance e interface mais intuitiva para uma experiência ainda melhor.",
       data: "15 de Janeiro, 2024",
       tipo: "Atualização"
     },
     {
       id: 2,
       titulo: "Manutenção programada",
-      descricao: "Sistema ficará em manutenção no dia 20/01 das 02:00 às 06:00 para melhorias na infraestrutura.",
+      descricao: "Sistema ficará em manutenção no dia 20/01 das 02:00 às 06:00 para melhorias na infraestrutura. Durante este período, algumas funcionalidades podem ficar temporariamente indisponíveis.",
       data: "12 de Janeiro, 2024",
       tipo: "Manutenção"
     },
     {
       id: 3,
       titulo: "Novas funcionalidades de IA",
-      descricao: "Adicionamos respostas automáticas inteligentes e análise de sentimento em tempo real.",
+      descricao: "Adicionamos respostas automáticas inteligentes e análise de sentimento em tempo real. Agora o sistema pode identificar automaticamente o tom das conversas e sugerir as melhores respostas.",
       data: "08 de Janeiro, 2024",
       tipo: "Recurso"
+    },
+    {
+      id: 4,
+      titulo: "Correções de segurança",
+      descricao: "Implementamos importantes correções de segurança para proteger ainda mais seus dados e conversas.",
+      data: "05 de Janeiro, 2024",
+      tipo: "Atualização"
     }
   ];
 
@@ -33,60 +52,41 @@ const AnunciosContent = () => {
     {
       id: 1,
       titulo: "Webinar: Maximizando o atendimento",
-      descricao: "Participe do nosso webinar gratuito sobre como otimizar seu atendimento ao cliente.",
+      descricao: "Participe do nosso webinar gratuito sobre como otimizar seu atendimento ao cliente. Aprenda técnicas avançadas e melhores práticas para aumentar a satisfação dos seus clientes.",
       data: "25 de Janeiro, 2024",
       tipo: "Evento"
     },
     {
       id: 2,
       titulo: "Novo plano Enterprise",
-      descricao: "Conheça nosso novo plano com recursos avançados para grandes empresas.",
+      descricao: "Conheça nosso novo plano com recursos avançados para grandes empresas. Inclui suporte prioritário, integrações personalizadas e capacidade ilimitada de atendimentos.",
       data: "20 de Janeiro, 2024",
       tipo: "Produto"
     },
     {
       id: 3,
       titulo: "Parceria com WhatsApp Business",
-      descricao: "Agora oferecemos integração oficial com a API do WhatsApp Business.",
+      descricao: "Agora oferecemos integração oficial com a API do WhatsApp Business. Conecte-se diretamente com seus clientes através da plataforma mais usada no Brasil.",
       data: "18 de Janeiro, 2024",
       tipo: "Parceria"
+    },
+    {
+      id: 4,
+      titulo: "Nova integração com CRM",
+      descricao: "Conecte seu sistema de atendimento com os principais CRMs do mercado para uma gestão completa dos seus clientes.",
+      data: "15 de Janeiro, 2024",
+      tipo: "Produto"
     }
   ];
 
-  const getIcon = (tipo: string) => {
-    switch (tipo) {
-      case 'Atualização':
-      case 'Recurso':
-        return <FileText className="h-5 w-5" />;
-      case 'Manutenção':
-        return <Bell className="h-5 w-5" />;
-      case 'Evento':
-        return <Calendar className="h-5 w-5" />;
-      case 'Produto':
-      case 'Parceria':
-        return <Star className="h-5 w-5" />;
-      default:
-        return <Bell className="h-5 w-5" />;
-    }
+  const handleCardClick = (card: CardData) => {
+    setSelectedCard(card);
+    setIsModalOpen(true);
   };
 
-  const getTypeColor = (tipo: string) => {
-    switch (tipo) {
-      case 'Atualização':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-      case 'Manutenção':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-      case 'Recurso':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-      case 'Evento':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
-      case 'Produto':
-        return 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200';
-      case 'Parceria':
-        return 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
-    }
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedCard(null);
   };
 
   return (
@@ -98,64 +98,27 @@ const AnunciosContent = () => {
       </div>
 
       {/* Notas de Atualização */}
-      <div className="space-y-4">
-        <div className="flex items-center space-x-2">
-          <FileText className="h-6 w-6 text-blue-600" />
-          <h2 className="text-2xl font-semibold text-foreground">Notas de Atualização</h2>
-        </div>
-        
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {notasAtualizacao.map((nota) => (
-            <Card key={nota.id} className="hover:shadow-md transition-shadow duration-200">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center space-x-2">
-                    {getIcon(nota.tipo)}
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(nota.tipo)}`}>
-                      {nota.tipo}
-                    </span>
-                  </div>
-                </div>
-                <CardTitle className="text-lg line-clamp-2">{nota.titulo}</CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <p className="text-sm text-muted-foreground mb-3 line-clamp-3">{nota.descricao}</p>
-                <p className="text-xs text-muted-foreground">{nota.data}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
+      <AnunciosSlider
+        items={notasAtualizacao}
+        onCardClick={handleCardClick}
+        title="Notas de Atualização"
+        icon={<FileText className="h-6 w-6 text-blue-600" />}
+      />
 
       {/* Anúncios */}
-      <div className="space-y-4">
-        <div className="flex items-center space-x-2">
-          <Bell className="h-6 w-6 text-green-600" />
-          <h2 className="text-2xl font-semibold text-foreground">Anúncios</h2>
-        </div>
-        
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {anuncios.map((anuncio) => (
-            <Card key={anuncio.id} className="hover:shadow-md transition-shadow duration-200">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center space-x-2">
-                    {getIcon(anuncio.tipo)}
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(anuncio.tipo)}`}>
-                      {anuncio.tipo}
-                    </span>
-                  </div>
-                </div>
-                <CardTitle className="text-lg line-clamp-2">{anuncio.titulo}</CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <p className="text-sm text-muted-foreground mb-3 line-clamp-3">{anuncio.descricao}</p>
-                <p className="text-xs text-muted-foreground">{anuncio.data}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
+      <AnunciosSlider
+        items={anuncios}
+        onCardClick={handleCardClick}
+        title="Anúncios"
+        icon={<Bell className="h-6 w-6 text-green-600" />}
+      />
+
+      {/* Modal */}
+      <CardModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        card={selectedCard}
+      />
     </div>
   );
 };
