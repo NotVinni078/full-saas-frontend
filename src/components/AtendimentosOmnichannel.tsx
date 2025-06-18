@@ -113,7 +113,7 @@ const AtendimentosOmnichannel = () => {
                 <p className="text-2xl font-bold brand-text-foreground">24</p>
               </div>
               <div className="brand-primary p-3 rounded-lg">
-                <MessageSquare className="w-6 h-6 text-white" />
+                <MessageSquare className="w-6 h-6 brand-text-background" />
               </div>
             </div>
             <div className="mt-4 flex items-center">
@@ -131,7 +131,7 @@ const AtendimentosOmnichannel = () => {
                 <p className="text-2xl font-bold brand-text-foreground">3m 45s</p>
               </div>
               <div className="brand-warning p-3 rounded-lg">
-                <Clock className="w-6 h-6 text-black" />
+                <Clock className="w-6 h-6 brand-text-foreground" />
               </div>
             </div>
             <div className="mt-4 flex items-center">
@@ -149,7 +149,7 @@ const AtendimentosOmnichannel = () => {
                 <p className="text-2xl font-bold brand-text-foreground">18</p>
               </div>
               <div className="brand-success p-3 rounded-lg">
-                <CheckCircle className="w-6 h-6 text-white" />
+                <CheckCircle className="w-6 h-6 brand-text-background" />
               </div>
             </div>
             <div className="mt-4 flex items-center">
@@ -167,7 +167,7 @@ const AtendimentosOmnichannel = () => {
                 <p className="text-2xl font-bold brand-text-foreground">4.8</p>
               </div>
               <div className="brand-info p-3 rounded-lg">
-                <Users className="w-6 h-6 text-white" />
+                <Users className="w-6 h-6 brand-text-background" />
               </div>
             </div>
             <div className="mt-4 flex items-center">
@@ -228,7 +228,7 @@ const AtendimentosOmnichannel = () => {
               >
                 <Avatar>
                   <AvatarImage src={conversation.avatar} />
-                  <AvatarFallback className="brand-primary text-white">
+                  <AvatarFallback className="brand-primary brand-text-background">
                     {conversation.customer.split(' ').map(n => n[0]).join('')}
                   </AvatarFallback>
                 </Avatar>

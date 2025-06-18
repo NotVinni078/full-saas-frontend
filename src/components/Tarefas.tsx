@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -200,71 +201,71 @@ const Tarefas = () => {
   const getSituacaoColor = (situacao: string) => {
     switch (situacao) {
       case 'pendente':
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
+        return 'brand-gray-100 brand-text-gray-800';
       case 'em_atraso':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+        return 'brand-error brand-text-background';
       case 'concluida':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+        return 'brand-success brand-text-background';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
+        return 'brand-gray-100 brand-text-gray-800';
     }
   };
 
   const contadores = contarTarefasPorStatus();
 
   return (
-    <div className="p-4 lg:p-6 space-y-4 lg:space-y-6 bg-background min-h-screen">
+    <div className="p-4 lg:p-6 space-y-4 lg:space-y-6 brand-background min-h-screen">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl lg:text-2xl font-bold text-foreground">Tarefas</h1>
-          <p className="text-muted-foreground mt-1 text-sm lg:text-base">Gerencie e acompanhe tarefas da equipe</p>
+          <h1 className="text-xl lg:text-2xl font-bold brand-text-foreground">Tarefas</h1>
+          <p className="brand-text-muted mt-1 text-sm lg:text-base">Gerencie e acompanhe tarefas da equipe</p>
         </div>
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-[#000000] hover:bg-gray-800 text-white w-full sm:w-auto">
+            <Button className="brand-primary brand-hover-primary brand-text-background w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
               Nova Tarefa
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px] mx-4 bg-card border-border">
+          <DialogContent className="sm:max-w-[500px] mx-4 brand-card brand-border">
             <DialogHeader>
-              <DialogTitle className="text-foreground">Criar Nova Tarefa</DialogTitle>
+              <DialogTitle className="brand-text-foreground">Criar Nova Tarefa</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="titulo" className="text-foreground">Título da Tarefa</Label>
+                <Label htmlFor="titulo" className="brand-text-foreground">Título da Tarefa</Label>
                 <Input
                   id="titulo"
                   value={novaTarefa.titulo}
                   onChange={(e) => setNovaTarefa({...novaTarefa, titulo: e.target.value})}
                   placeholder="Digite o título da tarefa"
-                  className="bg-background border-border text-foreground"
+                  className="brand-background brand-border brand-text-foreground"
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="descricao" className="text-foreground">Descrição</Label>
+                <Label htmlFor="descricao" className="brand-text-foreground">Descrição</Label>
                 <Textarea
                   id="descricao"
                   value={novaTarefa.descricao}
                   onChange={(e) => setNovaTarefa({...novaTarefa, descricao: e.target.value})}
                   placeholder="Descreva a tarefa detalhadamente"
                   rows={3}
-                  className="bg-background border-border text-foreground"
+                  className="brand-background brand-border brand-text-foreground"
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="atribuido" className="text-foreground">Atribuir Para</Label>
+                <Label htmlFor="atribuido" className="brand-text-foreground">Atribuir Para</Label>
                 <Select value={novaTarefa.atribuidoPara} onValueChange={(value) => setNovaTarefa({...novaTarefa, atribuidoPara: value})}>
-                  <SelectTrigger className="bg-background border-border text-foreground">
+                  <SelectTrigger className="brand-background brand-border brand-text-foreground">
                     <SelectValue placeholder="Selecione um usuário" />
                   </SelectTrigger>
-                  <SelectContent className="bg-card border-border">
+                  <SelectContent className="brand-card brand-border">
                     {usuarios.map((usuario) => (
-                      <SelectItem key={usuario} value={usuario} className="text-foreground hover:bg-accent">
+                      <SelectItem key={usuario} value={usuario} className="brand-text-foreground brand-hover-accent">
                         {usuario}
                       </SelectItem>
                     ))}
@@ -273,21 +274,21 @@ const Tarefas = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="prazo" className="text-foreground">Prazo</Label>
+                <Label htmlFor="prazo" className="brand-text-foreground">Prazo</Label>
                 <Input
                   id="prazo"
                   type="date"
                   value={novaTarefa.prazo}
                   onChange={(e) => setNovaTarefa({...novaTarefa, prazo: e.target.value})}
-                  className="bg-background border-border text-foreground"
+                  className="brand-background brand-border brand-text-foreground"
                 />
               </div>
               
               <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 pt-4">
-                <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="w-full sm:w-auto border-border text-foreground hover:bg-accent">
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="w-full sm:w-auto brand-border brand-text-foreground brand-hover-accent">
                   Cancelar
                 </Button>
-                <Button onClick={handleCriarTarefa} className="bg-[#000000] hover:bg-gray-800 text-white w-full sm:w-auto">
+                <Button onClick={handleCriarTarefa} className="brand-primary brand-hover-primary brand-text-background w-full sm:w-auto">
                   Criar Tarefa
                 </Button>
               </div>
@@ -304,8 +305,8 @@ const Tarefas = () => {
             onClick={() => setFiltroAtivo('pendente')}
             className={`text-xs sm:text-sm ${
               filtroAtivo === 'pendente' 
-                ? 'bg-[#000000] hover:bg-gray-800 text-white' 
-                : 'border-border text-foreground hover:bg-accent'
+                ? 'brand-primary brand-hover-primary brand-text-background' 
+                : 'brand-border brand-text-foreground brand-hover-accent'
             }`}
           >
             <Clock className="h-4 w-4 mr-1" />
@@ -316,8 +317,8 @@ const Tarefas = () => {
             onClick={() => setFiltroAtivo('em_atraso')}
             className={`text-xs sm:text-sm ${
               filtroAtivo === 'em_atraso' 
-                ? 'bg-[#000000] hover:bg-gray-800 text-white' 
-                : 'border-border text-foreground hover:bg-accent'
+                ? 'brand-primary brand-hover-primary brand-text-background' 
+                : 'brand-border brand-text-foreground brand-hover-accent'
             }`}
           >
             <AlertTriangle className="h-4 w-4 mr-1" />
@@ -328,8 +329,8 @@ const Tarefas = () => {
             onClick={() => setFiltroAtivo('concluida')}
             className={`text-xs sm:text-sm ${
               filtroAtivo === 'concluida' 
-                ? 'bg-[#000000] hover:bg-gray-800 text-white' 
-                : 'border-border text-foreground hover:bg-accent'
+                ? 'brand-primary brand-hover-primary brand-text-background' 
+                : 'brand-border brand-text-foreground brand-hover-accent'
             }`}
           >
             <CheckCircle2 className="h-4 w-4 mr-1" />
@@ -340,8 +341,8 @@ const Tarefas = () => {
             onClick={() => setFiltroAtivo('todos')}
             className={`text-xs sm:text-sm ${
               filtroAtivo === 'todos' 
-                ? 'bg-[#000000] hover:bg-gray-800 text-white' 
-                : 'border-border text-foreground hover:bg-accent'
+                ? 'brand-primary brand-hover-primary brand-text-background' 
+                : 'brand-border brand-text-foreground brand-hover-accent'
             }`}
           >
             Todas ({tarefas.length})
@@ -353,7 +354,7 @@ const Tarefas = () => {
             placeholder="Buscar tarefas..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-background border-border text-foreground"
+            className="w-full brand-background brand-border brand-text-foreground"
           />
         </div>
       </div>
@@ -361,12 +362,12 @@ const Tarefas = () => {
       {/* Lista de Tarefas */}
       <div className="grid gap-4">
         {filtrarTarefas().map((tarefa) => (
-          <Card key={tarefa.id} className="hover:shadow-md transition-shadow bg-card border-border">
+          <Card key={tarefa.id} className="hover:shadow-md transition-shadow brand-card brand-border">
             <CardContent className="p-4 lg:p-6">
               <div className="flex flex-col xl:flex-row xl:items-start justify-between gap-4">
                 <div className="flex-1 space-y-3">
                   <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                    <h3 className="font-semibold text-base lg:text-lg text-foreground break-words">{tarefa.titulo}</h3>
+                    <h3 className="font-semibold text-base lg:text-lg brand-text-foreground break-words">{tarefa.titulo}</h3>
                     <Badge className={`w-fit ${getSituacaoColor(tarefa.situacao)}`}>
                       {getSituacaoIcon(tarefa.situacao)}
                       <span className="ml-1 capitalize">
@@ -376,7 +377,7 @@ const Tarefas = () => {
                     </Badge>
                   </div>
                   
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 text-sm text-muted-foreground">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 text-sm brand-text-muted">
                     <div className="flex items-center gap-2 break-words">
                       <User className="h-4 w-4 flex-shrink-0" />
                       <span><strong>Criada por:</strong> {tarefa.criadoPor}</span>
@@ -388,45 +389,45 @@ const Tarefas = () => {
                   </div>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 text-sm">
-                    <div className="flex items-center gap-2 text-muted-foreground">
+                    <div className="flex items-center gap-2 brand-text-muted">
                       <Calendar className="h-4 w-4 flex-shrink-0" />
                       <span><strong>Prazo:</strong> {format(tarefa.prazo, 'dd/MM/yyyy', { locale: ptBR })}</span>
                     </div>
                     
                     {tarefa.situacao === 'concluida' ? (
                       <>
-                        <div className="text-green-600 dark:text-green-400">
+                        <div className="brand-text-success">
                           <strong>Início:</strong> {tarefa.dataInicio && format(tarefa.dataInicio, 'dd/MM/yyyy', { locale: ptBR })}
                         </div>
-                        <div className="text-green-600 dark:text-green-400">
+                        <div className="brand-text-success">
                           <strong>Conclusão:</strong> {tarefa.dataConclusao && format(tarefa.dataConclusao, 'dd/MM/yyyy', { locale: ptBR })}
                         </div>
-                        <div className="text-green-600 dark:text-green-400">
+                        <div className="brand-text-success">
                           <strong>Duração:</strong> {calcularDuracaoTarefa(tarefa.dataInicio, tarefa.dataConclusao)} dias
                         </div>
                       </>
                     ) : (
                       <>
                         {tarefa.dataInicio && (
-                          <div className="text-muted-foreground">
+                          <div className="brand-text-muted">
                             <strong>Início:</strong> {format(tarefa.dataInicio, 'dd/MM/yyyy', { locale: ptBR })}
                           </div>
                         )}
                         
                         {tarefa.dataInicio && (
-                          <div className="text-muted-foreground">
+                          <div className="brand-text-muted">
                             <strong>Dias em aberto:</strong> {calcularDiasEmAberto(tarefa.dataInicio, tarefa.situacao)}
                           </div>
                         )}
                         
                         {calcularDiasEmAtraso(tarefa.prazo, tarefa.situacao) > 0 && (
-                          <div className="text-red-600 dark:text-red-400">
+                          <div className="brand-text-error">
                             <strong>Dias em atraso:</strong> {calcularDiasEmAtraso(tarefa.prazo, tarefa.situacao)}
                           </div>
                         )}
                         
                         {calcularDiasParaPrazo(tarefa.prazo, tarefa.situacao) > 0 && (
-                          <div className="text-orange-600 dark:text-orange-400">
+                          <div className="brand-text-warning">
                             <strong>Dias para prazo:</strong> {calcularDiasParaPrazo(tarefa.prazo, tarefa.situacao)}
                           </div>
                         )}
@@ -440,7 +441,7 @@ const Tarefas = () => {
                   <div className="flex justify-end xl:justify-start">
                     <Button
                       onClick={() => handleConcluirTarefa(tarefa.id)}
-                      className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
+                      className="brand-success brand-hover-success brand-text-background w-full sm:w-auto"
                       size="sm"
                     >
                       <Check className="h-4 w-4 mr-2" />
@@ -455,9 +456,9 @@ const Tarefas = () => {
       </div>
 
       {filtrarTarefas().length === 0 && (
-        <Card className="bg-card border-border">
+        <Card className="brand-card brand-border">
           <CardContent className="p-8 text-center">
-            <div className="text-muted-foreground">
+            <div className="brand-text-muted">
               <Clock className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p className="text-lg font-medium">Nenhuma tarefa encontrada</p>
               <p className="text-sm mt-1">Tente ajustar os filtros ou criar uma nova tarefa</p>

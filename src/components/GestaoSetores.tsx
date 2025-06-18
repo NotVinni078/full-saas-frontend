@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -152,7 +153,7 @@ const GestaoSetores = () => {
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="brand-primary brand-hover-primary text-white w-full sm:w-auto">
+            <Button className="brand-primary brand-hover-primary brand-text-background w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
               Novo Setor
             </Button>
@@ -180,11 +181,11 @@ const GestaoSetores = () => {
                     type="color"
                     value={novoSetor.cor}
                     onChange={(e) => setNovoSetor({...novoSetor, cor: e.target.value})}
-                    className="w-16 h-10 p-1 border rounded"
+                    className="w-16 h-10 p-1 brand-border rounded"
                   />
                   <Badge 
                     style={{ backgroundColor: novoSetor.cor, color: 'white' }}
-                    className="text-white"
+                    className="brand-text-background"
                   >
                     {novoSetor.nome || 'Preview'}
                   </Badge>
@@ -197,7 +198,7 @@ const GestaoSetores = () => {
                 </Button>
                 <Button 
                   onClick={handleCriarSetor} 
-                  className="brand-primary brand-hover-primary text-white w-full sm:w-auto"
+                  className="brand-primary brand-hover-primary brand-text-background w-full sm:w-auto"
                   disabled={!novoSetor.nome.trim()}
                 >
                   {isEditMode ? 'Salvar Alterações' : 'Salvar'}
@@ -246,7 +247,7 @@ const GestaoSetores = () => {
                         <div className="flex items-center gap-3">
                           <Badge 
                             style={{ backgroundColor: setor.cor, color: 'white' }}
-                            className="text-white"
+                            className="brand-text-background"
                           >
                             {setor.nome}
                           </Badge>
@@ -279,7 +280,7 @@ const GestaoSetores = () => {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleExcluirSetor(setor.id)}
-                              className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
+                              className="h-8 w-8 p-0 brand-hover-error brand-text-error"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -361,7 +362,7 @@ const GestaoSetores = () => {
                         <Button
                           size="sm"
                           onClick={() => handleSelecionarUsuario(usuario.id)}
-                          className="brand-primary brand-hover-primary text-white"
+                          className="brand-primary brand-hover-primary brand-text-background"
                         >
                           <Plus className="h-4 w-4 mr-2" />
                           Adicionar
