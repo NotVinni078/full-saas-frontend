@@ -14,7 +14,6 @@ import { EllipsisVertical } from "lucide-react";
 interface SetorInterface {
   id: string;
   nome: string;
-  descricao: string;
   quantidadeUsuarios: number;
   cor: string;
 }
@@ -35,7 +34,6 @@ const GestaoSetores = () => {
   const [selectedSetorForUsuarios, setSelectedSetorForUsuarios] = useState<SetorInterface | null>(null);
   const [novoSetor, setNovoSetor] = useState({
     nome: '',
-    descricao: '',
     cor: '#3B82F6'
   });
 
@@ -44,42 +42,36 @@ const GestaoSetores = () => {
     {
       id: '1',
       nome: 'Vendas',
-      descricao: 'Setor responsável pelas vendas e prospecção',
       quantidadeUsuarios: 12,
       cor: '#10B981'
     },
     {
       id: '2',
       nome: 'Suporte',
-      descricao: 'Atendimento ao cliente e suporte técnico',
       quantidadeUsuarios: 8,
       cor: '#F59E0B'
     },
     {
       id: '3',
       nome: 'Financeiro',
-      descricao: 'Gestão financeira e contábil',
       quantidadeUsuarios: 5,
       cor: '#EF4444'
     },
     {
       id: '4',
       nome: 'Marketing',
-      descricao: 'Marketing digital e campanhas',
       quantidadeUsuarios: 6,
       cor: '#8B5CF6'
     },
     {
       id: '5',
       nome: 'RH',
-      descricao: 'Recursos humanos e gestão de pessoas',
       quantidadeUsuarios: 3,
       cor: '#06B6D4'
     },
     {
       id: '6',
       nome: 'TI',
-      descricao: 'Tecnologia da informação',
       quantidadeUsuarios: 4,
       cor: '#84CC16'
     }
@@ -98,8 +90,7 @@ const GestaoSetores = () => {
     if (!searchTerm) return setores;
     
     return setores.filter(setor =>
-      setor.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      setor.descricao.toLowerCase().includes(searchTerm.toLowerCase())
+      setor.nome.toLowerCase().includes(searchTerm.toLowerCase())
     );
   };
 
@@ -113,14 +104,13 @@ const GestaoSetores = () => {
     setIsDialogOpen(false);
     setIsEditMode(false);
     setEditingSetor(null);
-    setNovoSetor({ nome: '', descricao: '', cor: '#3B82F6' });
+    setNovoSetor({ nome: '', cor: '#3B82F6' });
   };
 
   const handleEditarSetor = (setor: SetorInterface) => {
     setEditingSetor(setor);
     setNovoSetor({
       nome: setor.nome,
-      descricao: setor.descricao,
       cor: setor.cor
     });
     setIsEditMode(true);
@@ -135,7 +125,7 @@ const GestaoSetores = () => {
     setIsDialogOpen(false);
     setIsEditMode(false);
     setEditingSetor(null);
-    setNovoSetor({ nome: '', descricao: '', cor: '#3B82F6' });
+    setNovoSetor({ nome: '', cor: '#3B82F6' });
   };
 
   const handleAdicionarUsuarios = (setor: SetorInterface) => {
@@ -180,16 +170,6 @@ const GestaoSetores = () => {
                   value={novoSetor.nome}
                   onChange={(e) => setNovoSetor({...novoSetor, nome: e.target.value})}
                   placeholder="Digite o nome do setor"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="descricao">Descrição</Label>
-                <Input
-                  id="descricao"
-                  value={novoSetor.descricao}
-                  onChange={(e) => setNovoSetor({...novoSetor, descricao: e.target.value})}
-                  placeholder="Digite a descrição do setor"
                 />
               </div>
               
@@ -255,7 +235,6 @@ const GestaoSetores = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>SETOR</TableHead>
-                  <TableHead>DESCRIÇÃO</TableHead>
                   <TableHead className="text-center">QTD DE USUÁRIOS</TableHead>
                   <TableHead className="text-center">AÇÕES</TableHead>
                 </TableRow>
@@ -273,9 +252,6 @@ const GestaoSetores = () => {
                             {setor.nome}
                           </Badge>
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm text-muted-foreground">{setor.descricao}</span>
                       </TableCell>
                       <TableCell className="text-center">
                         <span className="font-medium">{setor.quantidadeUsuarios}</span>
@@ -340,7 +316,7 @@ const GestaoSetores = () => {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center py-8">
+                    <TableCell colSpan={3} className="text-center py-8">
                       <div className="flex flex-col items-center gap-2 text-muted-foreground">
                         <Building2 className="h-8 w-8 opacity-50" />
                         <p>Nenhum setor encontrado</p>
