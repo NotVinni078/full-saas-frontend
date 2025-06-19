@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Search, MoreVertical, Phone, Video, Paperclip, Send, Smile, Mic, Filter, Users, UserCheck, MessageSquare, Bot } from 'lucide-react';
+import { Search, MoreVertical, Phone, Video, Paperclip, Send, Smile, Mic, Filter, Users, UserCheck, MessageSquare, Bot, Clock, CheckCircle } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,7 +36,7 @@ interface Message {
 const AtendimentosOmnichannel = () => {
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [message, setMessage] = useState('');
-  const [activeTab, setActiveTab] = useState('abertas');
+  const [activeTab, setActiveTab] = useState('em-atendimento');
   const [searchTerm, setSearchTerm] = useState('');
 
   const contacts: Contact[] = [
@@ -126,78 +125,96 @@ const AtendimentosOmnichannel = () => {
   );
 
   return (
-    <div className="flex h-screen brand-background">
+    <div className="flex h-screen bg-background">
       {/* Sidebar - Lista de Conversas */}
-      <div className="w-full md:w-96 brand-card brand-border-gray-200 flex flex-col">
-        {/* Header da Sidebar */}
-        <div className="p-4 brand-border-gray-200 border-b">
+      <div className="w-full md:w-96 bg-card border-r border-border flex flex-col">
+        {/* Header da Sidebar Reorganizado */}
+        <div className="p-4 border-b border-border">
+          {/* Título da Página */}
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold brand-text-foreground">Atendimentos</h2>
+            <h2 className="text-xl font-semibold text-foreground">Atendimentos</h2>
             <Button variant="ghost" size="sm">
               <MoreVertical className="w-5 h-5" />
             </Button>
           </div>
 
-          {/* Tabs de Status */}
-          <div className="flex space-x-1 mb-4">
+          {/* Barra de Busca com Filtros */}
+          <div className="flex gap-2 mb-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar atendimento e mensagens"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Button variant="outline" size="sm">
+              <Filter className="w-4 h-4" />
+            </Button>
+          </div>
+
+          {/* Tabs de Status - Primeira Linha */}
+          <div className="flex gap-1 mb-2">
             <button
-              onClick={() => setActiveTab('abertas')}
-              className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                activeTab === 'abertas' 
-                  ? 'brand-primary brand-text-background' 
-                  : 'brand-text-muted brand-hover-gray-100'
+              onClick={() => setActiveTab('finalizado')}
+              className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors flex-1 justify-center ${
+                activeTab === 'finalizado' 
+                  ? 'bg-primary text-primary-foreground' 
+                  : 'text-muted-foreground hover:bg-muted'
               }`}
             >
-              <MessageSquare className="w-4 h-4 mr-1" />
-              ABERTAS
-            </button>
-            <button
-              onClick={() => setActiveTab('resolvidos')}
-              className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                activeTab === 'resolvidos' 
-                  ? 'brand-primary brand-text-background' 
-                  : 'brand-text-muted brand-hover-gray-100'
-              }`}
-            >
-              <UserCheck className="w-4 h-4 mr-1" />
-              RESOLVIDOS
+              <CheckCircle className="w-4 h-4 mr-1" />
+              FINALIZADO
             </button>
             <button
               onClick={() => setActiveTab('grupos')}
-              className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors flex-1 justify-center ${
                 activeTab === 'grupos' 
-                  ? 'brand-primary brand-text-background' 
-                  : 'brand-text-muted brand-hover-gray-100'
+                  ? 'bg-primary text-primary-foreground' 
+                  : 'text-muted-foreground hover:bg-muted'
               }`}
             >
               <Users className="w-4 h-4 mr-1" />
               GRUPOS
             </button>
+          </div>
+
+          {/* Tabs de Status - Segunda Linha */}
+          <div className="flex gap-1">
+            <button
+              onClick={() => setActiveTab('em-atendimento')}
+              className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors flex-1 justify-center ${
+                activeTab === 'em-atendimento' 
+                  ? 'bg-primary text-primary-foreground' 
+                  : 'text-muted-foreground hover:bg-muted'
+              }`}
+            >
+              <MessageSquare className="w-4 h-4 mr-1" />
+              EM ATENDIMENTO
+            </button>
+            <button
+              onClick={() => setActiveTab('aguardando')}
+              className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors flex-1 justify-center ${
+                activeTab === 'aguardando' 
+                  ? 'bg-primary text-primary-foreground' 
+                  : 'text-muted-foreground hover:bg-muted'
+              }`}
+            >
+              <Clock className="w-4 h-4 mr-1" />
+              AGUARDANDO
+            </button>
             <button
               onClick={() => setActiveTab('chatbot')}
-              className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors flex-1 justify-center ${
                 activeTab === 'chatbot' 
-                  ? 'brand-primary brand-text-background' 
-                  : 'brand-text-muted brand-hover-gray-100'
+                  ? 'bg-primary text-primary-foreground' 
+                  : 'text-muted-foreground hover:bg-muted'
               }`}
             >
               <Bot className="w-4 h-4 mr-1" />
               CHATBOT
             </button>
-          </div>
-
-          {/* Barra de Busca */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 brand-text-gray-400" />
-            <Input
-              placeholder="Buscar atendimento e mensagens"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 brand-input brand-border brand-text-foreground"
-            />
-            <Button variant="ghost" size="sm" className="absolute right-2 top-1/2 transform -translate-y-1/2">
-              <Filter className="w-4 h-4" />
-            </Button>
           </div>
         </div>
 
@@ -207,10 +224,10 @@ const AtendimentosOmnichannel = () => {
             <div
               key={contact.id}
               onClick={() => setSelectedContact(contact)}
-              className={`p-4 cursor-pointer border-b brand-border-gray-100 transition-colors ${
+              className={`p-4 cursor-pointer border-b border-border transition-colors ${
                 selectedContact?.id === contact.id 
-                  ? 'brand-secondary' 
-                  : 'brand-hover-gray-50'
+                  ? 'bg-secondary' 
+                  : 'hover:bg-muted/50'
               }`}
             >
               <div className="flex items-start space-x-3">
@@ -269,7 +286,7 @@ const AtendimentosOmnichannel = () => {
         {selectedContact ? (
           <>
             {/* Header do Chat */}
-            <div className="p-4 brand-card brand-border-gray-200 border-b flex items-center justify-between">
+            <div className="p-4 bg-card border-b border-border flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="relative">
                   <Avatar className="w-10 h-10">
@@ -312,7 +329,7 @@ const AtendimentosOmnichannel = () => {
             </div>
 
             {/* Área de Mensagens */}
-            <div className="flex-1 p-4 overflow-y-auto brand-gray-50" style={{
+            <div className="flex-1 p-4 overflow-y-auto bg-muted/20" style={{
               backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23f0f0f0' fill-opacity='0.1'%3E%3Cpath d='M20 20c0-11.046 8.954-20 20-20s20 8.954 20 20-8.954 20-20 20-20-8.954-20-20zm20-16c-8.837 0-16 7.163-16 16s7.163 16 16 16 16-7.163 16-16-7.163-16-16-16z'/%3E%3C/g%3E%3C/svg%3E")`
             }}>
               <div className="space-y-4">
@@ -350,7 +367,7 @@ const AtendimentosOmnichannel = () => {
             </div>
 
             {/* Input de Mensagem */}
-            <div className="p-4 brand-card brand-border-gray-200 border-t">
+            <div className="p-4 bg-card border-t border-border">
               <div className="flex items-end space-x-2">
                 <Button variant="ghost" size="sm">
                   <Paperclip className="w-5 h-5" />
@@ -381,7 +398,7 @@ const AtendimentosOmnichannel = () => {
           </>
         ) : (
           /* Estado Vazio */
-          <div className="flex-1 flex items-center justify-center brand-gray-50">
+          <div className="flex-1 flex items-center justify-center bg-muted/20">
             <div className="text-center">
               <MessageSquare className="w-16 h-16 brand-text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-medium brand-text-foreground mb-2">
