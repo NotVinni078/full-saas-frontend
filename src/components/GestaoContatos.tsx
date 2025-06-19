@@ -3,27 +3,20 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { 
   Plus, 
-  Edit, 
-  Trash2, 
   Users, 
-  MessageSquare,
-  Calendar,
-  MoreVertical,
-  Filter,
   Download,
   Upload,
-  Search,
-  Ban,
-  Phone
+  Search
 } from "lucide-react";
 import { useContacts } from '@/hooks/useContacts';
 import ContactModal from './modals/ContactModal';
 import BlockedContactsList from './contacts/BlockedContactsList';
+import ContactsFilter from './contacts/ContactsFilter';
+import ImportContactsModal from './contacts/ImportContactsModal';
+import ContactsTable from './contacts/ContactsTable';
 
 const GestaoContatos = () => {
   // Estados principais para controle da interface
@@ -33,30 +26,53 @@ const GestaoContatos = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showBlockedContacts, setShowBlockedContacts] = useState(false);
   const [blockedContacts, setBlockedContacts] = useState([]);
+  
+  // Novos estados para filtros e importação
+  const [selectedFilter, setSelectedFilter] = useState<'all' | 'blocked'>('all');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [showImportModal, setShowImportModal] = useState(false);
 
   // Hook customizado para gerenciamento de contatos
   const { contacts, updateContact, addContact, removeContact, getContactTags, searchContacts } = useContacts();
 
   /**
-   * Filtra contatos para exibição principal
-   * Remove contatos do WebChat e contatos bloqueados da lista principal
+   * Filtra contatos baseado nos critérios selecionados
+   * Remove contatos do WebChat da listagem principal
+   * Aplica filtros de pesquisa, status e tags
    */
   const filtrarContatos = () => {
-    const filteredContacts = contacts.filter(contato => {
+    let filteredContacts = contacts.filter(contato => {
       // Remove contatos do WebChat da listagem principal
       if (contato.canal === 'webchat') return false;
       
-      // Remove contatos bloqueados da listagem principal
-      const isBlocked = blockedContacts.some(blocked => blocked.id === contato.id);
-      if (isBlocked) return false;
-
-      // Aplica filtro de pesquisa por nome, telefone ou email
-      const matchesSearch = contato.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           (contato.telefone && contato.telefone.includes(searchTerm)) ||
-                           (contato.email && contato.email.toLowerCase().includes(searchTerm.toLowerCase()));
-      
-      return matchesSearch;
+      return true;
     });
+
+    // Aplica filtro por status (todos ou bloqueados)
+    if (selectedFilter === 'blocked') {
+      filteredContacts = blockedContacts;
+    } else {
+      // Remove contatos bloqueados da lista principal se filtro for "all"
+      const blockedIds = blockedContacts.map(blocked => blocked.id);
+      filteredContacts = filteredContacts.filter(contato => !blockedIds.includes(contato.id));
+    }
+
+    // Aplica filtro de pesquisa por nome, telefone ou email
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      filteredContacts = filteredContacts.filter(contato =>
+        contato.nome.toLowerCase().includes(term) ||
+        (contato.telefone && contato.telefone.includes(term)) ||
+        (contato.email && contato.email.toLowerCase().includes(term))
+      );
+    }
+
+    // Aplica filtro por tags selecionadas
+    if (selectedTags.length > 0) {
+      filteredContacts = filteredContacts.filter(contato =>
+        selectedTags.some(tagId => contato.tags?.includes(tagId))
+      );
+    }
 
     return filteredContacts;
   };
@@ -135,59 +151,69 @@ const GestaoContatos = () => {
   };
 
   /**
-   * Retorna ícone baseado no canal de origem do contato
-   * @param {string} canal - Canal de origem (whatsapp, instagram, facebook, telegram)
+   * Processa importação de contatos via CSV
+   * @param {Array} importedContacts - Lista de contatos importados
    */
-  const getIconeOrigem = (canal) => {
-    const icones = {
-      whatsapp: <div className="h-4 w-4 bg-green-500 rounded-full flex items-center justify-center">
-                  <MessageSquare className="h-2 w-2 text-white" />
-                </div>,
-      instagram: <div className="h-4 w-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full" />,
-      facebook: <div className="h-4 w-4 bg-blue-600 rounded-full" />,
-      telegram: <div className="h-4 w-4 bg-blue-400 rounded-full" />
-    };
+  const handleImportContacts = (importedContacts) => {
+    importedContacts.forEach(contact => {
+      const newContact = {
+        id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+        ...contact,
+        avatar: contact.nome.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase(),
+        status: 'offline'
+      };
+      addContact(newContact);
+    });
     
-    return icones[canal] || <Users className="h-4 w-4 text-muted-foreground" />;
+    console.log(`${importedContacts.length} contatos importados com sucesso`);
+    setShowImportModal(false);
   };
 
   /**
-   * Retorna nome do canal de origem formatado
-   * @param {string} canal - Canal de origem
+   * Exporta todos os contatos para arquivo CSV
    */
-  const getNomeCanal = (canal) => {
-    const nomes = {
-      whatsapp: 'WhatsApp',
-      instagram: 'Instagram', 
-      facebook: 'Facebook',
-      telegram: 'Telegram'
-    };
+  const handleExportarCSV = () => {
+    const contatosParaExportar = filtrarContatos();
     
-    return nomes[canal] || 'Desconhecido';
+    if (contatosParaExportar.length === 0) {
+      alert('Nenhum contato disponível para exportação');
+      return;
+    }
+
+    // Cabeçalho do CSV
+    const csvHeader = 'nome,telefone,email,observacoes,tags,canal\n';
+    
+    // Dados dos contatos
+    const csvData = contatosParaExportar.map(contato => {
+      const tags = getContactTags(contato);
+      return [
+        `"${contato.nome || ''}"`,
+        `"${contato.telefone || ''}"`,
+        `"${contato.email || ''}"`,
+        `"${contato.observacoes || ''}"`,
+        `"${tags.map(tag => tag.nome).join(';')}"`,
+        `"${contato.canal || ''}"`
+      ].join(',');
+    }).join('\n');
+
+    // Cria e baixa o arquivo
+    const csvContent = csvHeader + csvData;
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `contatos_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    
+    console.log(`${contatosParaExportar.length} contatos exportados para CSV`);
   };
 
   /**
-   * Gera iniciais do nome para avatar quando não há foto
-   * @param {string} nome - Nome do contato
+   * Limpa todos os filtros aplicados
    */
-  const getIniciais = (nome) => {
-    return nome.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-  };
-
-  /**
-   * Manipula importação de CSV
-   */
-  const handleImportarCSV = () => {
-    console.log('Importar contatos via CSV');
-    // TODO: Implementar importação de CSV
-  };
-
-  /**
-   * Baixa planilha modelo para importação
-   */
-  const handleBaixarModelo = () => {
-    console.log('Baixar planilha modelo');
-    // TODO: Gerar e baixar planilha modelo baseada na estrutura de contatos
+  const handleClearFilters = () => {
+    setSearchTerm('');
+    setSelectedFilter('all');
+    setSelectedTags([]);
   };
 
   return (
@@ -203,25 +229,25 @@ const GestaoContatos = () => {
         
         {/* Botões de ação principais - responsivos */}
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-          {/* Dropdown de importação com duas opções */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-full sm:w-auto border-border text-foreground hover:bg-accent">
-                <Upload className="h-4 w-4 mr-2" />
-                Importar
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-card border-border">
-              <DropdownMenuItem onClick={handleImportarCSV} className="text-foreground hover:bg-accent">
-                <Upload className="h-4 w-4 mr-2" />
-                Importar CSV
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleBaixarModelo} className="text-foreground hover:bg-accent">
-                <Download className="h-4 w-4 mr-2" />
-                Baixar Planilha Modelo
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {/* Botão de exportar CSV */}
+          <Button 
+            variant="outline" 
+            onClick={handleExportarCSV}
+            className="w-full sm:w-auto border-border text-foreground hover:bg-accent"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Exportar CSV
+          </Button>
+
+          {/* Botão de importar CSV */}
+          <Button 
+            variant="outline" 
+            onClick={() => setShowImportModal(true)}
+            className="w-full sm:w-auto border-border text-foreground hover:bg-accent"
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            Importar CSV
+          </Button>
 
           {/* Botão de novo contato */}
           <Button onClick={handleNovoContato} className="bg-primary text-primary-foreground hover:bg-primary/90 w-full sm:w-auto">
@@ -246,18 +272,14 @@ const GestaoContatos = () => {
           </div>
         </div>
         
-        {/* Botão para acessar lista de contatos bloqueados */}
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            size="icon" 
-            onClick={() => setShowBlockedContacts(true)}
-            className="border-border text-foreground hover:bg-accent"
-            title="Ver contatos bloqueados"
-          >
-            <Filter className="h-4 w-4" />
-          </Button>
-        </div>
+        {/* Componente de filtros */}
+        <ContactsFilter
+          selectedFilter={selectedFilter}
+          selectedTags={selectedTags}
+          onFilterChange={setSelectedFilter}
+          onTagsChange={setSelectedTags}
+          onClearFilters={handleClearFilters}
+        />
       </div>
 
       {/* Lista principal de contatos */}
@@ -265,133 +287,46 @@ const GestaoContatos = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-foreground">
             <Users className="h-5 w-5" />
-            Contatos Ativos ({filtrarContatos().length})
+            {selectedFilter === 'blocked' ? 'Contatos Bloqueados' : 'Contatos Ativos'} ({filtrarContatos().length})
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {/* Container responsivo para lista de contatos */}
-          <div className="space-y-4">
-            {filtrarContatos().length > 0 ? (
-              filtrarContatos().map((contato) => {
-                const tags = getContactTags(contato);
-                
-                return (
-                  <div key={contato.id} className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 border border-border rounded-lg bg-background hover:bg-accent/50 transition-colors">
-                    {/* Avatar e informações básicas */}
-                    <div className="flex items-center gap-3 min-w-0 flex-1">
-                      {/* Avatar do contato */}
-                      <Avatar className="h-10 w-10 flex-shrink-0">
-                        <AvatarImage src={contato.avatar} alt={contato.nome} />
-                        <AvatarFallback className="bg-muted text-muted-foreground">
-                          {getIniciais(contato.nome)}
-                        </AvatarFallback>
-                      </Avatar>
-                      
-                      {/* Informações do contato */}
-                      <div className="min-w-0 flex-1">
-                        <div className="font-medium text-foreground truncate">{contato.nome}</div>
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-sm text-muted-foreground">
-                          {contato.telefone && (
-                            <span className="flex items-center gap-1">
-                              <Phone className="h-3 w-3" />
-                              {contato.telefone}
-                            </span>
-                          )}
-                          {contato.email && (
-                            <span className="truncate">{contato.email}</span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Origem do contato */}
-                    <div className="flex items-center gap-2 text-sm">
-                      {getIconeOrigem(contato.canal)}
-                      <span className="text-muted-foreground hidden sm:inline">
-                        {getNomeCanal(contato.canal)}
-                      </span>
-                    </div>
-
-                    {/* Tags do contato */}
-                    <div className="flex flex-wrap gap-1 min-w-0">
-                      {tags.length > 0 ? (
-                        tags.map((tag) => (
-                          <Badge key={tag.id} className={`text-xs px-2 py-1 ${tag.cor}`}>
-                            {tag.nome}
-                          </Badge>
-                        ))
-                      ) : (
-                        <span className="text-xs text-muted-foreground">Sem tags</span>
-                      )}
-                    </div>
-
-                    {/* Menu de ações */}
-                    <div className="flex items-center justify-end">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:bg-accent">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48 bg-card border-border">
-                          {/* Editar contato */}
-                          <DropdownMenuItem onClick={() => handleEditarContato(contato)} className="text-foreground hover:bg-accent">
-                            <Edit className="h-4 w-4 mr-2" />
-                            Editar
-                          </DropdownMenuItem>
-                          
-                          {/* Iniciar atendimento */}
-                          <DropdownMenuItem onClick={() => handleIniciarAtendimento(contato)} className="text-foreground hover:bg-accent">
-                            <MessageSquare className="h-4 w-4 mr-2" />
-                            Iniciar Atendimento
-                          </DropdownMenuItem>
-                          
-                          {/* Criar agendamento */}
-                          <DropdownMenuItem onClick={() => handleCriarAgendamento(contato)} className="text-foreground hover:bg-accent">
-                            <Calendar className="h-4 w-4 mr-2" />
-                            Criar Agendamento
-                          </DropdownMenuItem>
-                          
-                          {/* Bloquear/Desbloquear contato */}
-                          <DropdownMenuItem onClick={() => handleBloquearContato(contato)} className="text-foreground hover:bg-accent">
-                            <Ban className="h-4 w-4 mr-2" />
-                            {blockedContacts.some(blocked => blocked.id === contato.id) ? 'Desbloquear' : 'Bloquear'} Contato
-                          </DropdownMenuItem>
-                          
-                          {/* Excluir contato */}
-                          <DropdownMenuItem onClick={() => handleExcluirContato(contato.id)} className="text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20">
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Excluir
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
-                );
-              })
-            ) : (
-              /* Estado vazio quando não há contatos */
-              <div className="text-center py-12">
-                <div className="flex flex-col items-center gap-3 text-muted-foreground">
-                  <Users className="h-12 w-12 opacity-50" />
-                  <div>
-                    <p className="text-lg font-medium">Nenhum contato encontrado</p>
-                    {searchTerm ? (
-                      <p className="text-sm">Tente ajustar sua pesquisa ou criar um novo contato</p>
-                    ) : (
-                      <p className="text-sm">Comece criando seu primeiro contato</p>
-                    )}
-                  </div>
-                  {!searchTerm && (
-                    <Button onClick={handleNovoContato} className="mt-2 bg-primary text-primary-foreground hover:bg-primary/90">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Criar Primeiro Contato
-                    </Button>
+          {/* Tabela/Cards de contatos usando o novo componente */}
+          {filtrarContatos().length > 0 ? (
+            <ContactsTable
+              contacts={filtrarContatos()}
+              blockedContacts={blockedContacts}
+              onEditContact={handleEditarContato}
+              onStartService={handleIniciarAtendimento}
+              onCreateSchedule={handleCriarAgendamento}
+              onBlockContact={handleBloquearContato}
+              onDeleteContact={handleExcluirContato}
+              getContactTags={getContactTags}
+            />
+          ) : (
+            /* Estado vazio quando não há contatos */
+            <div className="text-center py-12">
+              <div className="flex flex-col items-center gap-3 text-muted-foreground">
+                <Users className="h-12 w-12 opacity-50" />
+                <div>
+                  <p className="text-lg font-medium">Nenhum contato encontrado</p>
+                  {searchTerm || selectedTags.length > 0 ? (
+                    <p className="text-sm">Tente ajustar sua pesquisa ou filtros</p>
+                  ) : selectedFilter === 'blocked' ? (
+                    <p className="text-sm">Nenhum contato bloqueado encontrado</p>
+                  ) : (
+                    <p className="text-sm">Comece criando seu primeiro contato</p>
                   )}
                 </div>
+                {!searchTerm && selectedTags.length === 0 && selectedFilter === 'all' && (
+                  <Button onClick={handleNovoContato} className="mt-2 bg-primary text-primary-foreground hover:bg-primary/90">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Criar Primeiro Contato
+                  </Button>
+                )}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -411,13 +346,20 @@ const GestaoContatos = () => {
         }}
       />
 
-      {/* Modal de contatos bloqueados */}
+      {/* Modal de contatos bloqueados (mantido para compatibilidade) */}
       <BlockedContactsList
         isOpen={showBlockedContacts}
         onClose={() => setShowBlockedContacts(false)}
         blockedContacts={blockedContacts}
         onUnblock={(contato) => handleBloquearContato(contato)}
-        onDelete={(contactId) => handleExcluirContato(contactId)}
+        onDelete={(contactId)=> handleExcluirContato(contactId)}
+      />
+
+      {/* Modal de importação de contatos */}
+      <ImportContactsModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        onImport={handleImportContacts}
       />
     </div>
   );
