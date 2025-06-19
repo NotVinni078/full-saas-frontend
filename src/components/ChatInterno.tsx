@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useUsers } from "@/hooks/useUsers";
 import { ChatInicio } from './chat/ChatInicio';
-import { NovoChat } from './chat/NovoChat';
+import { NovoChatPopup } from './chat/NovoChatsPopup';
 import { NovoGrupo } from './chat/NovoGrupo';
 import { ChatConversa } from './chat/ChatConversa';
 
@@ -45,13 +45,11 @@ interface Chat {
  * Estados possíveis da interface do chat interno
  * Controla qual tela está sendo exibida
  */
-type ChatState = 'inicio' | 'novo-chat' | 'novo-grupo' | 'conversa';
+type ChatState = 'inicio' | 'novo-grupo' | 'conversa';
 
 /**
  * Componente principal do Chat Interno
- * Gerencia toda a interface e funcionalidades do sistema de chat
- * Layout similar ao WhatsApp Desktop
- * Totalmente responsivo para todos os tamanhos de tela
+ * Agora usa popup flutuante para seleção de novo chat
  */
 const ChatInterno = () => {
   // Estados principais da aplicação
@@ -61,6 +59,9 @@ const ChatInterno = () => {
   const [chats, setChats] = useState<Chat[]>([]);
   const [currentMessage, setCurrentMessage] = useState('');
   const [replyingTo, setReplyingTo] = useState<Message | null>(null);
+  
+  // Novo estado para controlar o popup de novo chat
+  const [isNovoChatPopupOpen, setIsNovoChatPopupOpen] = useState(false);
   
   // Hook para detectar dispositivos móveis
   const isMobile = useIsMobile();
@@ -96,7 +97,7 @@ const ChatInterno = () => {
         if (currentState === 'conversa') {
           setCurrentState('inicio');
           setSelectedChatId('');
-        } else if (currentState === 'novo-chat' || currentState === 'novo-grupo') {
+        } else if (currentState === 'novo-grupo') {
           setCurrentState('inicio');
         }
       }
@@ -109,7 +110,21 @@ const ChatInterno = () => {
   }, [currentState, currentMessage]);
 
   /**
-   * Função para iniciar um novo chat individual
+   * Função para abrir o popup de novo chat
+   */
+  const handleOpenNovoChat = () => {
+    setIsNovoChatPopupOpen(true);
+  };
+
+  /**
+   * Função para fechar o popup de novo chat
+   */
+  const handleCloseNovoChat = () => {
+    setIsNovoChatPopupOpen(false);
+  };
+
+  /**
+   * Função para iniciar um novo chat individual a partir do popup
    * Verifica se já existe chat com o usuário selecionado
    */
   const handleStartIndividualChat = (userId: string) => {
@@ -294,7 +309,7 @@ const ChatInterno = () => {
    */
   const selectedChat = chats.find(chat => chat.id === selectedChatId);
 
-  // No mobile, mostrar apenas uma tela por vez (similar ao WhatsApp mobile)
+  // No mobile, mostrar apenas uma tela por vez
   if (isMobile) {
     return (
       <div className="h-full bg-background">
@@ -307,16 +322,8 @@ const ChatInterno = () => {
               setSelectedChatId(chatId);
               setCurrentState('conversa');
             }}
-            onNewChat={() => setCurrentState('novo-chat')}
+            onNewChat={handleOpenNovoChat}
             onNewGroup={() => setCurrentState('novo-grupo')}
-          />
-        )}
-
-        {currentState === 'novo-chat' && (
-          <NovoChat
-            onBack={() => setCurrentState('inicio')}
-            onSelectUser={handleStartIndividualChat}
-            existingChats={chats}
           />
         )}
 
@@ -342,6 +349,14 @@ const ChatInterno = () => {
             messageInputRef={messageInputRef}
           />
         )}
+
+        {/* Popup de novo chat */}
+        <NovoChatPopup
+          isOpen={isNovoChatPopupOpen}
+          onClose={handleCloseNovoChat}
+          onSelectUser={handleStartIndividualChat}
+          existingChats={chats}
+        />
       </div>
     );
   }
@@ -360,16 +375,8 @@ const ChatInterno = () => {
               setSelectedChatId(chatId);
               setCurrentState('conversa');
             }}
-            onNewChat={() => setCurrentState('novo-chat')}
+            onNewChat={handleOpenNovoChat}
             onNewGroup={() => setCurrentState('novo-grupo')}
-          />
-        )}
-
-        {currentState === 'novo-chat' && (
-          <NovoChat
-            onBack={() => setCurrentState('inicio')}
-            onSelectUser={handleStartIndividualChat}
-            existingChats={chats}
           />
         )}
 
@@ -401,7 +408,7 @@ const ChatInterno = () => {
             messageInputRef={messageInputRef}
           />
         ) : (
-          /* Estado inicial sem conversa selecionada - similar ao WhatsApp */
+          /* Estado inicial sem conversa selecionada */
           <div className="flex-1 flex items-center justify-center bg-muted/20">
             <div className="text-center max-w-md">
               <div className="mb-6">
@@ -426,7 +433,7 @@ const ChatInterno = () => {
               </p>
               <div className="flex gap-3 justify-center">
                 <button
-                  onClick={() => setCurrentState('novo-chat')}
+                  onClick={handleOpenNovoChat}
                   className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
                 >
                   Novo Chat
@@ -442,6 +449,14 @@ const ChatInterno = () => {
           </div>
         )}
       </div>
+
+      {/* Popup de novo chat */}
+      <NovoChatPopup
+        isOpen={isNovoChatPopupOpen}
+        onClose={handleCloseNovoChat}
+        onSelectUser={handleStartIndividualChat}
+        existingChats={chats}
+      />
     </div>
   );
 };
