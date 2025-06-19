@@ -24,6 +24,7 @@ import { User } from '@/types/global';
  * - Remoção do badge de status dos cards de usuário
  * - Validação aprimorada de senha (mínimo 6 caracteres)
  * - Interface mais limpa sem status desnecessário
+ * - Cabeçalhos de coluna para identificação visual dos dados (desktop apenas)
  */
 const GestaoUsuarios = () => {
   const { toast } = useToast();
@@ -485,6 +486,52 @@ const GestaoUsuarios = () => {
         </div>
       </div>
 
+      {/* Cabeçalhos das colunas - NOVA FUNCIONALIDADE - Visível apenas no desktop */}
+      {filteredUsers.length > 0 && (
+        <div className="hidden md:block mb-4">
+          <Card className="bg-muted/50 border-border">
+            <CardContent className="p-4">
+              <div className="grid grid-cols-12 gap-4 items-center">
+                {/* Cabeçalho Foto */}
+                <div className="col-span-1">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                    Foto
+                  </h3>
+                </div>
+                
+                {/* Cabeçalho Nome/Email */}
+                <div className="col-span-3">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                    Nome/Email
+                  </h3>
+                </div>
+
+                {/* Cabeçalho Setor */}
+                <div className="col-span-3">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                    Setor
+                  </h3>
+                </div>
+
+                {/* Cabeçalho Cargo */}
+                <div className="col-span-2">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                    Cargo
+                  </h3>
+                </div>
+
+                {/* Cabeçalho Ações */}
+                <div className="col-span-3 flex justify-end">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                    Ações
+                  </h3>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* Área de listagem dos usuários - STATUS REMOVIDO */}
       <div className="space-y-4">
         {filteredUsers.length > 0 ? (
@@ -564,7 +611,7 @@ const GestaoUsuarios = () => {
                     </div>
                   </div>
 
-                  {/* Layout responsivo para tablet e mobile - SEM STATUS */}
+                  {/* Layout responsivo para tablet e mobile - SEM STATUS - Mantém comportamento existente */}
                   <div className="md:hidden space-y-3">
                     {/* Cabeçalho com foto e nome */}
                     <div className="flex items-center gap-3">
