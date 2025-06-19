@@ -4,6 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Edit, Trash } from 'lucide-react';
+import ChannelLogo from './ChannelLogos';
 
 /**
  * Interface para definir a estrutura de um plano
@@ -13,6 +14,7 @@ interface Plan {
   name: string;
   type: 'Publico' | 'Personalizado';
   userLimit: number;
+  value: number;
   features: {
     chatInterno: boolean;
     agendamentos: boolean;
@@ -43,6 +45,7 @@ interface PlanCardProps {
  * Inclui botões para editar e excluir
  * Utiliza cores dinâmicas da gestão de marca
  * Responsivo para todos os tamanhos de tela
+ * Atualizado com valor do plano e logos reais dos canais
  */
 const PlanCard = ({ plan, onEdit, onDelete }: PlanCardProps) => {
   /**
@@ -59,6 +62,16 @@ const PlanCard = ({ plan, onEdit, onDelete }: PlanCardProps) => {
    * Calcula o total de conexões permitidas somando todos os canais
    */
   const totalConnections = Object.values(plan.channels).reduce((sum, count) => sum + count, 0);
+
+  /**
+   * Formata o valor do plano para exibição em R$
+   */
+  const formatPrice = (value: number): string => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(value);
+  };
 
   /**
    * Lista de nomes das funcionalidades para exibição
@@ -89,10 +102,16 @@ const PlanCard = ({ plan, onEdit, onDelete }: PlanCardProps) => {
       {/* Cabeçalho do Card */}
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
-          <div className="space-y-1">
+          <div className="space-y-2">
             <CardTitle className="text-foreground text-lg font-semibold">
               {plan.name}
             </CardTitle>
+            
+            {/* Valor do Plano - Destaque */}
+            <div className="text-2xl font-bold text-primary">
+              {formatPrice(plan.value)}
+            </div>
+            
             <Badge 
               variant={plan.type === 'Publico' ? 'default' : 'secondary'}
               className="text-xs"
@@ -164,18 +183,21 @@ const PlanCard = ({ plan, onEdit, onDelete }: PlanCardProps) => {
           </div>
         </div>
 
-        {/* Canais Ativos */}
+        {/* Canais Ativos com Logos Reais */}
         <div className="space-y-2">
           <p className="text-sm font-medium text-foreground">
             Canais ({activeChannelsCount}/6)
           </p>
-          <div className="space-y-1">
+          <div className="space-y-2">
             {Object.entries(plan.channels).map(([key, count]) => (
               count > 0 && (
-                <div key={key} className="flex justify-between items-center text-xs">
-                  <span className="text-muted-foreground">
-                    {channelNames[key]}
-                  </span>
+                <div key={key} className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <ChannelLogo channel={key} size="sm" />
+                    <span className="text-xs text-muted-foreground">
+                      {channelNames[key]}
+                    </span>
+                  </div>
                   <Badge variant="secondary" className="text-xs">
                     {count}
                   </Badge>

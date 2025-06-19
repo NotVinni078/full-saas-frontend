@@ -9,6 +9,7 @@ export interface Plan {
   name: string;
   type: 'Publico' | 'Personalizado';
   userLimit: number;
+  value: number; // Valor do plano em R$
   features: {
     chatInterno: boolean;
     agendamentos: boolean;
@@ -40,13 +41,14 @@ export const usePlans = () => {
       return JSON.parse(savedPlans);
     }
     
-    // Planos de exemplo iniciais
+    // Planos de exemplo iniciais com valores
     return [
       {
         id: '1',
         name: 'Plano Básico',
         type: 'Publico' as const,
         userLimit: 5,
+        value: 97.90,
         features: {
           chatInterno: true,
           agendamentos: false,
@@ -69,6 +71,7 @@ export const usePlans = () => {
         name: 'Plano Premium',
         type: 'Publico' as const,
         userLimit: 20,
+        value: 197.90,
         features: {
           chatInterno: true,
           agendamentos: true,
@@ -91,6 +94,7 @@ export const usePlans = () => {
         name: 'Plano Empresarial',
         type: 'Personalizado' as const,
         userLimit: 100,
+        value: 497.90,
         features: {
           chatInterno: true,
           agendamentos: true,

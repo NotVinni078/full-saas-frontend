@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
+import { ChannelRow } from './ChannelLogos';
 
 /**
  * Interface para definir a estrutura de um plano
@@ -22,6 +23,7 @@ interface Plan {
   name: string;
   type: 'Publico' | 'Personalizado';
   userLimit: number;
+  value: number;
   features: {
     chatInterno: boolean;
     agendamentos: boolean;
@@ -52,6 +54,7 @@ interface PlanModalProps {
  * Permite configurar todas as opções disponíveis para um plano
  * Utiliza cores dinâmicas da gestão de marca
  * Responsivo para todos os tamanhos de tela
+ * Corrigido dropdown transparente e logos dos canais
  */
 const PlanModal = ({ isOpen, onClose, onSave, plan }: PlanModalProps) => {
   // Estado inicial do formulário
@@ -59,6 +62,7 @@ const PlanModal = ({ isOpen, onClose, onSave, plan }: PlanModalProps) => {
     name: '',
     type: 'Publico',
     userLimit: 1,
+    value: 0,
     features: {
       chatInterno: false,
       agendamentos: false,
@@ -88,6 +92,7 @@ const PlanModal = ({ isOpen, onClose, onSave, plan }: PlanModalProps) => {
         name: plan.name,
         type: plan.type,
         userLimit: plan.userLimit,
+        value: plan.value || 0,
         features: { ...plan.features },
         channels: { ...plan.channels },
       });
@@ -97,6 +102,7 @@ const PlanModal = ({ isOpen, onClose, onSave, plan }: PlanModalProps) => {
         name: '',
         type: 'Publico',
         userLimit: 1,
+        value: 0,
         features: {
           chatInterno: false,
           agendamentos: false,
@@ -168,19 +174,24 @@ const PlanModal = ({ isOpen, onClose, onSave, plan }: PlanModalProps) => {
       return;
     }
 
+    if (formData.value < 0) {
+      alert('O valor do plano deve ser maior ou igual a 0.');
+      return;
+    }
+
     onSave(formData);
   };
 
   /**
-   * Lista de canais disponíveis com seus ícones e nomes
+   * Lista de canais disponíveis com seus nomes para exibição
    */
   const channelsList = [
-    { key: 'whatsappQR', name: 'WhatsApp QR Code', icon: '💬' },
-    { key: 'whatsappAPI', name: 'WhatsApp API Oficial', icon: '✅' },
-    { key: 'instagram', name: 'Instagram', icon: '📸' },
-    { key: 'facebook', name: 'Facebook', icon: '👥' },
-    { key: 'telegram', name: 'Telegram', icon: '✈️' },
-    { key: 'webchat', name: 'WebChat', icon: '💬' },
+    { key: 'whatsappQR', name: 'WhatsApp QR Code' },
+    { key: 'whatsappAPI', name: 'WhatsApp API Oficial' },
+    { key: 'instagram', name: 'Instagram' },
+    { key: 'facebook', name: 'Facebook' },
+    { key: 'telegram', name: 'Telegram' },
+    { key: 'webchat', name: 'WebChat' },
   ];
 
   return (
@@ -207,7 +218,7 @@ const PlanModal = ({ isOpen, onClose, onSave, plan }: PlanModalProps) => {
             />
           </div>
 
-          {/* Tipo do Plano */}
+          {/* Tipo do Plano - Corrigido dropdown transparente */}
           <div className="space-y-2">
             <Label className="text-foreground font-medium">
               Tipo do Plano
@@ -219,26 +230,49 @@ const PlanModal = ({ isOpen, onClose, onSave, plan }: PlanModalProps) => {
               <SelectTrigger className="bg-background border-border text-foreground">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Publico">Público</SelectItem>
-                <SelectItem value="Personalizado">Personalizado</SelectItem>
+              <SelectContent className="bg-background border-border z-50">
+                <SelectItem value="Publico" className="text-foreground hover:bg-accent">
+                  Público
+                </SelectItem>
+                <SelectItem value="Personalizado" className="text-foreground hover:bg-accent">
+                  Personalizado
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {/* Quantidade de Usuários */}
-          <div className="space-y-2">
-            <Label htmlFor="userLimit" className="text-foreground font-medium">
-              Quantidade de Usuários
-            </Label>
-            <Input
-              id="userLimit"
-              type="number"
-              min="1"
-              value={formData.userLimit}
-              onChange={(e) => handleInputChange('userLimit', parseInt(e.target.value) || 1)}
-              className="bg-background border-border text-foreground"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Quantidade de Usuários */}
+            <div className="space-y-2">
+              <Label htmlFor="userLimit" className="text-foreground font-medium">
+                Quantidade de Usuários
+              </Label>
+              <Input
+                id="userLimit"
+                type="number"
+                min="1"
+                value={formData.userLimit}
+                onChange={(e) => handleInputChange('userLimit', parseInt(e.target.value) || 1)}
+                className="bg-background border-border text-foreground"
+              />
+            </div>
+
+            {/* Valor do Plano */}
+            <div className="space-y-2">
+              <Label htmlFor="planValue" className="text-foreground font-medium">
+                Valor do Plano (R$)
+              </Label>
+              <Input
+                id="planValue"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                value={formData.value}
+                onChange={(e) => handleInputChange('value', parseFloat(e.target.value) || 0)}
+                className="bg-background border-border text-foreground"
+              />
+            </div>
           </div>
 
           {/* Funcionalidades do Sistema */}
@@ -324,7 +358,7 @@ const PlanModal = ({ isOpen, onClose, onSave, plan }: PlanModalProps) => {
             </Card>
           </div>
 
-          {/* Canais de Comunicação */}
+          {/* Canais de Comunicação - Com logos reais */}
           <div className="space-y-4">
             <Label className="text-foreground font-medium text-lg">
               Canais de Comunicação
@@ -333,21 +367,13 @@ const PlanModal = ({ isOpen, onClose, onSave, plan }: PlanModalProps) => {
             <Card className="border-border bg-card">
               <CardContent className="p-4 space-y-4">
                 {channelsList.map((channel) => (
-                  <div key={channel.key} className="flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xl">{channel.icon}</span>
-                      <Label className="text-foreground font-medium">
-                        {channel.name}
-                      </Label>
-                    </div>
-                    <Input
-                      type="number"
-                      min="0"
-                      value={formData.channels[channel.key]}
-                      onChange={(e) => handleChannelChange(channel.key, parseInt(e.target.value) || 0)}
-                      className="w-20 bg-background border-border text-foreground text-center"
-                    />
-                  </div>
+                  <ChannelRow
+                    key={channel.key}
+                    channel={channel.key}
+                    name={channel.name}
+                    value={formData.channels[channel.key]}
+                    onChange={handleChannelChange}
+                  />
                 ))}
               </CardContent>
             </Card>
