@@ -1,225 +1,141 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, EyeOff, Mail, Lock, Sun, Moon } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { useBrand } from '@/contexts/BrandContext';
 
 interface AuthFormProps {
-  onAuth: () => void;
+  onAuth?: () => void;
 }
 
 const AuthForm = ({ onAuth }: AuthFormProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState('pt-BR');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+  const { tempBrandConfig } = useBrand();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    
     // Simular autenticação
     setTimeout(() => {
       setIsLoading(false);
-      onAuth();
+      if (onAuth) {
+        onAuth();
+      } else {
+        navigate('/inicio');
+      }
     }, 1500);
   };
 
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    document.documentElement.classList.toggle('dark');
-  };
-
-  const languages = [
-    { code: 'pt-BR', name: 'Português (Brasil)', flag: '🇧🇷' },
-    { code: 'en-US', name: 'English (USA)', flag: '🇺🇸' },
-    { code: 'es-ES', name: 'Español (España)', flag: '🇪🇸' }
-  ];
-
-  const texts = {
-    'pt-BR': {
-      welcome: 'Bem-vindo',
-      loginDesc: 'Entre com suas credenciais para acessar sua conta',
-      email: 'Email',
-      password: 'Senha',
-      forgotPassword: 'Esqueci minha senha',
-      login: 'Entrar',
-      logging: 'Entrando...',
-      companyName: 'NOME DA EMPRESA'
-    },
-    'en-US': {
-      welcome: 'Welcome',
-      loginDesc: 'Enter your credentials to access your account',
-      email: 'Email',
-      password: 'Password',
-      forgotPassword: 'Forgot password',
-      login: 'Login',
-      logging: 'Logging in...',
-      companyName: 'COMPANY NAME'
-    },
-    'es-ES': {
-      welcome: 'Bienvenido',
-      loginDesc: 'Ingresa tus credenciales para acceder a tu cuenta',
-      email: 'Correo electrónico',
-      password: 'Contraseña',
-      forgotPassword: 'Olvidé mi contraseña',
-      login: 'Iniciar sesión',
-      logging: 'Iniciando sesión...',
-      companyName: 'NOMBRE DE LA EMPRESA'
-    }
-  };
-
-  const t = texts[currentLanguage as keyof typeof texts];
-  const currentLang = languages.find(lang => lang.code === currentLanguage);
-
   return (
-    <div className={`min-h-screen flex ${isDarkMode ? 'dark' : ''}`}>
-      {/* Lado esquerdo - Imagem */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-black"></div>
-        <img 
-          src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
-          alt="Login Background"
-          className="w-full h-full object-cover opacity-80 transition-transform duration-700 hover:scale-105"
-        />
-        <div className="absolute inset-0 bg-black/40"></div>
-        <div className="absolute bottom-8 left-8 brand-text-background">
-          <h2 className="text-3xl font-bold mb-2">Gerencie seu negócio</h2>
-          <p className="text-lg opacity-90">com inteligência e eficiência</p>
-        </div>
-      </div>
-
-      {/* Lado direito - Formulário */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 brand-gray-50 dark:brand-background transition-colors duration-300">
-        <div className="w-full max-w-md">
-          {/* Logo e Nome da Empresa */}
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 brand-primary dark:brand-background rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="brand-text-background dark:brand-text-foreground font-bold text-xl">SF</span>
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="w-full max-w-md space-y-6">
+        {/* Logo e Nome da Empresa */}
+        <div className="text-center space-y-4">
+          {tempBrandConfig.logo ? (
+            <img 
+              src={tempBrandConfig.logo} 
+              alt="Logo" 
+              className="h-16 w-auto mx-auto"
+            />
+          ) : (
+            <div className="w-16 h-16 bg-brand-primary rounded-full flex items-center justify-center mx-auto">
+              <span className="text-primary-foreground font-bold text-xl">
+                {tempBrandConfig.companyName.charAt(0)}
+              </span>
             </div>
-            <h1 className="text-2xl font-bold brand-text-foreground">
-              {t.companyName}
-            </h1>
-          </div>
+          )}
+          <h1 className="text-2xl font-bold text-brand-foreground">
+            {tempBrandConfig.companyName}
+          </h1>
+        </div>
 
-          {/* Formulário */}
-          <Card className="border-0 shadow-lg dark:brand-gray-900">
-            <CardHeader className="text-center pb-6 relative">
-              {/* Botões de tema e idioma */}
-              <div className="absolute top-4 right-4 flex space-x-2">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={toggleTheme}
-                  className="h-8 w-8 dark:brand-border-gray-600 dark:brand-hover-gray-700"
-                >
-                  {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                </Button>
-                
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8 dark:brand-border-gray-600 dark:brand-hover-gray-700"
-                    >
-                      <span className="text-sm">{currentLang?.flag}</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48 brand-background dark:brand-gray-800 brand-border dark:brand-border-gray-700">
-                    {languages.map((language) => (
-                      <DropdownMenuItem
-                        key={language.code}
-                        onClick={() => setCurrentLanguage(language.code)}
-                        className="flex items-center space-x-2 cursor-pointer brand-hover-gray-100 dark:brand-hover-gray-700"
-                      >
-                        <span className="text-lg">{language.flag}</span>
-                        <span className="text-sm dark:brand-text-background">{language.name}</span>
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+        {/* Formulário */}
+        <Card className="shadow-lg">
+          <CardHeader className="text-center">
+            <CardTitle className="text-xl text-brand-foreground">
+              Bem-vindo
+            </CardTitle>
+            <CardDescription className="text-brand-muted">
+              Entre com suas credenciais para acessar sua conta
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-brand-foreground">
+                  Email
+                </Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-brand-muted" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="seu@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
               </div>
               
-              <CardTitle className="text-2xl brand-text-foreground">
-                {t.welcome}
-              </CardTitle>
-              <CardDescription className="brand-text-muted">
-                {t.loginDesc}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="brand-text-foreground">
-                    {t.email}
-                  </Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 brand-text-muted" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="seu@email.com"
-                      className="pl-10 dark:brand-gray-800 dark:brand-border-gray-600 dark:brand-text-background"
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="brand-text-foreground">
-                    {t.password}
-                  </Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 brand-text-muted" />
-                    <Input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="••••••••"
-                      className="pl-10 pr-10 dark:brand-gray-800 dark:brand-border-gray-600 dark:brand-text-background"
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-3 brand-text-muted brand-hover-text-foreground"
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex justify-end">
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-brand-foreground">
+                  Senha
+                </Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-brand-muted" />
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-10 pr-10"
+                    required
+                  />
                   <button
                     type="button"
-                    className="text-sm brand-text-muted hover:brand-text-foreground transition-colors"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-3 text-brand-muted hover:text-brand-foreground transition-colors"
                   >
-                    {t.forgotPassword}
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
+              </div>
 
-                <Button
-                  type="submit"
-                  className="w-full brand-primary brand-hover-primary brand-text-background"
-                  disabled={isLoading}
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  className="text-sm text-brand-muted hover:text-brand-foreground transition-colors"
                 >
-                  {isLoading ? t.logging : t.login}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+                  Esqueci minha senha
+                </button>
+              </div>
 
-          <p className="text-center brand-text-muted text-sm mt-8">
-            © 2024 SaasFlow. Todos os direitos reservados.
-          </p>
-        </div>
+              <Button
+                type="submit"
+                className="w-full bg-brand-primary hover:bg-brand-primary text-primary-foreground"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Entrando...' : 'Entrar'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+
+        <p className="text-center text-brand-muted text-sm">
+          © 2024 {tempBrandConfig.companyName}. Todos os direitos reservados.
+        </p>
       </div>
     </div>
   );
