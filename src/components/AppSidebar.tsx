@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
@@ -64,7 +65,7 @@ const menuGroups = [
     label: 'Dashboards',
     icon: LayoutDashboard,
     items: [
-      { id: 'dashboard-gerencial', label: 'Dashboard de Infraestrutura', icon: ChartColumn, route: '/dashboard-gerencial' },
+      { id: 'dashboard-infraestrutura', label: 'Dashboard de Infraestrutura', icon: ChartColumn, route: '/dashboard-infraestrutura' },
       { id: 'dashboard-admin', label: 'Dashboard Administrativo', icon: ChartColumn, route: '/dashboard-admin' },
       { id: 'dashboard-usuario', label: 'Dashboard Usuário', icon: ChartColumn, route: '/dashboard-usuario' },
     ]
