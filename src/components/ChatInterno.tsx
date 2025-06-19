@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useUsers } from "@/hooks/useUsers";
 import { ChatInicio } from './chat/ChatInicio';
-import { NovoChatPopup } from './chat/NovoChatsPopup';
+import { NovoChatPopup } from './chat/NovochatPopup';
 import { NovoGrupo } from './chat/NovoGrupo';
 import { ChatConversa } from './chat/ChatConversa';
 
