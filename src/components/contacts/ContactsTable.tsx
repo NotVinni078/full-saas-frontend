@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Checkbox } from "@/components/ui/checkbox";
 import { 
   Table,
   TableBody,
@@ -26,11 +27,13 @@ import {
   Trash2,
   Phone,
   Mail,
-  Users
+  Users,
+  EllipsisVertical
 } from 'lucide-react';
 
 /**
  * Tabela de contatos com layout responsivo
+ * Inclui funcionalidades de seleção múltipla e ações em lote
  * Mantém design de cards para mobile/tablet e tabela para desktop
  * Cores dinâmicas do sistema de marca
  * Logos reais das redes sociais
@@ -45,6 +48,10 @@ interface ContactsTableProps {
   onBlockContact: (contact: any) => void;
   onDeleteContact: (contactId: string) => void;
   getContactTags: (contact: any) => any[];
+  onBulkStartService?: (contacts: any[]) => void;
+  onBulkBlock?: (contacts: any[]) => void;
+  onBulkDelete?: (contacts: any[]) => void;
+  onBulkCreateSchedule?: (contacts: any[]) => void;
 }
 
 const ContactsTable = ({
@@ -55,8 +62,14 @@ const ContactsTable = ({
   onCreateSchedule,
   onBlockContact,
   onDeleteContact,
-  getContactTags
+  getContactTags,
+  onBulkStartService,
+  onBulkBlock,
+  onBulkDelete,
+  onBulkCreateSchedule
 }: ContactsTableProps) => {
+  const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
+  const [isAllSelected, setIsAllSelected] = useState(false);
 
   /**
    * Gera iniciais do nome para avatar quando não há foto
@@ -136,13 +149,125 @@ const ContactsTable = ({
     return blockedContacts.some(blocked => blocked.id === contactId);
   };
 
+  /**
+   * Manipula seleção individual de contatos
+   * @param {string} contactId - ID do contato
+   * @param {boolean} checked - Estado da seleção
+   */
+  const handleContactSelection = (contactId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedContacts(prev => [...prev, contactId]);
+    } else {
+      setSelectedContacts(prev => prev.filter(id => id !== contactId));
+    }
+  };
+
+  /**
+   * Manipula seleção de todos os contatos visíveis
+   * @param {boolean} checked - Estado da seleção
+   */
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const allContactIds = contacts.map(contact => contact.id);
+      setSelectedContacts(allContactIds);
+    } else {
+      setSelectedContacts([]);
+    }
+    setIsAllSelected(checked);
+  };
+
+  /**
+   * Atualiza estado de "selecionar todos" baseado na seleção individual
+   */
+  useEffect(() => {
+    const allSelected = contacts.length > 0 && selectedContacts.length === contacts.length;
+    setIsAllSelected(allSelected);
+  }, [selectedContacts, contacts]);
+
+  /**
+   * Obtém contatos selecionados completos
+   */
+  const getSelectedContactsData = () => {
+    return contacts.filter(contact => selectedContacts.includes(contact.id));
+  };
+
+  /**
+   * Manipula ações em lote
+   * @param {string} action - Ação a ser executada
+   */
+  const handleBulkAction = (action: string) => {
+    const selectedContactsData = getSelectedContactsData();
+    
+    switch (action) {
+      case 'start-service':
+        onBulkStartService?.(selectedContactsData);
+        break;
+      case 'block':
+        onBulkBlock?.(selectedContactsData);
+        break;
+      case 'delete':
+        onBulkDelete?.(selectedContactsData);
+        break;
+      case 'create-schedule':
+        onBulkCreateSchedule?.(selectedContactsData);
+        break;
+    }
+    
+    // Limpa seleção após ação
+    setSelectedContacts([]);
+  };
+
   return (
     <div className="w-full">
+      {/* Ações em lote - visível apenas quando há contatos selecionados */}
+      {selectedContacts.length > 0 && (
+        <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-blue-700 dark:text-blue-300">
+              {selectedContacts.length} contato(s) selecionado(s)
+            </span>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="h-8 border-blue-300 text-blue-700 hover:bg-blue-100 dark:border-blue-700 dark:text-blue-300 dark:hover:bg-blue-800">
+                  <EllipsisVertical className="h-4 w-4" />
+                  Ações em Lote
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48 bg-card border-border">
+                <DropdownMenuItem onClick={() => handleBulkAction('start-service')} className="text-foreground hover:bg-accent">
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Iniciar Atendimento
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleBulkAction('create-schedule')} className="text-foreground hover:bg-accent">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Criar Agendamento
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleBulkAction('block')} className="text-foreground hover:bg-accent">
+                  <Ban className="h-4 w-4 mr-2" />
+                  Bloquear/Desbloquear
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleBulkAction('delete')} className="text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20">
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Excluir Selecionados
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+      )}
+
       {/* Layout tabela para desktop */}
       <div className="hidden lg:block">
         <Table>
           <TableHeader>
             <TableRow className="border-border hover:bg-transparent">
+              <TableHead className="text-foreground font-semibold w-[50px]">
+                <Checkbox
+                  checked={isAllSelected}
+                  onCheckedChange={handleSelectAll}
+                  aria-label="Selecionar todos os contatos"
+                />
+              </TableHead>
               <TableHead className="text-foreground font-semibold">Contato</TableHead>
               <TableHead className="text-foreground font-semibold">Telefone</TableHead>
               <TableHead className="text-foreground font-semibold">Email</TableHead>
@@ -155,14 +280,24 @@ const ContactsTable = ({
             {contacts.map((contato) => {
               const tags = getContactTags(contato);
               const isBlocked = isContactBlocked(contato.id);
+              const isSelected = selectedContacts.includes(contato.id);
               
               return (
                 <TableRow 
                   key={contato.id} 
                   className={`border-border hover:bg-accent/50 transition-colors ${
                     isBlocked ? 'opacity-60' : ''
-                  }`}
+                  } ${isSelected ? 'bg-blue-50 dark:bg-blue-900/20' : ''}`}
                 >
+                  {/* Coluna Checkbox */}
+                  <TableCell className="py-4">
+                    <Checkbox
+                      checked={isSelected}
+                      onCheckedChange={(checked) => handleContactSelection(contato.id, checked as boolean)}
+                      aria-label={`Selecionar ${contato.nome}`}
+                    />
+                  </TableCell>
+
                   {/* Coluna Contato - Avatar + Nome */}
                   <TableCell className="py-4">
                     <div className="flex items-center gap-3">
@@ -248,10 +383,12 @@ const ContactsTable = ({
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48 bg-card border-border">
-                        <DropdownMenuItem onClick={() => onEditContact(contato)} className="text-foreground hover:bg-accent">
-                          <Edit className="h-4 w-4 mr-2" />
-                          Editar
-                        </DropdownMenuItem>
+                        {selectedContacts.length <= 1 && (
+                          <DropdownMenuItem onClick={() => onEditContact(contato)} className="text-foreground hover:bg-accent">
+                            <Edit className="h-4 w-4 mr-2" />
+                            Editar
+                          </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem onClick={() => onStartService(contato)} className="text-foreground hover:bg-accent">
                           <MessageSquare className="h-4 w-4 mr-2" />
                           Iniciar Atendimento
@@ -283,16 +420,23 @@ const ContactsTable = ({
         {contacts.map((contato) => {
           const tags = getContactTags(contato);
           const isBlocked = isContactBlocked(contato.id);
+          const isSelected = selectedContacts.includes(contato.id);
           
           return (
             <div 
               key={contato.id} 
               className={`flex flex-col gap-4 p-4 border border-border rounded-lg bg-background hover:bg-accent/50 transition-colors ${
                 isBlocked ? 'opacity-60' : ''
-              }`}
+              } ${isSelected ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800' : ''}`}
             >
-              {/* Header do card - Avatar e informações básicas */}
+              {/* Header do card - Checkbox, Avatar e informações básicas */}
               <div className="flex items-center gap-3 min-w-0 flex-1">
+                <Checkbox
+                  checked={isSelected}
+                  onCheckedChange={(checked) => handleContactSelection(contato.id, checked as boolean)}
+                  aria-label={`Selecionar ${contato.nome}`}
+                />
+                
                 <Avatar className="h-10 w-10 flex-shrink-0">
                   <AvatarImage src={contato.avatar} alt={contato.nome} />
                   <AvatarFallback className="bg-muted text-muted-foreground">
@@ -323,10 +467,12 @@ const ContactsTable = ({
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48 bg-card border-border">
-                    <DropdownMenuItem onClick={() => onEditContact(contato)} className="text-foreground hover:bg-accent">
-                      <Edit className="h-4 w-4 mr-2" />
-                      Editar
-                    </DropdownMenuItem>
+                    {selectedContacts.length <= 1 && (
+                      <DropdownMenuItem onClick={() => onEditContact(contato)} className="text-foreground hover:bg-accent">
+                        <Edit className="h-4 w-4 mr-2" />
+                        Editar
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem onClick={() => onStartService(contato)} className="text-foreground hover:bg-accent">
                       <MessageSquare className="h-4 w-4 mr-2" />
                       Iniciar Atendimento

@@ -10,7 +10,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 
 /**
  * Modal para importação de contatos via arquivo JSON
- * Alterado de CSV para JSON para melhor estruturação dos dados
+ * Layout do seletor de arquivo corrigido para evitar cortes no conteúdo
  * Permite upload de arquivo ou colagem direta do JSON
  * Design responsivo com cores dinâmicas do sistema de marca
  */
@@ -204,23 +204,32 @@ const ImportContactsModal = ({
             </div>
           </div>
 
-          {/* Upload de arquivo */}
-          <div className="space-y-2">
-            <Label htmlFor="file-upload" className="text-foreground">
+          {/* Upload de arquivo - Layout corrigido */}
+          <div className="space-y-3">
+            <Label htmlFor="file-upload" className="text-foreground font-medium">
               Selecionar arquivo JSON
             </Label>
-            <Input
-              id="file-upload"
-              type="file"
-              accept=".json"
-              onChange={handleFileUpload}
-              className="bg-background border-border text-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
-            />
+            <div className="relative">
+              <Input
+                id="file-upload"
+                type="file"
+                accept=".json"
+                onChange={handleFileUpload}
+                className="bg-background border-border text-foreground 
+                  file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 
+                  file:text-sm file:font-medium file:bg-primary file:text-primary-foreground 
+                  hover:file:bg-primary/90 file:cursor-pointer cursor-pointer
+                  h-auto py-3 pr-4"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Selecione um arquivo .json com os dados dos contatos
+            </p>
           </div>
 
           {/* Textarea para colar JSON diretamente */}
-          <div className="space-y-2">
-            <Label htmlFor="json-content" className="text-foreground">
+          <div className="space-y-3">
+            <Label htmlFor="json-content" className="text-foreground font-medium">
               Ou cole o conteúdo JSON diretamente
             </Label>
             <Textarea
@@ -229,7 +238,7 @@ const ImportContactsModal = ({
               value={jsonContent}
               onChange={(e) => handleJsonContentChange(e.target.value)}
               rows={8}
-              className="bg-background border-border text-foreground font-mono text-sm"
+              className="bg-background border-border text-foreground font-mono text-sm resize-y min-h-[200px]"
             />
           </div>
 
@@ -254,8 +263,8 @@ const ImportContactsModal = ({
 
           {/* Preview dos contatos */}
           {previewContacts.length > 0 && (
-            <div className="space-y-2">
-              <Label className="text-foreground">Preview dos contatos (primeiros 3)</Label>
+            <div className="space-y-3">
+              <Label className="text-foreground font-medium">Preview dos contatos (primeiros 3)</Label>
               <div className="bg-muted/30 p-4 rounded-lg border border-border max-h-48 overflow-y-auto">
                 {previewContacts.slice(0, 3).map((contact, index) => (
                   <div key={index} className="mb-3 pb-3 border-b border-border last:border-b-0 last:mb-0 last:pb-0">

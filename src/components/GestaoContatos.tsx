@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +19,14 @@ import ImportContactsModal from './contacts/ImportContactsModal';
 import ContactsTable from './contacts/ContactsTable';
 import ConfirmationDialog from './contacts/ConfirmationDialog';
 import StartServiceDialog from './contacts/StartServiceDialog';
+import NewScheduleModal from './modals/NewScheduleModal';
+
+/**
+ * Componente principal de gestão de contatos
+ * Inclui funcionalidades de seleção múltipla, ações em lote e modal de agendamento
+ * Mantém responsividade e cores dinâmicas do sistema de marca
+ * Layout do seletor de arquivo JSON corrigido
+ */
 
 const GestaoContatos = () => {
   const navigate = useNavigate();
@@ -35,11 +44,13 @@ const GestaoContatos = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [showImportModal, setShowImportModal] = useState(false);
   
-  // Estados para diálogos de confirmação e iniciar atendimento
+  // Estados para diálogos de confirmação e ações
   const [showBlockConfirmation, setShowBlockConfirmation] = useState(false);
   const [showUnblockConfirmation, setShowUnblockConfirmation] = useState(false);
   const [showStartServiceDialog, setShowStartServiceDialog] = useState(false);
+  const [showNewScheduleModal, setShowNewScheduleModal] = useState(false);
   const [selectedContactForAction, setSelectedContactForAction] = useState(null);
+  const [preSelectedContactsForSchedule, setPreSelectedContactsForSchedule] = useState([]);
 
   // Hook customizado para gerenciamento de contatos
   const { contacts, updateContact, addContact, removeContact, getContactTags, searchContacts } = useContacts();
@@ -173,7 +184,7 @@ const GestaoContatos = () => {
    * Processa início do atendimento com setor selecionado
    * @param {string} contactId - ID do contato
    * @param {string} sectorId - ID do setor selecionado
-   * @param {string} action - Ação escolhida ('start' ou 'waiting')
+   * @param {string} action -ção escolhida ('start' ou 'waiting')
    */
   const handleStartService = (contactId: string, sectorId: string, action: 'start' | 'waiting') => {
     const contato = contacts.find(c => c.id === contactId);
@@ -186,22 +197,13 @@ const GestaoContatos = () => {
   };
 
   /**
-   * Redireciona para página de agendamentos com dados do contato
+   * Abre modal de novo agendamento com contato pré-selecionado
    * @param {Object} contato - Contato para criar agendamento
    */
   const handleCriarAgendamento = (contato) => {
-    console.log('Redirecionando para página de agendamentos com contato:', contato.nome);
-    // Redireciona para /agendamentos passando dados do contato via state
-    navigate('/agendamentos', { 
-      state: { 
-        preSelectedContact: {
-          id: contato.id,
-          nome: contato.nome,
-          telefone: contato.telefone,
-          email: contato.email
-        }
-      }
-    });
+    setPreSelectedContactsForSchedule([contato]);
+    setShowNewScheduleModal(true);
+    console.log('Abrindo modal de agendamento com contato pré-selecionado:', contato.nome);
   };
 
   /**
@@ -273,6 +275,64 @@ const GestaoContatos = () => {
     setSelectedTags([]);
   };
 
+  // Funções para ações em lote
+
+  /**
+   * Processa início de atendimento em lote
+   * @param {Array} selectedContacts - Contatos selecionados
+   */
+  const handleBulkStartService = (selectedContacts) => {
+    console.log('Iniciando atendimento para múltiplos contatos:', selectedContacts.map(c => c.nome));
+    // TODO: Implementar lógica de início de atendimento em lote
+    // Por enquanto, abre o diálogo para o primeiro contato como exemplo
+    if (selectedContacts.length > 0) {
+      handleIniciarAtendimento(selectedContacts[0]);
+    }
+  };
+
+  /**
+   * Processa bloqueio/desbloqueio em lote
+   * @param {Array} selectedContacts - Contatos selecionados
+   */
+  const handleBulkBlock = (selectedContacts) => {
+    selectedContacts.forEach(contact => {
+      const isCurrentlyBlocked = blockedContacts.some(blocked => blocked.id === contact.id);
+      
+      if (isCurrentlyBlocked) {
+        // Desbloquear
+        setBlockedContacts(prev => prev.filter(blocked => blocked.id !== contact.id));
+        console.log('Contato desbloqueado em lote:', contact.nome);
+      } else {
+        // Bloquear
+        setBlockedContacts(prev => [...prev, contact]);
+        console.log('Contato bloqueado em lote:', contact.nome);
+      }
+    });
+  };
+
+  /**
+   * Processa exclusão em lote
+   * @param {Array} selectedContacts - Contatos selecionados
+   */
+  const handleBulkDelete = (selectedContacts) => {
+    if (confirm(`Tem certeza que deseja excluir ${selectedContacts.length} contato(s)?`)) {
+      selectedContacts.forEach(contact => {
+        handleExcluirContato(contact.id);
+      });
+      console.log(`${selectedContacts.length} contatos excluídos em lote`);
+    }
+  };
+
+  /**
+   * Processa criação de agendamento em lote
+   * @param {Array} selectedContacts - Contatos selecionados
+   */
+  const handleBulkCreateSchedule = (selectedContacts) => {
+    setPreSelectedContactsForSchedule(selectedContacts);
+    setShowNewScheduleModal(true);
+    console.log('Abrindo modal de agendamento com múltiplos contatos pré-selecionados:', selectedContacts.map(c => c.nome));
+  };
+
   return (
     <div className="p-4 lg:p-6 space-y-4 lg:space-y-6 bg-background min-h-screen">
       {/* Cabeçalho da página com título e botões principais */}
@@ -286,7 +346,7 @@ const GestaoContatos = () => {
         
         {/* Botões de ação principais - responsivos */}
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-          {/* Botão de exportar JSON (alterado de CSV) */}
+          {/* Botão de exportar JSON */}
           <Button 
             variant="outline" 
             onClick={handleExportarJSON}
@@ -296,7 +356,7 @@ const GestaoContatos = () => {
             Exportar JSON
           </Button>
 
-          {/* Botão de importar JSON (alterado de CSV) */}
+          {/* Botão de importar JSON */}
           <Button 
             variant="outline" 
             onClick={() => setShowImportModal(true)}
@@ -348,7 +408,7 @@ const GestaoContatos = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {/* Tabela/Cards de contatos usando o componente existente */}
+          {/* Tabela/Cards de contatos com funcionalidades de seleção múltipla */}
           {filtrarContatos().length > 0 ? (
             <ContactsTable
               contacts={filtrarContatos()}
@@ -359,6 +419,10 @@ const GestaoContatos = () => {
               onBlockContact={handleBloquearContato}
               onDeleteContact={handleExcluirContato}
               getContactTags={getContactTags}
+              onBulkStartService={handleBulkStartService}
+              onBulkBlock={handleBulkBlock}
+              onBulkDelete={handleBulkDelete}
+              onBulkCreateSchedule={handleBulkCreateSchedule}
             />
           ) : (
             /* Estado vazio quando não há contatos */
@@ -412,11 +476,21 @@ const GestaoContatos = () => {
         onDelete={(contactId)=> handleExcluirContato(contactId)}
       />
 
-      {/* Modal de importação de contatos (agora JSON) */}
+      {/* Modal de importação de contatos (agora JSON com layout corrigido) */}
       <ImportContactsModal
         isOpen={showImportModal}
         onClose={() => setShowImportModal(false)}
         onImport={handleImportContacts}
+      />
+
+      {/* Modal de novo agendamento */}
+      <NewScheduleModal
+        isOpen={showNewScheduleModal}
+        onClose={() => {
+          setShowNewScheduleModal(false);
+          setPreSelectedContactsForSchedule([]);
+        }}
+        preSelectedContacts={preSelectedContactsForSchedule}
       />
 
       {/* Diálogo de confirmação para bloquear contato */}
