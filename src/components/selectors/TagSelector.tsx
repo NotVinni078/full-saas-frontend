@@ -9,8 +9,9 @@ import { Tag } from '@/types/global';
 
 /**
  * Componente de seleção de tags em formato dropdown
- * Permite seleção múltipla de tags com visual em badges
+ * Permite seleção múltipla de tags com visual em badges coloridos
  * Design responsivo com cores dinâmicas do sistema de marca
+ * Aplica cores personalizadas das tags de forma consistente
  */
 
 interface TagSelectorProps {
@@ -33,6 +34,31 @@ const TagSelector = ({
   const unselectedTags = availableTags.filter(tag => !selectedTagIds.includes(tag.id));
 
   /**
+   * Converte cor hexadecimal para estilo inline CSS
+   * Garante contraste adequado para texto sobre a cor da tag
+   * @param {string} hexColor - Cor em formato hexadecimal
+   * @returns {Object} Objeto com estilos CSS para aplicar na tag
+   */
+  const getTagStyles = (hexColor: string) => {
+    // Converter hex para RGB para calcular luminância
+    const hex = hexColor.replace('#', '');
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+    
+    // Calcular luminância para determinar cor do texto
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    const textColor = luminance > 0.5 ? '#000000' : '#FFFFFF';
+    
+    return {
+      backgroundColor: hexColor,
+      color: textColor,
+      border: `1px solid ${hexColor}`,
+      boxShadow: `0 1px 3px rgba(0, 0, 0, 0.1)`
+    };
+  };
+
+  /**
    * Adiciona uma tag à seleção
    * @param {Tag} tag - Tag a ser adicionada
    */
@@ -53,19 +79,20 @@ const TagSelector = ({
 
   return (
     <div className="space-y-3">
-      {/* Tags selecionadas - exibidas como badges */}
+      {/* Tags selecionadas - exibidas como badges com cores personalizadas */}
       {selectedTags.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {selectedTags.map((tag) => (
             <Badge 
               key={tag.id} 
-              className={`text-xs px-2 py-1 flex items-center gap-1 ${tag.cor} cursor-pointer hover:opacity-80 transition-opacity`}
+              style={getTagStyles(tag.cor)}
+              className="text-xs px-2 py-1 flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity border-0 shadow-sm"
             >
               {tag.nome}
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-3 w-3 p-0 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-full"
+                className="h-3 w-3 p-0 hover:bg-black/20 dark:hover:bg-white/20 rounded-full ml-1"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleRemoveTag(tag.id);
@@ -107,7 +134,10 @@ const TagSelector = ({
                 onClick={() => handleAddTag(tag)}
                 className="flex items-center gap-2 p-3 cursor-pointer text-foreground hover:bg-accent focus:bg-accent"
               >
-                <Badge className={`text-xs px-2 py-1 ${tag.cor} pointer-events-none`}>
+                <Badge 
+                  style={getTagStyles(tag.cor)}
+                  className="text-xs px-2 py-1 pointer-events-none border-0 shadow-sm"
+                >
                   {tag.nome}
                 </Badge>
                 {tag.descricao && (

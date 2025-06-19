@@ -6,6 +6,7 @@ import { Tag } from '@/types/global';
  * Hook customizado para gerenciamento de tags
  * Fornece funcionalidades CRUD e utilitários para tags
  * Mantém sincronização com contexto global de dados
+ * Inclui utilitários para aplicação consistente de cores das tags
  */
 
 export const useTags = () => {
@@ -43,13 +44,47 @@ export const useTags = () => {
   };
 
   /**
-   * Retorna tags baseadas em uma lista de IDs
+   * Retorna tags base em uma lista de IDs
    * Útil para buscar tags de um contato específico
    * @param {string[]} ids - Lista de IDs das tags
    * @returns {Tag[]} Lista de tags correspondentes aos IDs
    */
   const getTagsByIds = (ids: string[]): Tag[] => {
     return tags.filter(tag => ids.includes(tag.id));
+  };
+
+  /**
+   * Converte cor hexadecimal para estilo inline CSS com contraste adequado
+   * Garante legibilidade do texto sobre qualquer cor de fundo
+   * @param {string} hexColor - Cor em formato hexadecimal
+   * @returns {Object} Objeto com estilos CSS para aplicar na tag
+   */
+  const getTagStyles = (hexColor: string) => {
+    // Validar e limpar cor hexadecimal
+    if (!hexColor || !hexColor.startsWith('#') || hexColor.length !== 7) {
+      return {
+        backgroundColor: '#6B7280',
+        color: '#FFFFFF',
+        border: '1px solid #6B7280'
+      };
+    }
+
+    // Converter hex para RGB para calcular luminância
+    const hex = hexColor.replace('#', '');
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+    
+    // Calcular luminância relativa para determinar contraste
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    const textColor = luminance > 0.5 ? '#000000' : '#FFFFFF';
+    
+    return {
+      backgroundColor: hexColor,
+      color: textColor,
+      border: `1px solid ${hexColor}`,
+      boxShadow: `0 1px 3px rgba(0, 0, 0, 0.1)`
+    };
   };
 
   /**
@@ -122,6 +157,7 @@ export const useTags = () => {
     getActiveTags,
     searchTags,
     getTagsByIds,
-    getTagColorClasses
+    getTagColorClasses,
+    getTagStyles // Nova função para aplicação consistente de cores
   };
 };

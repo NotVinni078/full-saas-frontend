@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,6 +18,7 @@ import { Contact } from '@/types/global';
  * Componente principal de gestão de tags
  * Integrado com sistema de contatos para exibir quantidade real e gerenciar associações
  * Mantém responsividade e cores dinâmicas do sistema de marca
+ * Aplica cores das tags de forma consistente em todos os elementos visuais
  */
 
 const Tags = () => {
@@ -47,6 +47,31 @@ const Tags = () => {
    */
   const getContactCountForTag = (tagId: string): number => {
     return contacts.filter(contact => contact.tags && contact.tags.includes(tagId)).length;
+  };
+
+  /**
+   * Converte cor hexadecimal para estilo inline CSS
+   * Garante contraste adequado para texto sobre a cor da tag
+   * @param {string} hexColor - Cor em formato hexadecimal
+   * @returns {Object} Objeto com estilos CSS para aplicar na tag
+   */
+  const getTagStyles = (hexColor: string) => {
+    // Converter hex para RGB para calcular luminância
+    const hex = hexColor.replace('#', '');
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+    
+    // Calcular luminância para determinar cor do texto
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    const textColor = luminance > 0.5 ? '#000000' : '#FFFFFF';
+    
+    return {
+      backgroundColor: hexColor,
+      color: textColor,
+      border: `1px solid ${hexColor}`,
+      boxShadow: `0 1px 3px rgba(0, 0, 0, 0.1)`
+    };
   };
 
   /**
@@ -245,7 +270,7 @@ const Tags = () => {
                 />
               </div>
               
-              {/* Seletor de cor da tag */}
+              {/* Seletor de cor da tag com preview aplicando estilos corretos */}
               <div className="space-y-2">
                 <Label htmlFor="cor" className="text-foreground">Cor da Tag</Label>
                 <div className="flex items-center gap-3">
@@ -254,11 +279,11 @@ const Tags = () => {
                     type="color"
                     value={novaTag.cor}
                     onChange={(e) => setNovaTag({...novaTag, cor: e.target.value})}
-                    className="w-16 h-10 p-1 border-border rounded"
+                    className="w-16 h-10 p-1 border-border rounded cursor-pointer"
                   />
                   <Badge 
-                    style={{ backgroundColor: novaTag.cor, color: 'white' }}
-                    className="text-white"
+                    style={getTagStyles(novaTag.cor)}
+                    className="px-3 py-1 text-sm font-medium border-0"
                   >
                     {novaTag.nome || 'Preview'}
                   </Badge>
@@ -299,7 +324,7 @@ const Tags = () => {
         </div>
       </div>
 
-      {/* Tabela de Tags com dados reais */}
+      {/* Tabela de Tags com cores aplicadas corretamente */}
       <Card className="bg-card border-border">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-foreground">
@@ -325,12 +350,18 @@ const Tags = () => {
                       <TableRow key={tag.id} className="border-border hover:bg-accent/50">
                         <TableCell>
                           <div className="flex items-center gap-3">
+                            {/* Badge da tag com cor personalizada aplicada corretamente */}
                             <Badge 
-                              style={{ backgroundColor: tag.cor, color: 'white' }}
-                              className="text-white"
+                              style={getTagStyles(tag.cor)}
+                              className="px-3 py-1 text-sm font-medium border-0 shadow-sm"
                             >
                               {tag.nome}
                             </Badge>
+                            {tag.descricao && (
+                              <span className="text-xs text-muted-foreground hidden sm:inline">
+                                {tag.descricao}
+                              </span>
+                            )}
                           </div>
                         </TableCell>
                         <TableCell className="text-center">
@@ -430,12 +461,20 @@ const Tags = () => {
         </CardContent>
       </Card>
 
-      {/* Modal para Adicionar Contatos à Tag */}
+      {/* Modal para Adicionar Contatos à Tag com badge colorido */}
       <Dialog open={isContatosDialogOpen} onOpenChange={setIsContatosDialogOpen}>
         <DialogContent className="sm:max-w-[600px] mx-4 bg-card border-border max-h-[80vh] overflow-hidden">
           <DialogHeader>
-            <DialogTitle className="text-foreground">
-              Adicionar Contatos à Tag "{selectedTagForContatos?.nome}"
+            <DialogTitle className="text-foreground flex items-center gap-2">
+              Adicionar Contatos à Tag
+              {selectedTagForContatos && (
+                <Badge 
+                  style={getTagStyles(selectedTagForContatos.cor)}
+                  className="px-2 py-1 text-xs font-medium border-0 shadow-sm ml-2"
+                >
+                  {selectedTagForContatos.nome}
+                </Badge>
+              )}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4 overflow-hidden">
