@@ -1,13 +1,19 @@
 
 import React from 'react';
-import Conexoes from '@/components/Conexoes';
 import SidebarLayout from '@/components/SidebarLayout';
+import { Construction } from 'lucide-react';
 
 const ConexoesPage = () => {
   return (
     <SidebarLayout>
-      <div className="brand-background min-h-full">
-        <Conexoes />
+      <div className="p-6 bg-background min-h-screen">
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
+          <Construction className="h-16 w-16 text-muted-foreground" />
+          <h1 className="text-2xl font-bold text-foreground">Conexões</h1>
+          <p className="text-muted-foreground max-w-md">
+            Esta página está em construção. Em breve teremos novidades!
+          </p>
+        </div>
       </div>
     </SidebarLayout>
   );
