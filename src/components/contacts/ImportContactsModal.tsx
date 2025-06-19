@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useCallback } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -114,7 +113,7 @@ const ImportContactsModal = ({ isOpen, onClose, onImport }: ImportContactsModalP
           observacoes: headerMap.observacoes >= 0 ? values[headerMap.observacoes] || '' : '',
           tags: headerMap.tags >= 0 ? values[headerMap.tags]?.split(';').filter(t => t.trim()) || [] : [],
           canal: headerMap.canal >= 0 ? values[headerMap.canal] || 'whatsapp' : 'whatsapp',
-          status: 'valid' as const,
+          status: 'valid' as 'valid' | 'warning' | 'error',
           errors: []
         };
 

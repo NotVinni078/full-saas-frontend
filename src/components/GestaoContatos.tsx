@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { 
   Plus, 
   Users, 
@@ -17,6 +16,7 @@ import BlockedContactsList from './contacts/BlockedContactsList';
 import ContactsFilter from './contacts/ContactsFilter';
 import ImportContactsModal from './contacts/ImportContactsModal';
 import ContactsTable from './contacts/ContactsTable';
+import CreateScheduleShortcut from './contacts/CreateScheduleShortcut';
 
 const GestaoContatos = () => {
   // Estados principais para controle da interface
@@ -31,6 +31,10 @@ const GestaoContatos = () => {
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'blocked'>('all');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [showImportModal, setShowImportModal] = useState(false);
+  
+  // Novo estado para modal de agendamento
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [selectedContactForSchedule, setSelectedContactForSchedule] = useState(null);
 
   // Hook customizado para gerenciamento de contatos
   const { contacts, updateContact, addContact, removeContact, getContactTags, searchContacts } = useContacts();
@@ -141,13 +145,14 @@ const GestaoContatos = () => {
   };
 
   /**
-   * Abre popup de agendamento reutilizando funcionalidade existente
+   * Abre modal de agendamento usando o componente de atalho
+   * Reutiliza funcionalidade existente da página /agendamentos
    * @param {Object} contato - Contato para criar agendamento
    */
   const handleCriarAgendamento = (contato) => {
-    // TODO: Reutilizar popup de agendamento da página /agendamentos
-    console.log('Criar agendamento para:', contato.nome);
-    // Deve abrir o mesmo modal usado na página de agendamentos
+    setSelectedContactForSchedule(contato);
+    setShowScheduleModal(true);
+    console.log('Abrindo modal de agendamento para:', contato.nome);
   };
 
   /**
@@ -171,6 +176,7 @@ const GestaoContatos = () => {
 
   /**
    * Exporta todos os contatos para arquivo CSV
+   * Melhoria: agora inclui TODAS as tags dos contatos
    */
   const handleExportarCSV = () => {
     const contatosParaExportar = filtrarContatos();
@@ -183,15 +189,17 @@ const GestaoContatos = () => {
     // Cabeçalho do CSV
     const csvHeader = 'nome,telefone,email,observacoes,tags,canal\n';
     
-    // Dados dos contatos
+    // Dados dos contatos - agora com TODAS as tags
     const csvData = contatosParaExportar.map(contato => {
       const tags = getContactTags(contato);
+      const allTagNames = tags.map(tag => tag.nome).join(';'); // Todas as tags separadas por ;
+      
       return [
         `"${contato.nome || ''}"`,
         `"${contato.telefone || ''}"`,
         `"${contato.email || ''}"`,
         `"${contato.observacoes || ''}"`,
-        `"${tags.map(tag => tag.nome).join(';')}"`,
+        `"${allTagNames}"`, // Exporta todas as tags
         `"${contato.canal || ''}"`
       ].join(',');
     }).join('\n');
@@ -204,7 +212,7 @@ const GestaoContatos = () => {
     link.download = `contatos_${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
     
-    console.log(`${contatosParaExportar.length} contatos exportados para CSV`);
+    console.log(`${contatosParaExportar.length} contatos exportados para CSV com todas as tags`);
   };
 
   /**
@@ -360,6 +368,16 @@ const GestaoContatos = () => {
         isOpen={showImportModal}
         onClose={() => setShowImportModal(false)}
         onImport={handleImportContacts}
+      />
+
+      {/* Modal de atalho para criar agendamento */}
+      <CreateScheduleShortcut
+        isOpen={showScheduleModal}
+        onClose={() => {
+          setShowScheduleModal(false);
+          setSelectedContactForSchedule(null);
+        }}
+        contact={selectedContactForSchedule}
       />
     </div>
   );
