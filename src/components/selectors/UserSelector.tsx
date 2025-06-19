@@ -26,13 +26,14 @@ const UserSelector = ({
   filterBySetor
 }: UserSelectorProps) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const { searchUsers, getActiveUsers, getUsersBySetor } = useUsers();
+  const { searchUsers, getActiveUsers, userBelongsToSetor } = useUsers();
   const { getSectorById } = useSectors();
 
   let filteredUsers = searchTerm ? searchUsers(searchTerm) : getActiveUsers();
   
+  // FIXED: Use userBelongsToSetor function to check if user belongs to the filtered sector
   if (filterBySetor) {
-    filteredUsers = filteredUsers.filter(user => user.setor === filterBySetor);
+    filteredUsers = filteredUsers.filter(user => userBelongsToSetor(user, filterBySetor));
   }
 
   return (
@@ -50,7 +51,10 @@ const UserSelector = ({
       <ScrollArea className="h-[300px]">
         <div className="space-y-2">
           {filteredUsers.map((user) => {
-            const userSetor = getSectorById(user.setor);
+            // FIXED: Get the first sector for display (or handle multiple sectors)
+            const firstSectorId = user.setores[0];
+            const userSetor = firstSectorId ? getSectorById(firstSectorId) : null;
+            
             return (
               <div
                 key={user.id}
@@ -70,6 +74,12 @@ const UserSelector = ({
                     {showSector && userSetor && (
                       <Badge className={`text-xs px-2 py-1 ${userSetor.cor}`}>
                         {userSetor.nome}
+                      </Badge>
+                    )}
+                    {/* Show additional sectors count if user has multiple sectors */}
+                    {showSector && user.setores.length > 1 && (
+                      <Badge variant="outline" className="text-xs px-2 py-1">
+                        +{user.setores.length - 1} setores
                       </Badge>
                     )}
                   </div>
