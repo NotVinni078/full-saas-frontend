@@ -40,7 +40,7 @@ export interface User {
   nome: string;
   email: string;
   telefone?: string;
-  setor: string;
+  setores: string[]; // ALTERADO: agora é um array de IDs de setores
   cargo?: string;
   avatar: string;
   status: 'ativo' | 'inativo';

@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Contact, Sector, Tag, User, Connection } from '@/types/global';
 
@@ -124,13 +123,14 @@ const initialTags: Tag[] = [
   }
 ];
 
+// ATUALIZADO: Usuários agora possuem múltiplos setores
 const initialUsers: User[] = [
   {
     id: '1',
     nome: 'João Santos',
     email: 'joao@empresa.com',
     telefone: '(11) 99999-9999',
-    setor: '1', // Vendas
+    setores: ['1'], // Apenas Vendas
     cargo: 'Vendedor',
     avatar: 'JS',
     status: 'ativo',
@@ -143,7 +143,7 @@ const initialUsers: User[] = [
     nome: 'Maria Costa',
     email: 'maria@empresa.com',
     telefone: '(11) 88888-8888',
-    setor: '2', // Suporte
+    setores: ['2'], // Apenas Suporte
     cargo: 'Analista de Suporte',
     avatar: 'MC',
     status: 'ativo',
@@ -156,7 +156,7 @@ const initialUsers: User[] = [
     nome: 'Pedro Lima',
     email: 'pedro@empresa.com',
     telefone: '(11) 77777-7777',
-    setor: '3', // Financeiro
+    setores: ['3'], // Apenas Financeiro
     cargo: 'Analista Financeiro',
     avatar: 'PL',
     status: 'ativo',
@@ -169,7 +169,7 @@ const initialUsers: User[] = [
     nome: 'Ana Silva',
     email: 'ana@empresa.com',
     telefone: '(11) 66666-6666',
-    setor: '4', // Gerência
+    setores: ['1', '4'], // Vendas e Gerência - MÚLTIPLOS SETORES
     cargo: 'Gerente',
     avatar: 'AS',
     status: 'ativo',
@@ -182,7 +182,7 @@ const initialUsers: User[] = [
     nome: 'Carlos Mendes',
     email: 'carlos@empresa.com',
     telefone: '(11) 55555-5555',
-    setor: '4', // Gerência
+    setores: ['2', '3', '4'], // Suporte, Financeiro e Gerência - MÚLTIPLOS SETORES
     cargo: 'Supervisor',
     avatar: 'CM',
     status: 'ativo',

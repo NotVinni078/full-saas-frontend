@@ -9,6 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useToast } from "@/hooks/use-toast";
 import { useUsers } from '@/hooks/useUsers';
 import { useSectors } from '@/hooks/useSectors';
+import MultipleSectorSelector from '@/components/selectors/MultipleSectorSelector';
 import SectorSelector from '@/components/selectors/SectorSelector';
 import { User } from '@/types/global';
 
@@ -25,6 +26,9 @@ import { User } from '@/types/global';
  * - Validação aprimorada de senha (mínimo 6 caracteres)
  * - Interface mais limpa sem status desnecessário
  * - Cabeçalhos de coluna para identificação visual dos dados (desktop apenas)
+ * - NOVA: Suporte a múltiplos setores por usuário usando MultipleSectorSelector
+ * - NOVA: Exibição de múltiplos setores na listagem com badges coloridos
+ * - NOVA: Filtro por setor considerando usuários com múltiplos setores
  */
 const GestaoUsuarios = () => {
   const { toast } = useToast();
@@ -48,12 +52,12 @@ const GestaoUsuarios = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   
-  // Estado para criação de novo usuário com senha obrigatória
+  // ATUALIZADO: Estado para criação de novo usuário com múltiplos setores
   const [newUser, setNewUser] = useState({
     nome: '',
     email: '',
     senha: '', // Campo de senha obrigatório na criação
-    setor: '',
+    setores: [] as string[], // ALTERADO: agora é um array de setores
     cargo: 'atendente' as 'atendente' | 'supervisor' | 'gerente',
     telefone: '',
     avatar: '',
@@ -62,12 +66,12 @@ const GestaoUsuarios = () => {
   });
 
   // Hooks para acessar dados do contexto global
-  const { users, addUser, updateUser, removeUser, searchUsers, getUserSetor } = useUsers();
+  const { users, addUser, updateUser, removeUser, searchUsers, getUserSetores, userBelongsToSetor } = useUsers();
   const { sectors, getActiveSectors } = useSectors();
 
   /**
-   * Filtra usuários baseado no termo de busca e setor selecionado
-   * Utiliza a função de busca do hook useUsers
+   * ATUALIZADO: Filtra usuários baseado no termo de busca e setor selecionado
+   * Agora considera usuários com múltiplos setores no filtro
    */
   const filteredUsers = useMemo(() => {
     let result = users;
@@ -77,28 +81,27 @@ const GestaoUsuarios = () => {
       result = searchUsers(searchTerm);
     }
     
-    // Aplica filtro por setor se selecionado
+    // ATUALIZADO: Aplica filtro por setor considerando múltiplos setores
     if (setorFilter && setorFilter !== 'todos') {
-      result = result.filter(user => user.setor === setorFilter);
+      result = result.filter(user => userBelongsToSetor(user, setorFilter));
     }
     
     return result;
-  }, [users, searchTerm, setorFilter, searchUsers]);
+  }, [users, searchTerm, setorFilter, searchUsers, userBelongsToSetor]);
 
   // Contador total de usuários filtrados
   const totalUsers = filteredUsers.length;
 
   /**
-   * Manipula a criação de um novo usuário
-   * Valida os campos obrigatórios incluindo a senha
-   * Valida força da senha (mínimo 6 caracteres)
+   * ATUALIZADO: Manipula a criação de um novo usuário com múltiplos setores
+   * Valida os campos obrigatórios incluindo pelo menos um setor selecionado
    */
   const handleSaveUser = () => {
-    // Validação básica dos campos obrigatórios incluindo senha
-    if (!newUser.nome.trim() || !newUser.email.trim() || !newUser.senha.trim() || !newUser.setor) {
+    // Validação básica dos campos obrigatórios incluindo setores
+    if (!newUser.nome.trim() || !newUser.email.trim() || !newUser.senha.trim() || newUser.setores.length === 0) {
       toast({
         title: "Erro",
-        description: "Por favor, preencha todos os campos obrigatórios, incluindo a senha.",
+        description: "Por favor, preencha todos os campos obrigatórios, incluindo pelo menos um setor.",
         variant: "destructive"
       });
       return;
@@ -120,19 +123,19 @@ const GestaoUsuarios = () => {
         nome: newUser.nome,
         email: newUser.email,
         telefone: newUser.telefone || '',
-        setor: newUser.setor,
+        setores: newUser.setores, // ALTERADO: agora envia array de setores
         cargo: newUser.cargo,
         avatar: newUser.avatar || newUser.nome.substring(0, 2).toUpperCase(),
         status: newUser.status,
         perfil: newUser.perfil
       });
 
-      // Limpa o formulário incluindo a senha
+      // Limpa o formulário incluindo os setores
       setNewUser({
         nome: '',
         email: '',
         senha: '',
-        setor: '',
+        setores: [], // ALTERADO: limpa array de setores
         cargo: 'atendente',
         telefone: '',
         avatar: '',
@@ -159,15 +162,15 @@ const GestaoUsuarios = () => {
   };
 
   /**
-   * Descarta as alterações do formulário de novo usuário
-   * Limpa todos os campos incluindo a senha
+   * ATUALIZADO: Descarta as alterações do formulário de novo usuário
+   * Limpa todos os campos incluindo o array de setores
    */
   const handleDiscardUser = () => {
     setNewUser({
       nome: '',
       email: '',
       senha: '',
-      setor: '',
+      setores: [], // ALTERADO: limpa array de setores
       cargo: 'atendente',
       telefone: '',
       avatar: '',
@@ -333,7 +336,7 @@ const GestaoUsuarios = () => {
         <div className="relative mb-4">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
-            placeholder="Pesquisar usuário por nome ou email"
+            placeholder="Pesquisar usuário por nome, email ou setor"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10 border-border bg-background text-foreground placeholder:text-muted-foreground"
@@ -361,7 +364,7 @@ const GestaoUsuarios = () => {
               </Button>
             </DialogTrigger>
             
-            {/* Modal de criação de usuário com campo de senha obrigatório */}
+            {/* ATUALIZADO: Modal de criação de usuário com seletor de múltiplos setores */}
             <DialogContent className="sm:max-w-md bg-background border-border max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="text-foreground">Novo Usuário</DialogTitle>
@@ -409,7 +412,7 @@ const GestaoUsuarios = () => {
                   />
                 </div>
 
-                {/* Campo senha obrigatório - NOVA FUNCIONALIDADE */}
+                {/* Campo senha obrigatório */}
                 <div>
                   <label className="text-sm font-medium text-foreground">Senha *</label>
                   <Input
@@ -424,15 +427,18 @@ const GestaoUsuarios = () => {
                   </p>
                 </div>
 
-                {/* Seletor de setor */}
+                {/* NOVO: Seletor de múltiplos setores */}
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">Setor *</label>
-                  <SectorSelector
-                    value={newUser.setor}
-                    onValueChange={(value) => setNewUser({...newUser, setor: value})}
-                    placeholder="Selecionar setor"
+                  <label className="text-sm font-medium text-foreground mb-2 block">Setores * (Múltipla Seleção)</label>
+                  <MultipleSectorSelector
+                    value={newUser.setores}
+                    onValueChange={(value) => setNewUser({...newUser, setores: value})}
+                    placeholder="Selecione os setores do usuário"
                     showColors={true}
                   />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    O usuário pode atuar em múltiplos setores simultaneamente
+                  </p>
                 </div>
 
                 {/* Campo telefone */}
@@ -486,7 +492,7 @@ const GestaoUsuarios = () => {
         </div>
       </div>
 
-      {/* Cabeçalhos das colunas - NOVA FUNCIONALIDADE - Visível apenas no desktop */}
+      {/* ATUALIZADO: Cabeçalhos das colunas para suportar múltiplos setores */}
       {filteredUsers.length > 0 && (
         <div className="hidden md:block mb-4">
           <Card className="bg-muted/50 border-border">
@@ -506,10 +512,10 @@ const GestaoUsuarios = () => {
                   </h3>
                 </div>
 
-                {/* Cabeçalho Setor */}
+                {/* ATUALIZADO: Cabeçalho Setores (plural) */}
                 <div className="col-span-3">
                   <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                    Setor
+                    Setores
                   </h3>
                 </div>
 
@@ -532,15 +538,15 @@ const GestaoUsuarios = () => {
         </div>
       )}
 
-      {/* Área de listagem dos usuários - STATUS REMOVIDO */}
+      {/* ATUALIZADO: Área de listagem dos usuários com suporte a múltiplos setores */}
       <div className="space-y-4">
         {filteredUsers.length > 0 ? (
           filteredUsers.map((user) => {
-            const userSetor = getUserSetor(user);
+            const userSetores = getUserSetores(user); // ALTERADO: agora retorna array
             return (
               <Card key={user.id} className="bg-card border-border hover:shadow-lg transition-shadow duration-200">
                 <CardContent className="p-4">
-                  {/* Layout responsivo para desktop - SEM STATUS */}
+                  {/* ATUALIZADO: Layout responsivo para desktop com múltiplos setores */}
                   <div className="hidden md:grid grid-cols-12 gap-4 items-center">
                     {/* Foto do usuário */}
                     <div className="col-span-1">
@@ -555,20 +561,24 @@ const GestaoUsuarios = () => {
                       </div>
                     </div>
                     
-                    {/* Nome do usuário - expandido para ocupar mais espaço */}
+                    {/* Nome do usuário */}
                     <div className="col-span-3">
                       <h3 className="font-medium text-foreground">{user.nome}</h3>
                       <p className="text-sm text-muted-foreground">{user.email}</p>
                     </div>
 
-                    {/* Setor do usuário */}
+                    {/* ATUALIZADO: Múltiplos setores do usuário com badges coloridos */}
                     <div className="col-span-3">
-                      {userSetor ? (
-                        <Badge className={userSetor.cor}>
-                          {userSetor.nome}
-                        </Badge>
+                      {userSetores.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {userSetores.map((setor) => (
+                            <Badge key={setor.id} className={`text-xs px-2 py-1 ${setor.cor}`}>
+                              {setor.nome}
+                            </Badge>
+                          ))}
+                        </div>
                       ) : (
-                        <span className="text-sm text-muted-foreground">Sem setor</span>
+                        <span className="text-sm text-muted-foreground">Sem setores</span>
                       )}
                     </div>
 
@@ -579,7 +589,7 @@ const GestaoUsuarios = () => {
                       </Badge>
                     </div>
 
-                    {/* Ações do usuário - expandido */}
+                    {/* Ações do usuário */}
                     <div className="col-span-3 flex justify-end">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -611,7 +621,7 @@ const GestaoUsuarios = () => {
                     </div>
                   </div>
 
-                  {/* Layout responsivo para tablet e mobile - SEM STATUS - Mantém comportamento existente */}
+                  {/* ATUALIZADO: Layout responsivo para tablet e mobile com múltiplos setores */}
                   <div className="md:hidden space-y-3">
                     {/* Cabeçalho com foto e nome */}
                     <div className="flex items-center gap-3">
@@ -658,17 +668,21 @@ const GestaoUsuarios = () => {
                       </DropdownMenu>
                     </div>
                     
-                    {/* Informações organizadas em mobile - SEM STATUS */}
+                    {/* ATUALIZADO: Informações organizadas em mobile com múltiplos setores */}
                     <div className="space-y-2">
                       <div>
-                        <span className="text-xs text-muted-foreground uppercase tracking-wide">Setor</span>
+                        <span className="text-xs text-muted-foreground uppercase tracking-wide">Setores</span>
                         <div className="mt-1">
-                          {userSetor ? (
-                            <Badge className={userSetor.cor}>
-                              {userSetor.nome}
-                            </Badge>
+                          {userSetores.length > 0 ? (
+                            <div className="flex flex-wrap gap-1">
+                              {userSetores.map((setor) => (
+                                <Badge key={setor.id} className={`text-xs px-2 py-1 ${setor.cor}`}>
+                                  {setor.nome}
+                                </Badge>
+                              ))}
+                            </div>
                           ) : (
-                            <span className="text-sm text-muted-foreground">Sem setor</span>
+                            <span className="text-sm text-muted-foreground">Sem setores</span>
                           )}
                         </div>
                       </div>
@@ -707,7 +721,7 @@ const GestaoUsuarios = () => {
         )}
       </div>
 
-      {/* Dialog de Editar Usuário */}
+      {/* ATUALIZADO: Dialog de Editar Usuário com seletor de múltiplos setores */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-md bg-background border-border max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -715,7 +729,7 @@ const GestaoUsuarios = () => {
           </DialogHeader>
           {selectedUser && (
             <div className="space-y-4">
-              {/* Campos similares ao modal de criação */}
+              {/* Seção de upload da foto do perfil */}
               <div>
                 <label className="text-sm font-medium text-foreground">Foto do Perfil</label>
                 <div className="flex items-center gap-4 mt-2">
@@ -766,14 +780,18 @@ const GestaoUsuarios = () => {
                 />
               </div>
 
+              {/* NOVO: Seletor de múltiplos setores na edição */}
               <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">Setor</label>
-                <SectorSelector
-                  value={selectedUser.setor}
-                  onValueChange={(value) => setSelectedUser({...selectedUser, setor: value})}
-                  placeholder="Selecionar setor"
+                <label className="text-sm font-medium text-foreground mb-2 block">Setores (Múltipla Seleção)</label>
+                <MultipleSectorSelector
+                  value={selectedUser.setores}
+                  onValueChange={(value) => setSelectedUser({...selectedUser, setores: value})}
+                  placeholder="Selecione os setores do usuário"
                   showColors={true}
                 />
+                <p className="text-xs text-muted-foreground mt-1">
+                  O usuário pode atuar em múltiplos setores simultaneamente
+                </p>
               </div>
 
               <div>
