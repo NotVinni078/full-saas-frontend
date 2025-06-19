@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Search, MoreVertical, Phone, Video, Paperclip, Send, Smile, Mic, Filter, Users, UserCheck, MessageSquare, Bot, Clock, CheckCircle } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -125,11 +126,11 @@ const AtendimentosOmnichannel = () => {
   );
 
   return (
-    <div className="flex h-screen bg-background">
-      {/* Sidebar - Lista de Conversas */}
+    <div className="flex h-screen bg-background overflow-hidden">
+      {/* Sidebar - Lista de Conversas (VERMELHO) */}
       <div className="w-full md:w-96 bg-card border-r border-border flex flex-col">
-        {/* Header da Sidebar Reorganizado */}
-        <div className="p-4 border-b border-border">
+        {/* Header da Sidebar (AMARELO) - Fixo sem rolagem */}
+        <div className="flex-shrink-0 p-4 border-b border-border bg-card">
           {/* Título da Página */}
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-foreground">Atendimentos</h2>
@@ -149,7 +150,7 @@ const AtendimentosOmnichannel = () => {
                 className="pl-10"
               />
             </div>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="flex-shrink-0">
               <Filter className="w-4 h-4" />
             </Button>
           </div>
@@ -218,7 +219,7 @@ const AtendimentosOmnichannel = () => {
           </div>
         </div>
 
-        {/* Lista de Conversas */}
+        {/* Lista de Conversas (VERMELHO) - Rolagem independente */}
         <div className="flex-1 overflow-y-auto">
           {filteredContacts.map((contact) => (
             <div
@@ -231,10 +232,10 @@ const AtendimentosOmnichannel = () => {
               }`}
             >
               <div className="flex items-start space-x-3">
-                <div className="relative">
+                <div className="relative flex-shrink-0">
                   <Avatar className="w-12 h-12">
                     <AvatarImage src={contact.avatar} />
-                    <AvatarFallback className="brand-primary brand-text-background text-sm">
+                    <AvatarFallback className="bg-primary text-primary-foreground text-sm">
                       {contact.name.split(' ').map(n => n[0]).join('')}
                     </AvatarFallback>
                   </Avatar>
@@ -246,11 +247,11 @@ const AtendimentosOmnichannel = () => {
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-medium brand-text-foreground truncate">
+                    <h3 className="font-medium text-foreground truncate">
                       {contact.name}
                     </h3>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-xs brand-text-gray-500">{contact.time}</span>
+                    <div className="flex items-center space-x-2 flex-shrink-0">
+                      <span className="text-xs text-muted-foreground">{contact.time}</span>
                       {contact.unread > 0 && (
                         <Badge variant="destructive" className="text-xs">
                           {contact.unread}
@@ -259,7 +260,7 @@ const AtendimentosOmnichannel = () => {
                     </div>
                   </div>
                   
-                  <p className="text-sm brand-text-gray-600 truncate mt-1">
+                  <p className="text-sm text-muted-foreground truncate mt-1">
                     {contact.lastMessage}
                   </p>
                   
@@ -268,7 +269,7 @@ const AtendimentosOmnichannel = () => {
                       <Badge 
                         key={index} 
                         variant="outline" 
-                        className="text-xs brand-border brand-text-foreground"
+                        className="text-xs border-border text-foreground"
                       >
                         {tag}
                       </Badge>
@@ -282,54 +283,56 @@ const AtendimentosOmnichannel = () => {
       </div>
 
       {/* Área Principal do Chat */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col overflow-hidden">
         {selectedContact ? (
           <>
-            {/* Header do Chat */}
-            <div className="p-4 bg-card border-b border-border flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="relative">
-                  <Avatar className="w-10 h-10">
-                    <AvatarImage src={selectedContact.avatar} />
-                    <AvatarFallback className="brand-primary brand-text-background">
-                      {selectedContact.name.split(' ').map(n => n[0]).join('')}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${getStatusColor(selectedContact.status)}`}></div>
+            {/* Header do Chat (AMARELO) - Fixo sem rolagem */}
+            <div className="flex-shrink-0 p-4 bg-card border-b border-border">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="relative">
+                    <Avatar className="w-10 h-10">
+                      <AvatarImage src={selectedContact.avatar} />
+                      <AvatarFallback className="bg-primary text-primary-foreground">
+                        {selectedContact.name.split(' ').map(n => n[0]).join('')}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${getStatusColor(selectedContact.status)}`}></div>
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-foreground">{selectedContact.name}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Atribuído a: Suporte Komvvo | Setor: Suporte
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-medium brand-text-foreground">{selectedContact.name}</h3>
-                  <p className="text-sm brand-text-gray-500">
-                    Atribuído a: Suporte Komvvo | Setor: Suporte
-                  </p>
+                
+                <div className="flex items-center space-x-2">
+                  <Button variant="ghost" size="sm">
+                    <Phone className="w-5 h-5" />
+                  </Button>
+                  <Button variant="ghost" size="sm">
+                    <Video className="w-5 h-5" />
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm">
+                        <MoreVertical className="w-5 h-5" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem>Ver perfil</DropdownMenuItem>
+                      <DropdownMenuItem>Transferir atendimento</DropdownMenuItem>
+                      <DropdownMenuItem>Finalizar atendimento</DropdownMenuItem>
+                      <DropdownMenuItem>Bloquear contato</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="sm">
-                  <Phone className="w-5 h-5" />
-                </Button>
-                <Button variant="ghost" size="sm">
-                  <Video className="w-5 h-5" />
-                </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm">
-                      <MoreVertical className="w-5 h-5" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem>Ver perfil</DropdownMenuItem>
-                    <DropdownMenuItem>Transferir atendimento</DropdownMenuItem>
-                    <DropdownMenuItem>Finalizar atendimento</DropdownMenuItem>
-                    <DropdownMenuItem>Bloquear contato</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
               </div>
             </div>
 
-            {/* Área de Mensagens */}
-            <div className="flex-1 p-4 overflow-y-auto bg-muted/20" style={{
+            {/* Área de Mensagens (VERDE) - Rolagem independente */}
+            <div className="flex-1 overflow-y-auto bg-muted/20 p-4" style={{
               backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23f0f0f0' fill-opacity='0.1'%3E%3Cpath d='M20 20c0-11.046 8.954-20 20-20s20 8.954 20 20-8.954 20-20 20-20-8.954-20-20zm20-16c-8.837 0-16 7.163-16 16s7.163 16 16 16 16-7.163 16-16-7.163-16-16-16z'/%3E%3C/g%3E%3C/svg%3E")`
             }}>
               <div className="space-y-4">
@@ -341,15 +344,15 @@ const AtendimentosOmnichannel = () => {
                     <div
                       className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                         msg.sender === 'user'
-                          ? 'brand-primary brand-text-background'
-                          : 'brand-card brand-text-foreground brand-border'
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-card text-foreground border border-border'
                       }`}
                     >
                       <p className="text-sm">{msg.text}</p>
                       <p className={`text-xs mt-1 ${
                         msg.sender === 'user' 
-                          ? 'brand-text-background opacity-70' 
-                          : 'brand-text-gray-500'
+                          ? 'text-primary-foreground opacity-70' 
+                          : 'text-muted-foreground'
                       }`}>
                         {msg.time}
                       </p>
@@ -360,36 +363,36 @@ const AtendimentosOmnichannel = () => {
               
               {/* Indicador de Status do Atendimento */}
               <div className="text-center my-4">
-                <div className="inline-flex items-center px-3 py-1 rounded-full brand-success brand-text-background text-xs">
+                <div className="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-800 text-xs">
                   ✓ Atendimento finalizado por Suporte Komvvo, em 15/06/2025 - 15:47
                 </div>
               </div>
             </div>
 
-            {/* Input de Mensagem */}
-            <div className="p-4 bg-card border-t border-border">
+            {/* Input de Mensagem (AZUL) - Fixo no viewport */}
+            <div className="flex-shrink-0 p-4 bg-card border-t border-border">
               <div className="flex items-end space-x-2">
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" className="flex-shrink-0">
                   <Paperclip className="w-5 h-5" />
                 </Button>
-                <div className="flex-1 brand-card brand-border rounded-lg">
+                <div className="flex-1 bg-card border border-border rounded-lg">
                   <Input
                     placeholder="Digite uma mensagem"
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                    className="border-0 focus:ring-0 brand-input"
+                    className="border-0 focus:ring-0 bg-transparent"
                   />
                 </div>
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" className="flex-shrink-0">
                   <Smile className="w-5 h-5" />
                 </Button>
                 {message ? (
-                  <Button onClick={handleSendMessage} size="sm" className="brand-primary">
+                  <Button onClick={handleSendMessage} size="sm" className="bg-primary flex-shrink-0">
                     <Send className="w-4 h-4" />
                   </Button>
                 ) : (
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" className="flex-shrink-0">
                     <Mic className="w-5 h-5" />
                   </Button>
                 )}
@@ -400,11 +403,11 @@ const AtendimentosOmnichannel = () => {
           /* Estado Vazio */
           <div className="flex-1 flex items-center justify-center bg-muted/20">
             <div className="text-center">
-              <MessageSquare className="w-16 h-16 brand-text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium brand-text-foreground mb-2">
+              <MessageSquare className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-foreground mb-2">
                 Selecione uma conversa
               </h3>
-              <p className="brand-text-gray-500">
+              <p className="text-muted-foreground">
                 Escolha uma conversa na lista para começar a atender
               </p>
             </div>
