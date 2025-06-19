@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Search, Plus, UserPen, Save, X, Upload, SquarePen, EllipsisVertical, Key, Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -19,6 +18,12 @@ import { User } from '@/types/global';
  * Integra com setores e conexões do sistema
  * Utiliza cores dinâmicas da gestão de marca automaticamente
  * Totalmente responsivo para desktop, tablet e mobile
+ * 
+ * MELHORIAS IMPLEMENTADAS:
+ * - Campo de senha obrigatório na criação de usuários
+ * - Remoção do badge de status dos cards de usuário
+ * - Validação aprimorada de senha (mínimo 6 caracteres)
+ * - Interface mais limpa sem status desnecessário
  */
 const GestaoUsuarios = () => {
   const { toast } = useToast();
@@ -42,11 +47,11 @@ const GestaoUsuarios = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   
-  // Estado para criação de novo usuário
+  // Estado para criação de novo usuário com senha obrigatória
   const [newUser, setNewUser] = useState({
     nome: '',
     email: '',
-    senha: '',
+    senha: '', // Campo de senha obrigatório na criação
     setor: '',
     cargo: 'atendente' as 'atendente' | 'supervisor' | 'gerente',
     telefone: '',
@@ -84,14 +89,25 @@ const GestaoUsuarios = () => {
 
   /**
    * Manipula a criação de um novo usuário
-   * Valida os campos obrigatórios e adiciona o usuário ao contexto global
+   * Valida os campos obrigatórios incluindo a senha
+   * Valida força da senha (mínimo 6 caracteres)
    */
   const handleSaveUser = () => {
-    // Validação básica dos campos obrigatórios
+    // Validação básica dos campos obrigatórios incluindo senha
     if (!newUser.nome.trim() || !newUser.email.trim() || !newUser.senha.trim() || !newUser.setor) {
       toast({
         title: "Erro",
-        description: "Por favor, preencha todos os campos obrigatórios.",
+        description: "Por favor, preencha todos os campos obrigatórios, incluindo a senha.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validação da força da senha
+    if (newUser.senha.length < 6) {
+      toast({
+        title: "Erro",
+        description: "A senha deve ter pelo menos 6 caracteres.",
         variant: "destructive"
       });
       return;
@@ -110,7 +126,7 @@ const GestaoUsuarios = () => {
         perfil: newUser.perfil
       });
 
-      // Limpa o formulário
+      // Limpa o formulário incluindo a senha
       setNewUser({
         nome: '',
         email: '',
@@ -143,6 +159,7 @@ const GestaoUsuarios = () => {
 
   /**
    * Descarta as alterações do formulário de novo usuário
+   * Limpa todos os campos incluindo a senha
    */
   const handleDiscardUser = () => {
     setNewUser({
@@ -343,7 +360,7 @@ const GestaoUsuarios = () => {
               </Button>
             </DialogTrigger>
             
-            {/* Modal de criação de usuário */}
+            {/* Modal de criação de usuário com campo de senha obrigatório */}
             <DialogContent className="sm:max-w-md bg-background border-border max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="text-foreground">Novo Usuário</DialogTitle>
@@ -370,7 +387,7 @@ const GestaoUsuarios = () => {
 
                 {/* Campo nome do usuário */}
                 <div>
-                  <label className="text-sm font-medium text-foreground">Nome</label>
+                  <label className="text-sm font-medium text-foreground">Nome *</label>
                   <Input
                     value={newUser.nome}
                     onChange={(e) => setNewUser({...newUser, nome: e.target.value})}
@@ -381,7 +398,7 @@ const GestaoUsuarios = () => {
 
                 {/* Campo login (email) */}
                 <div>
-                  <label className="text-sm font-medium text-foreground">Login (Email)</label>
+                  <label className="text-sm font-medium text-foreground">Login (Email) *</label>
                   <Input
                     type="email"
                     value={newUser.email}
@@ -391,21 +408,24 @@ const GestaoUsuarios = () => {
                   />
                 </div>
 
-                {/* Campo senha */}
+                {/* Campo senha obrigatório - NOVA FUNCIONALIDADE */}
                 <div>
-                  <label className="text-sm font-medium text-foreground">Senha</label>
+                  <label className="text-sm font-medium text-foreground">Senha *</label>
                   <Input
                     type="password"
                     value={newUser.senha}
                     onChange={(e) => setNewUser({...newUser, senha: e.target.value})}
-                    placeholder="Senha do usuário"
+                    placeholder="Mínimo 6 caracteres"
                     className="border-border bg-background text-foreground"
                   />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    A senha deve ter pelo menos 6 caracteres
+                  </p>
                 </div>
 
                 {/* Seletor de setor */}
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">Setor</label>
+                  <label className="text-sm font-medium text-foreground mb-2 block">Setor *</label>
                   <SectorSelector
                     value={newUser.setor}
                     onValueChange={(value) => setNewUser({...newUser, setor: value})}
@@ -465,7 +485,7 @@ const GestaoUsuarios = () => {
         </div>
       </div>
 
-      {/* Área de listagem dos usuários */}
+      {/* Área de listagem dos usuários - STATUS REMOVIDO */}
       <div className="space-y-4">
         {filteredUsers.length > 0 ? (
           filteredUsers.map((user) => {
@@ -473,7 +493,7 @@ const GestaoUsuarios = () => {
             return (
               <Card key={user.id} className="bg-card border-border hover:shadow-lg transition-shadow duration-200">
                 <CardContent className="p-4">
-                  {/* Layout responsivo para desktop */}
+                  {/* Layout responsivo para desktop - SEM STATUS */}
                   <div className="hidden md:grid grid-cols-12 gap-4 items-center">
                     {/* Foto do usuário */}
                     <div className="col-span-1">
@@ -488,14 +508,14 @@ const GestaoUsuarios = () => {
                       </div>
                     </div>
                     
-                    {/* Nome do usuário */}
-                    <div className="col-span-2">
+                    {/* Nome do usuário - expandido para ocupar mais espaço */}
+                    <div className="col-span-3">
                       <h3 className="font-medium text-foreground">{user.nome}</h3>
                       <p className="text-sm text-muted-foreground">{user.email}</p>
                     </div>
 
                     {/* Setor do usuário */}
-                    <div className="col-span-2">
+                    <div className="col-span-3">
                       {userSetor ? (
                         <Badge className={userSetor.cor}>
                           {userSetor.nome}
@@ -512,14 +532,7 @@ const GestaoUsuarios = () => {
                       </Badge>
                     </div>
 
-                    {/* Status do usuário */}
-                    <div className="col-span-2">
-                      <Badge variant={user.status === 'ativo' ? 'default' : 'secondary'}>
-                        {user.status}
-                      </Badge>
-                    </div>
-
-                    {/* Ações do usuário */}
+                    {/* Ações do usuário - expandido */}
                     <div className="col-span-3 flex justify-end">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -551,7 +564,7 @@ const GestaoUsuarios = () => {
                     </div>
                   </div>
 
-                  {/* Layout responsivo para tablet e mobile */}
+                  {/* Layout responsivo para tablet e mobile - SEM STATUS */}
                   <div className="md:hidden space-y-3">
                     {/* Cabeçalho com foto e nome */}
                     <div className="flex items-center gap-3">
@@ -598,7 +611,7 @@ const GestaoUsuarios = () => {
                       </DropdownMenu>
                     </div>
                     
-                    {/* Informações organizadas em mobile */}
+                    {/* Informações organizadas em mobile - SEM STATUS */}
                     <div className="space-y-2">
                       <div>
                         <span className="text-xs text-muted-foreground uppercase tracking-wide">Setor</span>
@@ -618,15 +631,6 @@ const GestaoUsuarios = () => {
                         <div className="mt-1">
                           <Badge variant="outline" className="border-border">
                             {user.cargo || 'Não definido'}
-                          </Badge>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <span className="text-xs text-muted-foreground uppercase tracking-wide">Status</span>
-                        <div className="mt-1">
-                          <Badge variant={user.status === 'ativo' ? 'default' : 'secondary'}>
-                            {user.status}
                           </Badge>
                         </div>
                       </div>
