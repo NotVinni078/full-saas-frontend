@@ -62,7 +62,7 @@ const Planos = () => {
    * Calcula o total de conexões permitidas somando todos os canais
    */
   const getTotalConnections = (channels: any): number => {
-    return Object.values(channels).reduce((sum: number, count: any) => sum + count, 0);
+    return Object.values(channels).reduce((sum: number, count: unknown) => sum + (count as number), 0);
   };
 
   /**
