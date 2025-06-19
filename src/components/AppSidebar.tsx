@@ -238,11 +238,11 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
           size="sm"
           onClick={onToggleCollapse}
           className={cn(
-            "p-2 hidden md:flex", 
+            "p-2 hidden md:flex text-card-foreground hover:text-card-foreground hover:bg-accent", 
             isCollapsed && "w-full justify-center"
           )}
         >
-          <PanelLeft className="h-4 w-4 text-card-foreground" />
+          <PanelLeft className="h-4 w-4" />
         </Button>
       </div>
 
@@ -259,7 +259,7 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                 <CollapsibleTrigger asChild>
                   <button
                     className={cn(
-                      "w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-left transition-colors hover:bg-accent",
+                      "w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-left transition-colors hover:bg-accent hover:text-accent-foreground",
                       isCollapsed && "md:justify-center",
                       "text-card-foreground"
                     )}
@@ -288,7 +288,7 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                             "w-full flex items-center space-x-2 px-2 py-1.5 ml-5 rounded-lg text-left transition-colors text-xs",
                             isActive 
                               ? "bg-primary text-primary-foreground" 
-                              : "text-card-foreground hover:bg-accent"
+                              : "text-card-foreground hover:bg-accent hover:text-accent-foreground"
                           )}
                         >
                           <ItemIcon className={cn("h-3 w-3 flex-shrink-0", isActive ? "text-primary-foreground" : "text-card-foreground")} />
@@ -313,7 +313,7 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                   "w-full flex items-center space-x-2 px-2 py-1.5 rounded-lg text-left transition-colors",
                   isActive 
                     ? "bg-primary text-primary-foreground" 
-                    : "text-card-foreground hover:bg-accent",
+                    : "text-card-foreground hover:bg-accent hover:text-accent-foreground",
                   isCollapsed && "md:justify-center"
                 )}
               >
@@ -329,8 +329,8 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
       <div className="p-3 border-t border-border bg-card">
         {(!isCollapsed || window.innerWidth < 768) && (
           <div className="flex items-center space-x-2 mb-2">
-            <div className="w-7 h-7 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold">
-              <span className="text-xs">U</span>
+            <div className="w-7 h-7 bg-primary rounded-full flex items-center justify-center">
+              <span className="text-xs text-primary-foreground font-semibold">U</span>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-card-foreground truncate">Usuário</p>
