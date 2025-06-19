@@ -227,7 +227,7 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                 {brandConfig.companyName.split(' ').map(word => word[0]).join('').substring(0, 2).toUpperCase()}
               </span>
             </div>
-            <h1 className="text-lg font-bold text-card-foreground">
+            <h1 className="text-lg font-bold text-foreground">
               {brandConfig.companyName}
             </h1>
           </button>
@@ -238,7 +238,7 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
           size="sm"
           onClick={onToggleCollapse}
           className={cn(
-            "p-2 hidden md:flex text-card-foreground hover:text-card-foreground hover:bg-accent", 
+            "p-2 hidden md:flex text-foreground hover:text-foreground hover:bg-secondary", 
             isCollapsed && "w-full justify-center"
           )}
         >
@@ -259,17 +259,17 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                 <CollapsibleTrigger asChild>
                   <button
                     className={cn(
-                      "w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-left transition-colors hover:bg-accent hover:text-accent-foreground",
+                      "w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-left transition-colors hover:bg-secondary hover:text-foreground",
                       isCollapsed && "md:justify-center",
-                      "text-card-foreground"
+                      "text-foreground"
                     )}
                   >
                     <div className="flex items-center space-x-2">
-                      <GroupIcon className="h-3.5 w-3.5 flex-shrink-0 text-card-foreground" />
-                      {(!isCollapsed || window.innerWidth < 768) && <span className="font-medium text-xs text-card-foreground">{group.label}</span>}
+                      <GroupIcon className="h-3.5 w-3.5 flex-shrink-0 text-foreground" />
+                      {(!isCollapsed || window.innerWidth < 768) && <span className="font-medium text-xs text-foreground">{group.label}</span>}
                     </div>
                     {(!isCollapsed || window.innerWidth < 768) && (
-                      isOpen ? <ChevronUp className="h-3 w-3 text-card-foreground" /> : <ChevronDown className="h-3 w-3 text-card-foreground" />
+                      isOpen ? <ChevronUp className="h-3 w-3 text-foreground" /> : <ChevronDown className="h-3 w-3 text-foreground" />
                     )}
                   </button>
                 </CollapsibleTrigger>
@@ -288,11 +288,11 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                             "w-full flex items-center space-x-2 px-2 py-1.5 ml-5 rounded-lg text-left transition-colors text-xs",
                             isActive 
                               ? "bg-primary text-primary-foreground" 
-                              : "text-card-foreground hover:bg-accent hover:text-accent-foreground"
+                              : "text-foreground hover:bg-secondary hover:text-foreground"
                           )}
                         >
-                          <ItemIcon className={cn("h-3 w-3 flex-shrink-0", isActive ? "text-primary-foreground" : "text-card-foreground")} />
-                          <span className={cn("text-xs", isActive ? "text-primary-foreground" : "text-card-foreground")}>{subItem.label}</span>
+                          <ItemIcon className={cn("h-3 w-3 flex-shrink-0", isActive ? "text-primary-foreground" : "text-foreground")} />
+                          <span className={cn("text-xs", isActive ? "text-primary-foreground" : "text-foreground")}>{subItem.label}</span>
                         </button>
                       );
                     })}
@@ -313,12 +313,12 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
                   "w-full flex items-center space-x-2 px-2 py-1.5 rounded-lg text-left transition-colors",
                   isActive 
                     ? "bg-primary text-primary-foreground" 
-                    : "text-card-foreground hover:bg-accent hover:text-accent-foreground",
+                    : "text-foreground hover:bg-secondary hover:text-foreground",
                   isCollapsed && "md:justify-center"
                 )}
               >
-                <Icon className={cn("h-3.5 w-3.5 flex-shrink-0", isActive ? "text-primary-foreground" : "text-card-foreground")} />
-                {(!isCollapsed || window.innerWidth < 768) && <span className={cn("font-medium text-xs", isActive ? "text-primary-foreground" : "text-card-foreground")}>{singleItem.label}</span>}
+                <Icon className={cn("h-3.5 w-3.5 flex-shrink-0", isActive ? "text-primary-foreground" : "text-foreground")} />
+                {(!isCollapsed || window.innerWidth < 768) && <span className={cn("font-medium text-xs", isActive ? "text-primary-foreground" : "text-foreground")}>{singleItem.label}</span>}
               </button>
             );
           }
@@ -333,13 +333,13 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
               <span className="text-xs text-primary-foreground font-semibold">U</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-card-foreground truncate">Usuário</p>
+              <p className="text-xs font-medium text-foreground truncate">Usuário</p>
               <p className="text-xs text-muted-foreground truncate">Administração</p>
             </div>
             <div className="flex items-center space-x-1">
               <button
                 onClick={toggleUserStatus}
-                className="p-1 hover:bg-accent rounded flex items-center justify-center"
+                className="p-1 hover:bg-secondary rounded flex items-center justify-center"
               >
                 {userStatus ? (
                   <UserCheck className="h-3 w-3 text-green-600" />
@@ -363,7 +363,7 @@ const AppSidebar = ({ currentPage, onPageChange, isCollapsed, onToggleCollapse, 
           <div className="flex flex-col space-y-1">
             <button
               onClick={toggleUserStatus}
-              className="p-1.5 hover:bg-accent rounded flex items-center justify-center"
+              className="p-1.5 hover:bg-secondary rounded flex items-center justify-center"
             >
               {userStatus ? (
                 <UserCheck className="h-3.5 w-3.5 text-green-600" />
