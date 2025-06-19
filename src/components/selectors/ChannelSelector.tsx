@@ -31,7 +31,7 @@ const ChannelSelector = ({ value, onValueChange }: ChannelSelectorProps) => {
    * Apenas conexões ativas são mostradas
    */
   const availableConnections = connections.filter(conn => 
-    conn.tipo !== 'webchat' && conn.status === 'connected'
+    conn.tipo !== 'webchat' && conn.status === 'ativo'
   );
 
   /**
@@ -86,7 +86,7 @@ const ChannelSelector = ({ value, onValueChange }: ChannelSelectorProps) => {
    * Obtém ícone de status da conexão
    */
   const getStatusIcon = (status: string) => {
-    return status === 'connected' 
+    return status === 'ativo' 
       ? <Wifi className="h-3 w-3 text-green-500" />
       : <WifiOff className="h-3 w-3 text-red-500" />;
   };
@@ -133,7 +133,7 @@ const ChannelSelector = ({ value, onValueChange }: ChannelSelectorProps) => {
                       {connection.nome}
                     </div>
                     <div className="text-xs text-muted-foreground mt-1">
-                      {connection.tipo} • {connection.status === 'connected' ? 'Conectado' : 'Desconectado'}
+                      {connection.tipo} • {connection.status === 'ativo' ? 'Conectado' : 'Desconectado'}
                     </div>
                   </div>
                   
