@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { ArrowLeft, Send, Smile, Paperclip, MoreVertical, Reply, Trash2, Heart } from 'lucide-react';
+import { ArrowLeft, Send, Smile, Paperclip, MoreVertical, Reply, Trash2, Heart, Users, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
