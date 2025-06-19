@@ -11,7 +11,6 @@ import { Calendar, Clock, Users, X, Search, Tag, MessageSquare, Mic, Paperclip, 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import ContactSelector from '@/components/selectors/ContactSelector';
 import TagSelector from '@/components/selectors/TagSelector';
@@ -28,11 +27,11 @@ import { Contact, Tag as TagType, Connection } from '@/types/global';
 /**
  * Modal completo para criação de novos agendamentos
  * Melhorias implementadas:
- * - Seleção de contatos aprimorada (apenas ao digitar)
- * - Remoção de status online/offline
- * - Ícones de redes sociais com logos reais
- * - Avisos com melhor destaque e textos corretos
- * - Remoção do aviso de QR Code
+ * - Validação rigorosa de compatibilidade entre contatos e conexões
+ * - Bloqueio de WebChat para agendamentos
+ * - Dropdown de status com fundo sólido (não transparente)
+ * - Seleção de conexões reais em vez de tipos
+ * - Avisos claros sobre incompatibilidades
  * Design responsivo com cores dinâmicas do sistema de marca
  */
 
@@ -93,16 +92,36 @@ const NewScheduleModal = ({
   }, [preSelectedContacts, preSelectedTag]);
 
   /**
-   * Valida compatibilidade entre contatos e canal selecionado
+   * Valida compatibilidade entre contatos e conexão selecionada
+   * Implementa verificação rigorosa para todas as plataformas
    */
   useEffect(() => {
-    validateContactsAndChannel();
-  }, [selectedContacts, selectedChannelId, useTagContacts, selectedTagIds]);
+    validateContactsAndConnection();
+  }, [selectedContacts, selectedChannelId, useTagContacts, selectedTagIds, connections]);
 
   /**
-   * Valida se todos os contatos são compatíveis com o canal selecionado
+   * Mapeamento de compatibilidade entre canais de contato e tipos de conexão
+   * Garante que mensagens só sejam enviadas para canais compatíveis
    */
-  const validateContactsAndChannel = () => {
+  const getChannelCompatibility = (contactChannel: string, connectionType: string): boolean => {
+    const compatibility: Record<string, string[]> = {
+      'whatsapp': ['whatsapp'],
+      'instagram': ['instagram'],
+      'facebook': ['facebook'],
+      'telegram': ['telegram']
+    };
+    
+    const normalizedContactChannel = contactChannel.toLowerCase();
+    const normalizedConnectionType = connectionType.toLowerCase();
+    
+    return compatibility[normalizedContactChannel]?.includes(normalizedConnectionType) ?? false;
+  };
+
+  /**
+   * Valida se todos os contatos são compatíveis com a conexão selecionada
+   * Bloqueia agendamentos quando há incompatibilidade
+   */
+  const validateContactsAndConnection = () => {
     const newErrors: string[] = [];
     const newWarnings: string[] = [];
 
@@ -118,21 +137,34 @@ const NewScheduleModal = ({
     // Verificar se todos os contatos têm a mesma origem
     const contactOrigins = [...new Set(finalContacts.map(contact => contact.canal))];
     if (contactOrigins.length > 1) {
-      newWarnings.push(`Contatos selecionados possuem origens diferentes: ${contactOrigins.join(', ')}. Não é possível enviar para contatos de origem diferente.`);
+      newWarnings.push(`Contatos selecionados possuem origens diferentes: ${contactOrigins.join(', ')}. Agrupe contatos da mesma plataforma para evitar problemas.`);
     }
 
-    // Verificar compatibilidade com canal selecionado
-    if (selectedChannelId) {
-      const selectedChannel = connections.find(conn => conn.id === selectedChannelId);
-      if (selectedChannel) {
-        const incompatibleContacts = finalContacts.filter(
-          contact => contact.canal !== selectedChannel.tipo
-        );
-        
-        if (incompatibleContacts.length > 0) {
-          newErrors.push(
-            `${incompatibleContacts.length} contato(s) não são compatíveis com o canal ${selectedChannel.nome} (${selectedChannel.tipo})`
+    // Verificar compatibilidade com conexão selecionada
+    if (selectedChannelId && finalContacts.length > 0) {
+      const selectedConnection = connections.find(conn => conn.id === selectedChannelId);
+      
+      if (selectedConnection) {
+        // Bloquear WebChat explicitamente
+        if (selectedConnection.tipo === 'webchat') {
+          newErrors.push('WebChat não é permitido para agendamentos. Selecione uma conexão de rede social.');
+        } else {
+          // Verificar compatibilidade de cada contato
+          const incompatibleContacts = finalContacts.filter(
+            contact => !getChannelCompatibility(contact.canal, selectedConnection.tipo)
           );
+          
+          if (incompatibleContacts.length > 0) {
+            const incompatibleChannels = [...new Set(incompatibleContacts.map(c => c.canal))];
+            newErrors.push(
+              `${incompatibleContacts.length} contato(s) não compatível(is) com a conexão ${selectedConnection.nome} (${selectedConnection.tipo}). Canais incompatíveis: ${incompatibleChannels.join(', ')}`
+            );
+          }
+
+          // Verificar se a conexão está ativa
+          if (selectedConnection.status !== 'connected') {
+            newErrors.push(`A conexão ${selectedConnection.nome} não está ativa. Verifique o status da conexão.`);
+          }
         }
       }
     }
@@ -188,6 +220,7 @@ const NewScheduleModal = ({
 
   /**
    * Valida formulário antes do envio
+   * Inclui validação de compatibilidade rigorosa
    */
   const validateForm = (): boolean => {
     if (errors.length > 0) return false;
@@ -195,6 +228,11 @@ const NewScheduleModal = ({
     if (messageType === 'text' && !messageText.trim()) return false;
     if (messageType === 'audio' && !audioBlob) return false;
     if (!selectedChannelId || !selectedSectorId) return false;
+    
+    // Validação adicional para WebChat
+    const selectedConnection = connections.find(conn => conn.id === selectedChannelId);
+    if (selectedConnection?.tipo === 'webchat') return false;
+    
     return true;
   };
 
@@ -324,7 +362,7 @@ const NewScheduleModal = ({
   const selectedTags = selectedTagIds.map(tagId => getTagById(tagId)).filter(Boolean);
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-4xl mx-4 bg-card border-border max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-foreground flex items-center gap-2">
@@ -336,7 +374,7 @@ const NewScheduleModal = ({
         <div className="space-y-6 py-4">
           {/* Alertas de erro com melhor destaque */}
           {errors.length > 0 && (
-            <Alert variant="destructive" className="border-2 border-red-200 dark:border-red-800">
+            <Alert variant="destructive" className="border-2 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/20">
               <AlertTriangle className="h-5 w-5" />
               <AlertDescription className="font-medium">
                 <ul className="list-disc list-inside space-y-1">
@@ -348,7 +386,7 @@ const NewScheduleModal = ({
             </Alert>
           )}
 
-          {/* Avisos com melhor destaque e texto corrigido */}
+          {/* Avisos com melhor destaque */}
           {warnings.length > 0 && (
             <Alert className="border-2 border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/20">
               <AlertTriangle className="h-5 w-5 text-orange-600" />
@@ -371,13 +409,18 @@ const NewScheduleModal = ({
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-                {/* Seletor de contatos individuais - sem pré-visualização */}
+                {/* Seletor de contatos individuais */}
                 <div>
                   <Label className="text-sm text-muted-foreground mb-2 block">
                     Selecionar Contatos
                   </Label>
                   <ContactSelector
-                    onSelectContact={handleAddContact}
+                    onSelectContact={(contact) => {
+                      if (!selectedContacts.find(c => c.id === contact.id)) {
+                        setSelectedContacts(prev => [...prev, contact]);
+                        setUseTagContacts(false);
+                      }
+                    }}
                     placeholder="Digite para buscar contatos..."
                     maxResults={5}
                     showTags={true}
@@ -391,7 +434,13 @@ const NewScheduleModal = ({
                   </Label>
                   <TagSelector
                     selectedTagIds={selectedTagIds}
-                    onTagsChange={handleTagsSelection}
+                    onTagsChange={(tagIds) => {
+                      setSelectedTagIds(tagIds);
+                      setUseTagContacts(tagIds.length > 0);
+                      if (tagIds.length > 0) {
+                        setSelectedContacts([]);
+                      }
+                    }}
                     placeholder="Selecionar tags..."
                   />
                 </div>
@@ -433,7 +482,7 @@ const NewScheduleModal = ({
                         <Avatar className="h-8 w-8">
                           <AvatarImage src={contact.avatar} alt={contact.nome} />
                           <AvatarFallback className="bg-primary/10 text-primary text-xs font-medium">
-                            {getInitials(contact.nome)}
+                            {contact.nome.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                         
@@ -452,7 +501,7 @@ const NewScheduleModal = ({
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleRemoveContact(contact.id)}
+                          onClick={() => setSelectedContacts(prev => prev.filter(c => c.id !== contact.id))}
                           className="h-6 w-6 p-0 hover:bg-destructive/10 hover:text-destructive"
                         >
                           <X className="h-3 w-3" />
@@ -522,7 +571,12 @@ const NewScheduleModal = ({
                       <input
                         type="file"
                         multiple
-                        onChange={(e) => handleFileUpload(e.target.files)}
+                        onChange={(e) => {
+                          if (e.target.files && messageType === 'text') {
+                            const newFiles = Array.from(e.target.files);
+                            setAttachments(prev => [...prev, ...newFiles]);
+                          }
+                        }}
                         className="hidden"
                         id="file-upload"
                         accept="image/*,video/*,audio/*,.pdf,.doc,.docx"
@@ -544,7 +598,7 @@ const NewScheduleModal = ({
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => removeAttachment(index)}
+                              onClick={() => setAttachments(prev => prev.filter((_, i) => i !== index))}
                             >
                               <X className="h-3 w-3" />
                             </Button>
@@ -606,7 +660,7 @@ const NewScheduleModal = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card>
               <CardContent className="p-4">
-                <Label className="text-foreground font-medium mb-3 block">Canal *</Label>
+                <Label className="text-foreground font-medium mb-3 block">Conexão *</Label>
                 <ChannelSelector
                   value={selectedChannelId}
                   onValueChange={setSelectedChannelId}
@@ -625,20 +679,26 @@ const NewScheduleModal = ({
             </Card>
           </div>
 
-          {/* Status do Atendimento */}
+          {/* Status do Atendimento - Dropdown com fundo sólido */}
           <Card>
             <CardContent className="p-4">
               <Label className="text-foreground font-medium mb-3 block">
                 Status do Atendimento *
               </Label>
               <Select value={ticketStatus} onValueChange={(value: TicketStatus) => setTicketStatus(value)}>
-                <SelectTrigger>
+                <SelectTrigger className="bg-background border-border text-foreground">
                   <SelectValue placeholder="Selecionar status..." />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Em Atendimento">Em Atendimento</SelectItem>
-                  <SelectItem value="Aguardando">Aguardando</SelectItem>
-                  <SelectItem value="Finalizado">Finalizado</SelectItem>
+                <SelectContent className="bg-background border-border shadow-lg z-50">
+                  <SelectItem value="Em Atendimento" className="hover:bg-accent focus:bg-accent text-foreground">
+                    Em Atendimento
+                  </SelectItem>
+                  <SelectItem value="Aguardando" className="hover:bg-accent focus:bg-accent text-foreground">
+                    Aguardando
+                  </SelectItem>
+                  <SelectItem value="Finalizado" className="hover:bg-accent focus:bg-accent text-foreground">
+                    Finalizado
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </CardContent>
@@ -648,14 +708,84 @@ const NewScheduleModal = ({
           <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
             <Button 
               variant="outline" 
-              onClick={handleClose}
+              onClick={() => {
+                setSelectedContacts([]);
+                setSelectedTagIds([]);
+                setUseTagContacts(false);
+                setMessageType('text');
+                setMessageText('');
+                setIncludeSignature(false);
+                setAudioBlob(null);
+                setSelectedDate(undefined);
+                setSelectedTime('');
+                setHasRecurrence(false);
+                setRecurrenceType('');
+                setCustomDays(1);
+                setSelectedChannelId('');
+                setTicketStatus('Em Atendimento');
+                setSelectedSectorId('');
+                setAttachments([]);
+                setErrors([]);
+                setWarnings([]);
+                onClose();
+              }}
               className="border-border text-foreground hover:bg-accent"
             >
               <Trash2 className="h-4 w-4 mr-2" />
               Descartar
             </Button>
             <Button 
-              onClick={handleCreateSchedule}
+              onClick={() => {
+                if (!validateForm()) {
+                  alert('Por favor, preencha todos os campos obrigatórios e corrija os erros.');
+                  return;
+                }
+
+                const finalContacts = useTagContacts && selectedTagIds.length > 0
+                  ? selectedTagIds.flatMap(tagId => getContactsByTag(tagId))
+                  : selectedContacts;
+
+                const scheduleData = {
+                  contacts: finalContacts,
+                  messageType,
+                  messageText: messageType === 'text' ? messageText : '',
+                  includeSignature: messageType === 'text' ? includeSignature : false,
+                  audioBlob: messageType === 'audio' ? audioBlob : null,
+                  scheduledDate: selectedDate,
+                  scheduledTime: selectedTime,
+                  hasRecurrence,
+                  recurrenceType: hasRecurrence ? recurrenceType : null,
+                  customDays: recurrenceType === 'custom' ? customDays : null,
+                  channelId: selectedChannelId,
+                  ticketStatus,
+                  sectorId: selectedSectorId,
+                  attachments: messageType === 'text' ? attachments : [],
+                  createdAt: new Date()
+                };
+
+                console.log('Agendamento criado:', scheduleData);
+                
+                // Limpar estados
+                setSelectedContacts([]);
+                setSelectedTagIds([]);
+                setUseTagContacts(false);
+                setMessageType('text');
+                setMessageText('');
+                setIncludeSignature(false);
+                setAudioBlob(null);
+                setSelectedDate(undefined);
+                setSelectedTime('');
+                setHasRecurrence(false);
+                setRecurrenceType('');
+                setCustomDays(1);
+                setSelectedChannelId('');
+                setTicketStatus('Em Atendimento');
+                setSelectedSectorId('');
+                setAttachments([]);
+                setErrors([]);
+                setWarnings([]);
+                onClose();
+              }}
               disabled={!validateForm()}
               className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
