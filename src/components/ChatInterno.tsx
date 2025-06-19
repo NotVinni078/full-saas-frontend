@@ -1,701 +1,354 @@
+
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Search, Smile, Paperclip, UserPlus, ArrowLeft } from 'lucide-react';
+import { Send, Search, Smile, Paperclip, UserPlus, ArrowLeft, Users, MoreVertical, Trash2, Reply, Heart } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useUsers } from "@/hooks/useUsers";
+import { ChatInicio } from './chat/ChatInicio';
+import { NovoChat } from './chat/NovoChat';
+import { NovoGrupo } from './chat/NovoGrupo';
+import { ChatConversa } from './chat/ChatConversa';
 
+/**
+ * Interface para definir uma mensagem individual do chat
+ * Contém todas as informações necessárias para renderizar uma mensagem
+ */
 interface Message {
   id: string;
-  sender: string;
+  senderId: string;
+  senderName: string;
   content: string;
-  timestamp: string;
-  isOwn: boolean;
+  timestamp: Date;
+  type: 'text' | 'audio' | 'file' | 'emoji';
+  replyTo?: string; // ID da mensagem sendo respondida
+  reactions: { userId: string; emoji: string }[]; // Reações dos usuários
+  isDeleted?: boolean; // Marca mensagens apagadas
+  deletedAt?: Date; // Timestamp de quando foi deletada
 }
 
-interface Contact {
+/**
+ * Interface para definir um chat (individual ou grupo)
+ * Contém informações do chat e lista de mensagens
+ */
+interface Chat {
   id: string;
   name: string;
-  department: string;
+  type: 'individual' | 'group';
+  participants: string[]; // IDs dos usuários participantes
+  messages: Message[];
+  lastMessage?: Message;
+  unreadCount: number;
   avatar?: string;
-  status: 'online' | 'offline' | 'away';
-  lastMessage?: string;
-  lastMessageTime?: string;
-  unreadCount?: number;
+  createdAt: Date;
+  updatedAt: Date;
+  isActive: boolean; // Para controlar se o chat ainda está ativo
 }
 
+/**
+ * Estados possíveis da interface do chat interno
+ * Controla qual tela está sendo exibida
+ */
+type ChatState = 'inicio' | 'novo-chat' | 'novo-grupo' | 'conversa';
+
+/**
+ * Componente principal do Chat Interno
+ * Gerencia toda a interface e funcionalidades do sistema de chat
+ * Utiliza cores dinâmicas da gestão de marca
+ * Totalmente responsivo para todos os tamanhos de tela
+ */
 const ChatInterno = () => {
-  const [selectedContact, setSelectedContact] = useState<string>('');
-  const [message, setMessage] = useState('');
+  // Estados principais da aplicação
+  const [currentState, setCurrentState] = useState<ChatState>('inicio');
+  const [selectedChatId, setSelectedChatId] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [showChat, setShowChat] = useState(false);
-  const [showNewChatDialog, setShowNewChatDialog] = useState(false);
+  const [chats, setChats] = useState<Chat[]>([]);
+  const [currentMessage, setCurrentMessage] = useState('');
+  const [replyingTo, setReplyingTo] = useState<Message | null>(null);
+  
+  // Hook para acessar dados dos usuários do sistema
+  const { users, getActiveUsers } = useUsers();
+  
+  // Referências para elementos DOM
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messageInputRef = useRef<HTMLInputElement>(null);
 
-  const contacts: Contact[] = [
-    {
-      id: '1',
-      name: 'João Silva',
-      department: 'Suporte Técnico',
-      status: 'online',
-      lastMessage: 'Oi! Como está o projeto?',
-      lastMessageTime: '14:30',
-      unreadCount: 2
-    },
-    {
-      id: '2',
-      name: 'Maria Santos',
-      department: 'Vendas',
-      status: 'away',
-      lastMessage: 'Vou verificar isso',
-      lastMessageTime: '13:45'
-    },
-    {
-      id: '3',
-      name: 'Pedro Costa',
-      department: 'Desenvolvimento',
-      status: 'offline',
-      lastMessage: 'Obrigado pela ajuda!',
-      lastMessageTime: '12:15'
-    },
-    {
-      id: '4',
-      name: 'Ana Oliveira',
-      department: 'Marketing',
-      status: 'online',
-      lastMessage: 'Reunião confirmada para amanhã',
-      lastMessageTime: '11:30',
-      unreadCount: 1
-    },
-    {
-      id: '5',
-      name: 'Carlos Lima',
-      department: 'Financeiro',
-      status: 'online',
-      lastMessage: 'Perfeito! Vamos em frente',
-      lastMessageTime: '10:20'
-    },
-    {
-      id: '6',
-      name: 'Luciana Ferreira',
-      department: 'RH',
-      status: 'online',
-      lastMessage: 'Documentos enviados por email',
-      lastMessageTime: '09:45',
-      unreadCount: 3
-    },
-    {
-      id: '7',
-      name: 'Roberto Alves',
-      department: 'Operações',
-      status: 'away',
-      lastMessage: 'Processo aprovado!',
-      lastMessageTime: '09:15'
-    },
-    {
-      id: '8',
-      name: 'Fernanda Souza',
-      department: 'Qualidade',
-      status: 'offline',
-      lastMessage: 'Relatório está pronto',
-      lastMessageTime: 'Ontem'
-    },
-    {
-      id: '9',
-      name: 'Gabriel Pereira',
-      department: 'TI',
-      status: 'online',
-      lastMessage: 'Sistema funcionando perfeitamente',
-      lastMessageTime: '16:20',
-      unreadCount: 1
-    },
-    {
-      id: '10',
-      name: 'Julia Mendes',
-      department: 'Design',
-      status: 'online',
-      lastMessage: 'Mockups prontos para revisão',
-      lastMessageTime: '15:45'
-    },
-    {
-      id: '11',
-      name: 'Rafael Torres',
-      department: 'Produto',
-      status: 'away',
-      lastMessage: 'Reunião de planejamento às 17h',
-      lastMessageTime: '14:50'
-    },
-    {
-      id: '12',
-      name: 'Camila Rocha',
-      department: 'Comunicação',
-      status: 'online',
-      lastMessage: 'Post aprovado para publicação',
-      lastMessageTime: '14:25',
-      unreadCount: 2
-    },
-    {
-      id: '13',
-      name: 'Ricardo Mendes',
-      department: 'TI',
-      status: 'online',
-      lastMessage: 'Backup realizado com sucesso',
-      lastMessageTime: '13:10'
-    },
-    {
-      id: '14',
-      name: 'Juliana Rocha',
-      department: 'Comercial',
-      status: 'online',
-      lastMessage: 'Cliente confirmou a proposta',
-      lastMessageTime: '12:30',
-      unreadCount: 1
-    },
-    {
-      id: '15',
-      name: 'André Barbosa',
-      department: 'Logística',
-      status: 'away',
-      lastMessage: 'Entrega programada para hoje',
-      lastMessageTime: '11:45'
-    },
-    {
-      id: '16',
-      name: 'Beatriz Silva',
-      department: 'Jurídico',
-      status: 'online',
-      lastMessage: 'Contrato revisado e aprovado',
-      lastMessageTime: '10:15',
-      unreadCount: 2
-    }
-  ];
-
-  const availableUsers: Contact[] = [
-    {
-      id: '17',
-      name: 'Marcos Oliveira',
-      department: 'TI',
-      status: 'online'
-    },
-    {
-      id: '18',
-      name: 'Patricia Santos',
-      department: 'Comercial',
-      status: 'online'
-    },
-    {
-      id: '19',
-      name: 'Diego Costa',
-      department: 'Logística',
-      status: 'away'
-    },
-    {
-      id: '20',
-      name: 'Larissa Lima',
-      department: 'Jurídico',
-      status: 'online'
-    }
-  ];
-
-  const messages: Record<string, Message[]> = {
-    '1': [
-      {
-        id: '1',
-        sender: 'João Silva',
-        content: 'Oi! Como está o projeto?',
-        timestamp: '14:30',
-        isOwn: false
-      },
-      {
-        id: '2',
-        sender: 'Você',
-        content: 'Está indo bem! Acabei de finalizar a parte do dashboard.',
-        timestamp: '14:32',
-        isOwn: true
-      },
-      {
-        id: '3',
-        sender: 'João Silva',
-        content: 'Ótimo! Podemos revisar juntos depois?',
-        timestamp: '14:33',
-        isOwn: false
-      },
-      {
-        id: '4',
-        sender: 'Você',
-        content: 'Claro! Que tal às 16h?',
-        timestamp: '14:34',
-        isOwn: true
-      }
-    ],
-    '2': [
-      {
-        id: '1',
-        sender: 'Maria Santos',
-        content: 'Bom dia! Recebi sua proposta comercial',
-        timestamp: '13:40',
-        isOwn: false
-      },
-      {
-        id: '2',
-        sender: 'Você',
-        content: 'Ótimo! O que achou dos valores?',
-        timestamp: '13:42',
-        isOwn: true
-      },
-      {
-        id: '3',
-        sender: 'Maria Santos',
-        content: 'Vou verificar isso',
-        timestamp: '13:45',
-        isOwn: false
-      }
-    ],
-    '3': [
-      {
-        id: '1',
-        sender: 'Pedro Costa',
-        content: 'Conseguiu resolver o bug da API?',
-        timestamp: '12:10',
-        isOwn: false
-      },
-      {
-        id: '2',
-        sender: 'Você',
-        content: 'Sim! Era um problema na validação dos dados',
-        timestamp: '12:12',
-        isOwn: true
-      },
-      {
-        id: '3',
-        sender: 'Pedro Costa',
-        content: 'Obrigado pela ajuda!',
-        timestamp: '12:15',
-        isOwn: false
-      }
-    ],
-    '4': [
-      {
-        id: '1',
-        sender: 'Ana Oliveira',
-        content: 'Preciso confirmar nossa reunião de amanhã',
-        timestamp: '11:25',
-        isOwn: false
-      },
-      {
-        id: '2',
-        sender: 'Você',
-        content: 'Claro! Às 10h na sala de reuniões?',
-        timestamp: '11:28',
-        isOwn: true
-      },
-      {
-        id: '3',
-        sender: 'Ana Oliveira',
-        content: 'Reunião confirmada para amanhã',
-        timestamp: '11:30',
-        isOwn: false
-      }
-    ],
-    '5': [
-      {
-        id: '1',
-        sender: 'Carlos Lima',
-        content: 'Os números do trimestre estão aprovados',
-        timestamp: '10:15',
-        isOwn: false
-      },
-      {
-        id: '2',
-        sender: 'Você',
-        content: 'Excelente! Podemos prosseguir com o planejamento',
-        timestamp: '10:18',
-        isOwn: true
-      },
-      {
-        id: '3',
-        sender: 'Carlos Lima',
-        content: 'Perfeito! Vamos em frente',
-        timestamp: '10:20',
-        isOwn: false
-      }
-    ],
-    '6': [
-      {
-        id: '1',
-        sender: 'Luciana Ferreira',
-        content: 'Enviados os contratos para assinatura',
-        timestamp: '09:40',
-        isOwn: false
-      },
-      {
-        id: '2',
-        sender: 'Você',
-        content: 'Recebi! Vou revisar hoje',
-        timestamp: '09:42',
-        isOwn: true
-      },
-      {
-        id: '3',
-        sender: 'Luciana Ferreira',
-        content: 'Documentos enviados por email',
-        timestamp: '09:45',
-        isOwn: false
-      }
-    ],
-    '7': [
-      {
-        id: '1',
-        sender: 'Roberto Alves',
-        content: 'Solicitação de melhoria foi analisada',
-        timestamp: '09:10',
-        isOwn: false
-      },
-      {
-        id: '2',
-        sender: 'Você',
-        content: 'E qual foi o resultado?',
-        timestamp: '09:12',
-        isOwn: true
-      },
-      {
-        id: '3',
-        sender: 'Roberto Alves',
-        content: 'Processo aprovado!',
-        timestamp: '09:15',
-        isOwn: false
-      }
-    ],
-    '8': [
-      {
-        id: '1',
-        sender: 'Fernanda Souza',
-        content: 'Análise de qualidade finalizada',
-        timestamp: 'Ontem 16:30',
-        isOwn: false
-      },
-      {
-        id: '2',
-        sender: 'Você',
-        content: 'Ótimo! Alguma observação importante?',
-        timestamp: 'Ontem 16:32',
-        isOwn: true
-      },
-      {
-        id: '3',
-        sender: 'Fernanda Souza',
-        content: 'Relatório está pronto',
-        timestamp: 'Ontem 16:35',
-        isOwn: false
-      }
-    ]
-  };
-
-  const filteredContacts = contacts.filter(contact =>
-    contact.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const currentMessages = messages[selectedContact] || [];
-  const currentContact = contacts.find(c => c.id === selectedContact);
-
-  const handleSelectContact = (contactId: string) => {
-    setSelectedContact(contactId);
-    setShowChat(true);
-  };
-
-  const handleBackToList = () => {
-    setShowChat(false);
-    setSelectedContact('');
-  };
-
-  const handleCloseChat = () => {
-    setSelectedContact('');
-    setShowChat(false);
-  };
-
-  const handleSendMessage = () => {
-    if (message.trim()) {
-      console.log('Enviando mensagem:', message);
-      setMessage('');
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
-
-  const handleStartNewChat = (userId: string) => {
-    console.log('Iniciando novo chat com usuário:', userId);
-    setShowNewChatDialog(false);
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'online': return 'brand-success';
-      case 'away': return 'brand-warning';
-      case 'offline': return 'brand-muted';
-      default: return 'brand-muted';
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'online': return 'Online';
-      case 'away': return 'Ausente';
-      case 'offline': return 'Offline';
-      default: return 'Offline';
-    }
-  };
-
+  /**
+   * Efeito para rolar automaticamente para o final das mensagens
+   * Executado sempre que novas mensagens são recebidas
+   */
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [currentMessages]);
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [selectedChatId, chats]);
 
+  /**
+   * Efeito para configurar atalhos de teclado
+   * Enter: Enviar mensagem
+   * Esc: Voltar para início/fechar chat
+   */
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === 'Enter' && currentState === 'conversa') {
+        event.preventDefault();
+        handleSendMessage();
+      } else if (event.key === 'Escape') {
+        if (currentState === 'conversa') {
+          setCurrentState('inicio');
+          setSelectedChatId('');
+        } else if (currentState === 'novo-chat' || currentState === 'novo-grupo') {
+          setCurrentState('inicio');
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyPress);
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [currentState, currentMessage]);
+
+  /**
+   * Função para iniciar um novo chat individual
+   * Verifica se já existe chat com o usuário selecionado
+   */
+  const handleStartIndividualChat = (userId: string) => {
+    const user = users.find(u => u.id === userId);
+    if (!user) return;
+
+    // Verificar se já existe chat com este usuário
+    const existingChat = chats.find(chat => 
+      chat.type === 'individual' && 
+      chat.participants.includes(userId) && 
+      chat.isActive
+    );
+
+    if (existingChat) {
+      // Se já existe, abrir o chat existente
+      setSelectedChatId(existingChat.id);
+      setCurrentState('conversa');
+    } else {
+      // Criar novo chat
+      const newChat: Chat = {
+        id: Date.now().toString(),
+        name: user.nome,
+        type: 'individual',
+        participants: [userId, 'current-user'], // Assumindo usuário atual
+        messages: [],
+        unreadCount: 0,
+        avatar: user.avatar,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        isActive: true
+      };
+
+      setChats(prev => [...prev, newChat]);
+      setSelectedChatId(newChat.id);
+      setCurrentState('conversa');
+    }
+  };
+
+  /**
+   * Função para criar um novo grupo
+   * Permite nomear o grupo e selecionar participantes
+   */
+  const handleCreateGroup = (groupName: string, participantIds: string[]) => {
+    const newGroup: Chat = {
+      id: Date.now().toString(),
+      name: groupName,
+      type: 'group',
+      participants: [...participantIds, 'current-user'], // Incluir usuário atual
+      messages: [],
+      unreadCount: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      isActive: true
+    };
+
+    setChats(prev => [...prev, newGroup]);
+    setSelectedChatId(newGroup.id);
+    setCurrentState('conversa');
+  };
+
+  /**
+   * Função para enviar uma nova mensagem
+   * Suporta texto, resposta a mensagens e diferentes tipos de conteúdo
+   */
+  const handleSendMessage = () => {
+    if (!currentMessage.trim() || !selectedChatId) return;
+
+    const newMessage: Message = {
+      id: Date.now().toString(),
+      senderId: 'current-user', // ID do usuário atual
+      senderName: 'Você', // Nome do usuário atual
+      content: currentMessage.trim(),
+      timestamp: new Date(),
+      type: 'text',
+      replyTo: replyingTo?.id,
+      reactions: []
+    };
+
+    setChats(prev => prev.map(chat => {
+      if (chat.id === selectedChatId) {
+        return {
+          ...chat,
+          messages: [...chat.messages, newMessage],
+          lastMessage: newMessage,
+          updatedAt: new Date()
+        };
+      }
+      return chat;
+    }));
+
+    setCurrentMessage('');
+    setReplyingTo(null);
+  };
+
+  /**
+   * Função para reagir a uma mensagem com emoji
+   * Permite adicionar/remover reações de mensagens
+   */
+  const handleReactToMessage = (messageId: string, emoji: string) => {
+    setChats(prev => prev.map(chat => {
+      if (chat.id === selectedChatId) {
+        return {
+          ...chat,
+          messages: chat.messages.map(msg => {
+            if (msg.id === messageId) {
+              const existingReaction = msg.reactions.find(r => 
+                r.userId === 'current-user' && r.emoji === emoji
+              );
+
+              if (existingReaction) {
+                // Remover reação se já existe
+                return {
+                  ...msg,
+                  reactions: msg.reactions.filter(r => 
+                    !(r.userId === 'current-user' && r.emoji === emoji)
+                  )
+                };
+              } else {
+                // Adicionar nova reação
+                return {
+                  ...msg,
+                  reactions: [...msg.reactions, { userId: 'current-user', emoji }]
+                };
+              }
+            }
+            return msg;
+          })
+        };
+      }
+      return chat;
+    }));
+  };
+
+  /**
+   * Função para deletar uma mensagem
+   * Permite deletar mensagens dentro do prazo de 1 hora
+   */
+  const handleDeleteMessage = (messageId: string) => {
+    const now = new Date();
+    
+    setChats(prev => prev.map(chat => {
+      if (chat.id === selectedChatId) {
+        return {
+          ...chat,
+          messages: chat.messages.map(msg => {
+            if (msg.id === messageId) {
+              const timeDiff = now.getTime() - msg.timestamp.getTime();
+              const oneHour = 60 * 60 * 1000; // 1 hora em millisegundos
+
+              if (timeDiff <= oneHour && msg.senderId === 'current-user') {
+                return {
+                  ...msg,
+                  isDeleted: true,
+                  deletedAt: now,
+                  content: 'Esta mensagem foi deletada'
+                };
+              }
+            }
+            return msg;
+          })
+        };
+      }
+      return chat;
+    }));
+  };
+
+  /**
+   * Função para filtrar chats baseado na pesquisa
+   * Busca por nome do chat ou última mensagem
+   */
+  const filteredChats = chats.filter(chat => {
+    if (!searchQuery) return chat.isActive;
+    
+    const nameMatch = chat.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const messageMatch = chat.lastMessage?.content.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    return chat.isActive && (nameMatch || messageMatch);
+  });
+
+  /**
+   * Função para obter o chat atualmente selecionado
+   */
+  const selectedChat = chats.find(chat => chat.id === selectedChatId);
+
+  // Renderização condicional baseada no estado atual
   return (
-    <div className="h-full brand-background flex">
-      {/* Lista de Contatos - Mobile e Tablet: condicional, Desktop (lg+): sempre visível */}
-      <div className={`w-full lg:w-80 border-r brand-border brand-card flex flex-col ${showChat ? 'hidden lg:flex' : 'flex'}`}>
-        {/* Header da lista */}
-        <div className="p-4 border-b brand-border">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold brand-text-foreground">Chat Interno</h2>
-            <Dialog open={showNewChatDialog} onOpenChange={setShowNewChatDialog}>
-              <DialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="brand-text-muted brand-hover-text-foreground">
-                  <UserPlus className="h-4 w-4" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-md brand-card brand-border">
-                <DialogHeader>
-                  <DialogTitle className="brand-text-foreground">Iniciar Nova Conversa</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-2 max-h-60 overflow-y-auto">
-                  {availableUsers.map((user) => (
-                    <button
-                      key={user.id}
-                      onClick={() => handleStartNewChat(user.id)}
-                      className="w-full p-3 rounded-lg text-left transition-colors brand-hover-muted flex items-center space-x-3"
-                    >
-                      <div className="relative">
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={user.avatar} />
-                          <AvatarFallback className="brand-muted brand-text-muted text-xs">
-                            {user.name.split(' ').map(n => n[0]).join('')}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className={`absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border brand-border ${getStatusColor(user.status)}`} />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-medium text-sm brand-text-foreground">{user.name}</h3>
-                        <p className="text-xs brand-text-muted">{user.department}</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-          
-          {/* Busca */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 brand-text-muted" />
-            <Input
-              placeholder="Buscar usuário"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 brand-background brand-border brand-text-foreground brand-placeholder-muted"
-            />
-          </div>
-        </div>
+    <div className="h-full bg-background flex">
+      {/* 
+        Renderização condicional dos componentes baseada no estado atual
+        Cada estado representa uma tela diferente da aplicação
+      */}
+      {currentState === 'inicio' && (
+        <ChatInicio
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          filteredChats={filteredChats}
+          onSelectChat={(chatId) => {
+            setSelectedChatId(chatId);
+            setCurrentState('conversa');
+          }}
+          onNewChat={() => setCurrentState('novo-chat')}
+          onNewGroup={() => setCurrentState('novo-grupo')}
+        />
+      )}
 
-        {/* Lista de contatos */}
-        <ScrollArea className="flex-1">
-          <div className="p-2 space-y-1">
-            {filteredContacts.map((contact) => (
-              <button
-                key={contact.id}
-                onClick={() => handleSelectContact(contact.id)}
-                className={`w-full p-3 rounded-lg text-left transition-colors ${
-                  selectedContact === contact.id 
-                    ? 'brand-primary brand-text-background' 
-                    : 'brand-hover-muted'
-                }`}
-              >
-                <div className="flex items-center space-x-3">
-                  <div className="relative">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={contact.avatar} />
-                      <AvatarFallback className="brand-muted brand-text-muted">
-                        {contact.name.split(' ').map(n => n[0]).join('')}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 brand-border ${getStatusColor(contact.status)}`} />
-                  </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1 min-w-0">
-                        <h3 className={`font-medium text-sm truncate ${
-                          selectedContact === contact.id ? 'brand-text-background' : 'brand-text-foreground'
-                        }`}>
-                          {contact.name}
-                        </h3>
-                        <p className={`text-xs truncate ${
-                          selectedContact === contact.id ? 'brand-text-background opacity-70' : 'brand-text-muted'
-                        }`}>
-                          {contact.department}
-                        </p>
-                      </div>
-                      <div className="flex items-center space-x-1 ml-2">
-                        {contact.lastMessageTime && (
-                          <span className={`text-xs ${
-                            selectedContact === contact.id ? 'brand-text-background opacity-70' : 'brand-text-muted'
-                          }`}>
-                            {contact.lastMessageTime}
-                          </span>
-                        )}
-                        {contact.unreadCount && (
-                          <Badge variant="destructive" className="h-5 w-5 p-0 text-xs flex items-center justify-center brand-error brand-text-background">
-                            {contact.unreadCount}
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                    {contact.lastMessage && (
-                      <p className={`text-xs truncate mt-1 ${
-                        selectedContact === contact.id ? 'brand-text-background opacity-70' : 'brand-text-muted'
-                      }`}>
-                        {contact.lastMessage}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
-        </ScrollArea>
-      </div>
+      {currentState === 'novo-chat' && (
+        <NovoChat
+          onBack={() => setCurrentState('inicio')}
+          onSelectUser={handleStartIndividualChat}
+          existingChats={chats}
+        />
+      )}
 
-      {/* Área de Chat - Mobile e Tablet: condicional, Desktop (lg+): sempre visível */}
-      <div className={`flex-1 flex flex-col brand-background ${!showChat ? 'hidden lg:flex' : 'flex'}`}>
-        {currentContact ? (
-          <>
-            {/* Header do chat */}
-            <div className="p-4 border-b brand-border brand-card flex items-center">
-              {/* Botão voltar - mobile e tablet */}
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="lg:hidden mr-2 brand-text-muted brand-hover-text-foreground"
-                onClick={handleBackToList}
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-              
-              <div className="flex items-center space-x-3 flex-1">
-                {/* Botão fechar conversa - apenas para desktop (lg+) */}
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={handleCloseChat}
-                  className="hidden lg:flex brand-text-muted brand-hover-text-foreground"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                </Button>
-                
-                <div className="relative">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={currentContact.avatar} />
-                    <AvatarFallback className="brand-muted brand-text-muted text-sm">
-                      {currentContact.name.split(' ').map(n => n[0]).join('')}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border brand-border ${getStatusColor(currentContact.status)}`} />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-medium brand-text-foreground">{currentContact.name}</h3>
-                  <p className="text-xs brand-text-muted">{currentContact.department} • {getStatusText(currentContact.status)}</p>
-                </div>
-              </div>
-            </div>
+      {currentState === 'novo-grupo' && (
+        <NovoGrupo
+          onBack={() => setCurrentState('inicio')}
+          onCreate={handleCreateGroup}
+        />
+      )}
 
-            {/* Mensagens */}
-            <ScrollArea className="flex-1 p-4">
-              <div className="space-y-4">
-                {currentMessages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`flex ${msg.isOwn ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div className={`max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl ${msg.isOwn ? 'order-2' : ''}`}>
-                      {!msg.isOwn && (
-                        <p className="text-xs brand-text-muted mb-1 ml-1">{msg.sender}</p>
-                      )}
-                      <div
-                        className={`rounded-lg px-3 py-2 ${
-                          msg.isOwn
-                            ? 'brand-primary brand-text-background'
-                            : 'brand-muted brand-text-foreground'
-                        }`}
-                      >
-                        <p className="text-sm">{msg.content}</p>
-                        <p className={`text-xs mt-1 ${
-                          msg.isOwn ? 'brand-text-background opacity-70' : 'brand-text-muted'
-                        }`}>
-                          {msg.timestamp}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                <div ref={messagesEndRef} />
-              </div>
-            </ScrollArea>
-
-            {/* Input de mensagem */}
-            <div className="p-4 border-t brand-border brand-card">
-              <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="sm" className="brand-text-muted brand-hover-text-foreground">
-                  <Paperclip className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="sm" className="brand-text-muted brand-hover-text-foreground">
-                  <Smile className="h-4 w-4" />
-                </Button>
-                <div className="flex-1">
-                  <Input
-                    placeholder="Digite sua mensagem..."
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    className="resize-none brand-background brand-border brand-text-foreground brand-placeholder-muted"
-                  />
-                </div>
-                <Button 
-                  onClick={handleSendMessage}
-                  disabled={!message.trim()}
-                  className="brand-primary brand-text-background brand-hover-primary"
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </>
-        ) : (
-          <div className="flex-1 flex items-center justify-center brand-background">
-            <div className="text-center">
-              <UserPlus className="h-12 w-12 brand-text-muted mx-auto mb-4" />
-              <h3 className="text-lg font-medium brand-text-foreground mb-2">Selecione um usuário</h3>
-              <p className="brand-text-muted">Escolha uma conversa para começar a conversar</p>
-            </div>
-          </div>
-        )}
-      </div>
+      {currentState === 'conversa' && selectedChat && (
+        <ChatConversa
+          chat={selectedChat}
+          currentMessage={currentMessage}
+          setCurrentMessage={setCurrentMessage}
+          replyingTo={replyingTo}
+          setReplyingTo={setReplyingTo}
+          onBack={() => setCurrentState('inicio')}
+          onSendMessage={handleSendMessage}
+          onReactToMessage={handleReactToMessage}
+          onDeleteMessage={handleDeleteMessage}
+          messagesEndRef={messagesEndRef}
+          messageInputRef={messageInputRef}
+        />
+      )}
     </div>
   );
 };
