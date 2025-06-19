@@ -344,7 +344,7 @@ export const ChatConversa: React.FC<ChatConversaProps> = ({
                   <button
                     key={emoji}
                     onClick={() => {
-                      setCurrentMessage(prev => prev + emoji);
+                      setCurrentMessage(currentMessage + emoji);
                       setShowEmojiPicker(false);
                     }}
                     className="text-lg hover:bg-accent rounded p-2 transition-colors"
