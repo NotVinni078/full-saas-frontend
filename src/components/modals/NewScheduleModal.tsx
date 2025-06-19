@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -50,7 +49,7 @@ const NewScheduleModal = ({
 }: NewScheduleModalProps) => {
   // Estados principais
   const [selectedContacts, setSelectedContacts] = useState<Contact[]>([]);
-  const [selectedTagId, setSelectedTagId] = useState<string>(preSelectedTag || '');
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [useTagContacts, setUseTagContacts] = useState(false);
   const [messageType, setMessageType] = useState<MessageType>('text');
   const [messageText, setMessageText] = useState('');
@@ -83,7 +82,7 @@ const NewScheduleModal = ({
       setSelectedContacts(preSelectedContacts);
     }
     if (preSelectedTag) {
-      setSelectedTagId(preSelectedTag);
+      setSelectedTagIds([preSelectedTag]);
       setUseTagContacts(true);
     }
   }, [preSelectedContacts, preSelectedTag]);
@@ -93,7 +92,7 @@ const NewScheduleModal = ({
    */
   useEffect(() => {
     validateContactsAndChannel();
-  }, [selectedContacts, selectedChannelId, useTagContacts, selectedTagId]);
+  }, [selectedContacts, selectedChannelId, useTagContacts, selectedTagIds]);
 
   /**
    * Valida se todos os contatos são compatíveis com o canal selecionado
@@ -102,9 +101,9 @@ const NewScheduleModal = ({
     const newErrors: string[] = [];
     const newWarnings: string[] = [];
 
-    // Obter contatos finais (individuais ou da tag)
-    const finalContacts = useTagContacts && selectedTagId 
-      ? getContactsByTag(selectedTagId)
+    // Obter contatos finais (individuais ou das tags)
+    const finalContacts = useTagContacts && selectedTagIds.length > 0
+      ? selectedTagIds.flatMap(tagId => getContactsByTag(tagId))
       : selectedContacts;
 
     if (finalContacts.length === 0) {
@@ -155,12 +154,14 @@ const NewScheduleModal = ({
   };
 
   /**
-   * Seleciona tag para usar todos os contatos
+   * Seleciona tags para usar todos os contatos
    */
-  const handleTagSelection = (tagId: string) => {
-    setSelectedTagId(tagId);
-    setUseTagContacts(true);
-    setSelectedContacts([]); // Limpa seleção individual
+  const handleTagsSelection = (tagIds: string[]) => {
+    setSelectedTagIds(tagIds);
+    setUseTagContacts(tagIds.length > 0);
+    if (tagIds.length > 0) {
+      setSelectedContacts([]); // Limpa seleção individual
+    }
   };
 
   /**
@@ -202,8 +203,8 @@ const NewScheduleModal = ({
     }
 
     // Obter contatos finais
-    const finalContacts = useTagContacts && selectedTagId 
-      ? getContactsByTag(selectedTagId)
+    const finalContacts = useTagContacts && selectedTagIds.length > 0
+      ? selectedTagIds.flatMap(tagId => getContactsByTag(tagId))
       : selectedContacts;
 
     const scheduleData = {
@@ -235,7 +236,7 @@ const NewScheduleModal = ({
    */
   const handleClose = () => {
     setSelectedContacts([]);
-    setSelectedTagId('');
+    setSelectedTagIds([]);
     setUseTagContacts(false);
     setMessageType('text');
     setMessageText('');
@@ -263,11 +264,11 @@ const NewScheduleModal = ({
   };
 
   // Obter contatos finais para exibição
-  const finalContacts = useTagContacts && selectedTagId 
-    ? getContactsByTag(selectedTagId)
+  const finalContacts = useTagContacts && selectedTagIds.length > 0
+    ? selectedTagIds.flatMap(tagId => getContactsByTag(tagId))
     : selectedContacts;
 
-  const selectedTag = selectedTagId ? getTagById(selectedTagId) : null;
+  const selectedTags = selectedTagIds.map(tagId => getTagById(tagId)).filter(Boolean);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -329,24 +330,24 @@ const NewScheduleModal = ({
                 {/* Seletor de tags */}
                 <div>
                   <Label className="text-sm text-muted-foreground mb-2 block">
-                    Ou Selecionar por Tag
+                    Ou Selecionar por Tags
                   </Label>
                   <TagSelector
-                    value={selectedTagId}
-                    onValueChange={handleTagSelection}
-                    placeholder="Selecionar tag..."
+                    selectedTagIds={selectedTagIds}
+                    onTagsChange={handleTagsSelection}
+                    placeholder="Selecionar tags..."
                   />
                 </div>
               </div>
 
               {/* Exibir seleção atual */}
-              {useTagContacts && selectedTag ? (
+              {useTagContacts && selectedTags.length > 0 ? (
                 <div className="p-3 bg-primary/10 rounded-lg border border-primary/20">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <Tag className="h-4 w-4 text-primary" />
                       <span className="font-medium text-foreground">
-                        Tag: {selectedTag.nome}
+                        Tags: {selectedTags.map(tag => tag.nome).join(', ')}
                       </span>
                       <Badge variant="secondary">
                         {finalContacts.length} contatos
@@ -357,7 +358,7 @@ const NewScheduleModal = ({
                       size="sm"
                       onClick={() => {
                         setUseTagContacts(false);
-                        setSelectedTagId('');
+                        setSelectedTagIds([]);
                       }}
                     >
                       <X className="h-3 w-3" />
