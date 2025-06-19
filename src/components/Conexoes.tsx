@@ -11,7 +11,7 @@ import MultipleSectorSelector from '@/components/selectors/MultipleSectorSelecto
 import ChannelSelector from '@/components/selectors/ChannelSelector';
 import ImportSettings from '@/components/selectors/ImportSettings';
 import ConnectionCard from '@/components/cards/ConnectionCard';
-import QRCodeDisplay from '@/components/qr/QRCodeDisplay';
+import QRCodeModal from '@/components/qr/QRCodeModal';
 
 /**
  * Interface para definir uma conexão
@@ -45,13 +45,12 @@ interface NewConnection {
 /**
  * Componente principal de Gerenciamento de Conexões
  * Melhorias implementadas:
- * - Botão "Editar" adicionado aos cards de conexão
- * - Instruções completas para Facebook e Instagram
- * - Seleção múltipla de setores no formulário
- * - Layout para exibição de QR Code da API Baileys
- * - Modal de edição de conexões existentes
- * - Responsividade aprimorada para todas as telas
+ * - Modal flutuante para QR Code que fecha automaticamente após conexão
+ * - Botão "Conectar" dinâmico para conexões desconectadas
+ * - Botão "Desconectar" para conexões ativas
+ * - Modal QR Code responsivo para todas as telas
  * - Cores dinâmicas da gestão de marca mantidas
+ * - Layout responsivo otimizado para celular, tablet e desktop
  */
 const Conexoes = () => {
   // Estado para controlar o diálogo de nova conexão
@@ -74,8 +73,16 @@ const Conexoes = () => {
   // Estado para conexão sendo editada
   const [editingConnection, setEditingConnection] = useState<Connection | null>(null);
 
-  // Estado para controlar exibição do QR Code
-  const [showQRCode, setShowQRCode] = useState<string | null>(null);
+  // Estado para controlar exibição do modal QR Code
+  const [qrCodeModal, setQrCodeModal] = useState<{
+    isOpen: boolean;
+    connectionId: string;
+    connectionName: string;
+  }>({
+    isOpen: false,
+    connectionId: '',
+    connectionName: ''
+  });
 
   // Hook para acessar setores disponíveis
   const { getActiveSectors, getSectorById } = useSectors();
@@ -169,12 +176,44 @@ const Conexoes = () => {
     
     setIsDialogOpen(false);
     
-    // Mostra QR Code se for WhatsApp Baileys
+    // Abre modal QR Code se for WhatsApp Baileys
     if (newConnection.channel === 'whatsapp-qr') {
-      setShowQRCode(connection.id);
+      setQrCodeModal({
+        isOpen: true,
+        connectionId: connection.id,
+        connectionName: connection.name
+      });
     }
     
     console.log('Nova conexão criada:', connection);
+  };
+
+  /**
+   * Manipula a conexão de uma conexão desconectada
+   * Abre o modal QR Code para canais que necessitam
+   */
+  const handleConnect = (id: string) => {
+    const connection = connections.find(conn => conn.id === id);
+    
+    if (!connection) return;
+    
+    // Se for WhatsApp QR, abre o modal
+    if (connection.channel === 'whatsapp-qr') {
+      setQrCodeModal({
+        isOpen: true,
+        connectionId: id,
+        connectionName: connection.name
+      });
+    } else {
+      // Para outros canais, conecta diretamente
+      setConnections(prev => prev.map(conn => 
+        conn.id === id 
+          ? { ...conn, status: 'connected' as const, lastActivity: new Date().toLocaleString('pt-BR') }
+          : conn
+      ));
+    }
+    
+    console.log('Conectando:', id);
   };
 
   /**
@@ -240,6 +279,31 @@ const Conexoes = () => {
       ...prev,
       importSettings: settings
     }));
+  };
+
+  /**
+   * Manipula mudanças de status do QR Code no modal
+   * Atualiza o status da conexão quando necessário
+   */
+  const handleQRStatusChange = (status: 'generating' | 'ready' | 'connected' | 'expired') => {
+    if (status === 'connected' && qrCodeModal.connectionId) {
+      setConnections(prev => prev.map(conn => 
+        conn.id === qrCodeModal.connectionId 
+          ? { ...conn, status: 'connected', lastActivity: new Date().toLocaleString('pt-BR') }
+          : conn
+      ));
+    }
+  };
+
+  /**
+   * Fecha o modal QR Code
+   */
+  const closeQRModal = () => {
+    setQrCodeModal({
+      isOpen: false,
+      connectionId: '',
+      connectionName: ''
+    });
   };
 
   /**
@@ -505,33 +569,14 @@ const Conexoes = () => {
         </Dialog>
       </div>
 
-      {/* Exibição do QR Code quando necessário */}
-      {showQRCode && (
-        <div className="mb-6">
-          <QRCodeDisplay
-            connectionId={showQRCode}
-            connectionName={connections.find(c => c.id === showQRCode)?.name || 'Conexão'}
-            onStatusChange={(status) => {
-              if (status === 'connected') {
-                setConnections(prev => prev.map(conn => 
-                  conn.id === showQRCode 
-                    ? { ...conn, status: 'connected', lastActivity: new Date().toLocaleString('pt-BR') }
-                    : conn
-                ));
-              }
-            }}
-          />
-          <div className="mt-4 text-center">
-            <Button 
-              variant="outline" 
-              onClick={() => setShowQRCode(null)}
-              className="border-brand text-brand-foreground hover:bg-brand-accent"
-            >
-              Fechar QR Code
-            </Button>
-          </div>
-        </div>
-      )}
+      {/* Modal flutuante do QR Code */}
+      <QRCodeModal
+        isOpen={qrCodeModal.isOpen}
+        onClose={closeQRModal}
+        connectionId={qrCodeModal.connectionId}
+        connectionName={qrCodeModal.connectionName}
+        onStatusChange={handleQRStatusChange}
+      />
 
       {/* Grid de conexões existentes */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
@@ -545,6 +590,7 @@ const Conexoes = () => {
               }}
               onRestart={handleRestart}
               onDisconnect={handleDisconnect}
+              onConnect={handleConnect}
               onDelete={handleDelete}
               onEdit={handleEditConnection}
             />

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { RotateCcw, WifiOff, Trash2, MessageSquare, Send, Instagram, Facebook, Globe, Edit } from 'lucide-react';
+import { RotateCcw, WifiOff, Wifi, Trash2, MessageSquare, Send, Instagram, Facebook, Globe, Edit } from 'lucide-react';
 
 interface Connection {
   id: string;
@@ -19,6 +19,7 @@ interface ConnectionCardProps {
   connection: Connection;
   onRestart: (id: string) => void;
   onDisconnect: (id: string) => void;
+  onConnect: (id: string) => void;
   onDelete: (id: string) => void;
   onEdit: (connection: Connection) => void;
 }
@@ -26,12 +27,13 @@ interface ConnectionCardProps {
 /**
  * Componente de card para exibir conexões existentes
  * Melhorias implementadas:
- * - Adicionado botão "Editar" com ícone específico
+ * - Botão "Conectar" quando conexão está desconectada
+ * - Botão "Desconectar" quando conexão está conectada
  * - Reorganização dos botões de ação com melhor responsividade
  * - Mantém logos oficiais das empresas e cores dinâmicas
  * - Layout otimizado para desktop, tablet e mobile
  */
-const ConnectionCard = ({ connection, onRestart, onDisconnect, onDelete, onEdit }: ConnectionCardProps) => {
+const ConnectionCard = ({ connection, onRestart, onDisconnect, onConnect, onDelete, onEdit }: ConnectionCardProps) => {
   
   /**
    * Retorna a logo oficial da empresa correspondente ao canal
@@ -110,6 +112,66 @@ const ConnectionCard = ({ connection, onRestart, onDisconnect, onDelete, onEdit 
     }
   };
 
+  /**
+   * Renderiza o botão de conexão baseado no status
+   * Se está conectado, mostra "Desconectar"
+   * Se está desconectado, mostra "Conectar"
+   */
+  const renderConnectionButton = () => {
+    if (connection.status === 'connected') {
+      // Botão Desconectar
+      return (
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="border-brand text-brand-foreground hover:bg-brand-accent"
+            >
+              <WifiOff className="h-4 w-4 mr-1" />
+              <span className="hidden sm:inline">Desconectar</span>
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent className="border-brand bg-brand-background">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-brand-foreground">
+                Desconectar
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-brand-muted">
+                Você deseja desconectar "{connection.name}"? 
+                O atendimento será interrompido até reconectar.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="border-brand text-brand-foreground">
+                Cancelar
+              </AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={() => onDisconnect(connection.id)}
+                className="bg-yellow-600 hover:bg-yellow-700 text-white"
+              >
+                Desconectar
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      );
+    } else {
+      // Botão Conectar
+      return (
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => onConnect(connection.id)}
+          className="border-green-300 text-green-600 hover:bg-green-50 dark:border-green-800 dark:text-green-400 dark:hover:bg-green-950"
+        >
+          <Wifi className="h-4 w-4 mr-1" />
+          <span className="hidden sm:inline">Conectar</span>
+        </Button>
+      );
+    }
+  };
+
   return (
     <Card className="border-brand bg-brand-background hover:shadow-md transition-shadow duration-200">
       <CardHeader className="pb-3">
@@ -160,9 +222,9 @@ const ConnectionCard = ({ connection, onRestart, onDisconnect, onDelete, onEdit 
           Última atividade: {connection.lastActivity}
         </div>
 
-        {/* Botões de ação reorganizados com novo botão Editar */}
+        {/* Botões de ação reorganizados */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          {/* Botão Editar - Novo */}
+          {/* Botão Editar */}
           <Button 
             variant="outline" 
             size="sm" 
@@ -209,41 +271,8 @@ const ConnectionCard = ({ connection, onRestart, onDisconnect, onDelete, onEdit 
             </AlertDialogContent>
           </AlertDialog>
 
-          {/* Botão Desconectar */}
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="border-brand text-brand-foreground hover:bg-brand-accent"
-              >
-                <WifiOff className="h-4 w-4 mr-1" />
-                <span className="hidden sm:inline">Desconectar</span>
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent className="border-brand bg-brand-background">
-              <AlertDialogHeader>
-                <AlertDialogTitle className="text-brand-foreground">
-                  Desconectar
-                </AlertDialogTitle>
-                <AlertDialogDescription className="text-brand-muted">
-                  Você deseja desconectar "{connection.name}"? 
-                  O atendimento será interrompido até reconectar.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel className="border-brand text-brand-foreground">
-                  Cancelar
-                </AlertDialogCancel>
-                <AlertDialogAction 
-                  onClick={() => onDisconnect(connection.id)}
-                  className="bg-yellow-600 hover:bg-yellow-700 text-white"
-                >
-                  Desconectar
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          {/* Botão Conectar/Desconectar dinâmico */}
+          {renderConnectionButton()}
 
           {/* Botão Excluir */}
           <AlertDialog>
