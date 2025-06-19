@@ -129,7 +129,7 @@ export const MobilePreview: React.FC<MobilePreviewProps> = ({
   /**
    * Renderiza o preview específico para Email
    */
-  const render EmailPreview = () => (
+  const renderEmailPreview = () => (
     <div className="bg-white min-h-full flex flex-col">
       {/* Header do Email */}
       <div className="border-b p-3 space-y-2">
