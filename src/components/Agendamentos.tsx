@@ -228,7 +228,7 @@ const Agendamentos = () => {
   const filteredContacts = useMemo(() => {
     let contacts = mockContacts;
     
-    if (selectedTag) {
+    if (selectedTag && selectedTag !== 'none') {
       contacts = mockContacts.filter(contact =>
         contact.tags.includes(selectedTag)
       );
@@ -476,7 +476,7 @@ const Agendamentos = () => {
                             <SelectValue placeholder="Selecionar TAG" />
                           </SelectTrigger>
                           <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
-                            <SelectItem value="">Nenhuma TAG</SelectItem>
+                            <SelectItem value="none">Nenhuma TAG</SelectItem>
                             {availableTags.map((tag) => (
                               <SelectItem key={tag} value={tag}>
                                 {tag}
@@ -973,7 +973,7 @@ const Agendamentos = () => {
                             <SelectValue placeholder="Selecionar TAG" />
                           </SelectTrigger>
                           <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
-                            <SelectItem value="">Nenhuma TAG</SelectItem>
+                            <SelectItem value="none">Nenhuma TAG</SelectItem>
                             {availableTags.map((tag) => (
                               <SelectItem key={tag} value={tag}>
                                 {tag}
