@@ -25,25 +25,41 @@ interface ConnectionCardProps {
 /**
  * Componente de card para exibir conexões existentes
  * Mostra informações da conexão e ações disponíveis
+ * Usa logos oficiais das empresas ao invés de ícones genéricos
  * Responsivo para desktop, tablet e mobile
  * Utiliza cores dinâmicas da gestão de marca
  */
 const ConnectionCard = ({ connection, onRestart, onDisconnect, onDelete }: ConnectionCardProps) => {
   
   /**
-   * Retorna o ícone correspondente ao canal da conexão
-   * Mantém consistência visual com o seletor de canais
+   * Retorna a logo oficial da empresa correspondente ao canal
+   * Substitui ícones genéricos por logos reais das plataformas
+   */
+  const getChannelLogo = (channel: string) => {
+    const logos = {
+      'whatsapp-qr': 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg',
+      'whatsapp-oficial': 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg',
+      'telegram': 'https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg',
+      'facebook': 'https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png',
+      'instagram': 'https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png',
+      'webchat': 'https://upload.wikimedia.org/wikipedia/commons/6/6a/Web_chat_icon.svg'
+    };
+    return logos[channel] || '';
+  };
+
+  /**
+   * Retorna ícone de fallback caso a logo não carregue
    */
   const getChannelIcon = (channel: string) => {
     const icons = {
-      'whatsapp-qr': <MessageSquare className="h-5 w-5 text-green-500" />,
-      'whatsapp-oficial': <MessageSquare className="h-5 w-5 text-green-600" />,
-      'telegram': <Send className="h-5 w-5 text-blue-500" />,
-      'facebook': <Facebook className="h-5 w-5 text-blue-600" />,
-      'instagram': <Instagram className="h-5 w-5 text-pink-500" />,
-      'webchat': <Globe className="h-5 w-5 text-purple-500" />
+      'whatsapp-qr': <MessageSquare className="h-6 w-6 text-green-500" />,
+      'whatsapp-oficial': <MessageSquare className="h-6 w-6 text-green-600" />,
+      'telegram': <Send className="h-6 w-6 text-blue-500" />,
+      'facebook': <Facebook className="h-6 w-6 text-blue-600" />,
+      'instagram': <Instagram className="h-6 w-6 text-pink-500" />,
+      'webchat': <Globe className="h-6 w-6 text-purple-500" />
     };
-    return icons[channel] || <MessageSquare className="h-5 w-5 text-gray-500" />;
+    return icons[channel] || <MessageSquare className="h-6 w-6 text-gray-500" />;
   };
 
   /**
@@ -100,8 +116,26 @@ const ConnectionCard = ({ connection, onRestart, onDisconnect, onDelete }: Conne
         {/* Cabeçalho com informações da conexão */}
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-3">
-            {/* Ícone do canal */}
-            {getChannelIcon(connection.channel)}
+            {/* Logo oficial da empresa */}
+            <div className="relative">
+              <img 
+                src={getChannelLogo(connection.channel)} 
+                alt={`${getChannelName(connection.channel)} logo`}
+                className="h-8 w-8 object-contain"
+                onError={(e) => {
+                  // Fallback para ícone se logo não carregar
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  const fallbackDiv = target.nextElementSibling as HTMLDivElement;
+                  if (fallbackDiv) {
+                    fallbackDiv.classList.remove('hidden');
+                  }
+                }}
+              />
+              <div className="hidden">
+                {getChannelIcon(connection.channel)}
+              </div>
+            </div>
             
             {/* Nome e detalhes da conexão */}
             <div className="min-w-0 flex-1">

@@ -1,12 +1,10 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Plus, Search, Wifi, QrCode } from 'lucide-react';
+import { Plus, Search, QrCode } from 'lucide-react';
 import { useSectors } from '@/hooks/useSectors';
 import SectorSelector from '@/components/selectors/SectorSelector';
 import ChannelSelector from '@/components/selectors/ChannelSelector';
@@ -44,9 +42,13 @@ interface NewConnection {
 
 /**
  * Componente principal de Gerenciamento de Conexões
- * Responsável por exibir, criar, editar e excluir conexões
- * Utiliza cores dinâmicas da gestão de marca
- * Totalmente responsivo para desktop, tablet e mobile
+ * Melhorias implementadas:
+ * - Removido alert desnecessário de estatísticas
+ * - Seletor de canais convertido para dropdown com logos oficiais
+ * - Seletor de setores com fundo sólido e alta visibilidade
+ * - Toggles com maior destaque seguindo cores dinâmicas
+ * - Instruções técnicas removidas da interface (mantidas em comentários)
+ * - Responsivo para desktop, tablet e mobile
  */
 const Conexoes = () => {
   // Estado para controlar o diálogo de nova conexão
@@ -232,9 +234,41 @@ const Conexoes = () => {
     );
   };
 
+  /**
+   * Renderiza informações de QR Code para WhatsApp Baileys
+   */
+  const renderQRCodeInfo = () => {
+    if (newConnection.channel !== 'whatsapp-qr') return null;
+
+    return (
+      <Card className="mt-4 border-brand bg-brand-background">
+        <CardHeader>
+          <CardTitle className="text-sm text-brand-foreground flex items-center gap-2">
+            <QrCode className="h-4 w-4" />
+            QR Code para Conexão
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="bg-green-50 dark:bg-green-950 p-4 rounded-lg border border-green-200 dark:border-green-800">
+            <p className="text-sm text-green-800 dark:text-green-200 mb-2">
+              <strong>Após criar a conexão:</strong>
+            </p>
+            <ul className="text-xs text-green-700 dark:text-green-300 space-y-1">
+              <li>• Um QR Code será gerado automaticamente</li>
+              <li>• Abra o WhatsApp no seu celular</li>
+              <li>• Vá em Configurações → Aparelhos conectados</li>
+              <li>• Toque em "Conectar um aparelho"</li>
+              <li>• Escaneie o QR Code exibido na tela</li>
+            </ul>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
   return (
     <div className="p-4 lg:p-6 space-y-4 lg:space-y-6">
-      {/* Cabeçalho principal com título e estatísticas */}
+      {/* Cabeçalho principal simplificado */}
       <div className="flex flex-col space-y-4">
         <div>
           <h1 className="text-xl lg:text-2xl font-bold text-brand-foreground">
@@ -244,14 +278,6 @@ const Conexoes = () => {
             Configure e gerencie suas conexões com diferentes canais de comunicação
           </p>
         </div>
-
-        {/* Alert com estatísticas das conexões */}
-        <Alert className="border-brand bg-brand-background">
-          <Wifi className="h-4 w-4" />
-          <AlertDescription className="text-brand-foreground">
-            {connections.filter(c => c.status === 'connected').length} de {connections.length} conexões ativas
-          </AlertDescription>
-        </Alert>
       </div>
 
       {/* Barra de ferramentas com pesquisa e botão criar */}
@@ -300,7 +326,7 @@ const Conexoes = () => {
                 />
               </div>
 
-              {/* Seletor de setor */}
+              {/* Seletor de setor com dropdown melhorado */}
               <div className="space-y-2">
                 <Label className="text-brand-foreground">Setor Responsável *</Label>
                 <SectorSelector
@@ -310,7 +336,7 @@ const Conexoes = () => {
                 />
               </div>
 
-              {/* Seletor de canal */}
+              {/* Seletor de canal como dropdown */}
               <div className="space-y-2">
                 <ChannelSelector
                   value={newConnection.channel}
@@ -318,7 +344,7 @@ const Conexoes = () => {
                 />
               </div>
 
-              {/* Configurações de importação */}
+              {/* Configurações de importação com toggles melhorados */}
               {newConnection.channel && (
                 <ImportSettings
                   channel={newConnection.channel}
@@ -328,6 +354,9 @@ const Conexoes = () => {
 
               {/* Código do WebChat se selecionado */}
               {renderWebChatCode()}
+
+              {/* Informações do QR Code para WhatsApp Baileys */}
+              {renderQRCodeInfo()}
 
               {/* Botões de ação do modal */}
               <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 pt-4 border-t border-brand">
@@ -393,7 +422,7 @@ const Conexoes = () => {
       <Card className="border-brand bg-brand-background">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-brand-foreground">
-            <Wifi className="h-5 w-5" />
+            <QrCode className="h-5 w-5" />
             Instruções de Configuração
           </CardTitle>
         </CardHeader>

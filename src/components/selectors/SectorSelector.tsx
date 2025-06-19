@@ -11,6 +11,11 @@ interface SectorSelectorProps {
   showColors?: boolean;
 }
 
+/**
+ * Componente seletor de setores com dropdown não transparente
+ * Integra com os setores da página /gestao-setores
+ * Totalmente responsivo e com cores dinâmicas
+ */
 const SectorSelector = ({ 
   value, 
   onValueChange, 
@@ -23,7 +28,7 @@ const SectorSelector = ({
 
   return (
     <Select value={value} onValueChange={onValueChange}>
-      <SelectTrigger>
+      <SelectTrigger className="w-full border-brand bg-brand-background text-brand-foreground">
         <SelectValue placeholder={placeholder}>
           {selectedSector && (
             <div className="flex items-center gap-2">
@@ -37,9 +42,15 @@ const SectorSelector = ({
           )}
         </SelectValue>
       </SelectTrigger>
-      <SelectContent>
+      
+      {/* Dropdown com fundo sólido e alta visibilidade */}
+      <SelectContent className="border-brand bg-brand-background shadow-lg z-50 max-h-60 overflow-y-auto">
         {activeSectors.map((sector) => (
-          <SelectItem key={sector.id} value={sector.id}>
+          <SelectItem 
+            key={sector.id} 
+            value={sector.id}
+            className="cursor-pointer hover:bg-brand-accent focus:bg-brand-accent text-brand-foreground py-3"
+          >
             <div className="flex items-center gap-2">
               {showColors && (
                 <Badge className={`text-xs px-2 py-1 ${sector.cor}`}>

@@ -26,7 +26,7 @@ interface ImportSettings {
 /**
  * Componente para configurações de importação de mensagens
  * Exibido apenas para canais que suportam importação (não WebChat)
- * Permite configurar data de importação e indicadores de digitação/gravação
+ * Toggles com maior visibilidade seguindo cores dinâmicas
  * Responsivo para todos os tamanhos de tela
  */
 const ImportSettings = ({ channel, onSettingsChange }: ImportSettingsProps) => {
@@ -67,11 +67,11 @@ const ImportSettings = ({ channel, onSettingsChange }: ImportSettingsProps) => {
         </CardTitle>
       </CardHeader>
       
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6">
         {/* Toggle para ativar/desativar importação de mensagens */}
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <Label className="text-sm font-medium text-brand-foreground">
+        <div className="flex items-center justify-between p-3 rounded-lg border border-brand bg-brand-muted/10">
+          <div className="space-y-1 flex-1">
+            <Label className="text-sm font-medium text-brand-foreground cursor-pointer">
               Importar Mensagens Históricas
             </Label>
             <p className="text-xs text-brand-muted">
@@ -81,13 +81,13 @@ const ImportSettings = ({ channel, onSettingsChange }: ImportSettingsProps) => {
           <Switch
             checked={settings.importMessages}
             onCheckedChange={(checked) => updateSetting('importMessages', checked)}
-            className="data-[state=checked]:bg-primary"
+            className="data-[state=checked]:bg-primary data-[state=unchecked]:bg-gray-300 dark:data-[state=unchecked]:bg-gray-600"
           />
         </div>
 
         {/* Seletor de data - só aparece se importação estiver ativada */}
         {settings.importMessages && (
-          <div className="space-y-2">
+          <div className="space-y-3 p-3 rounded-lg border border-brand bg-brand-accent/20">
             <Label className="text-sm font-medium text-brand-foreground">
               Data de Início da Importação
             </Label>
@@ -96,7 +96,7 @@ const ImportSettings = ({ channel, onSettingsChange }: ImportSettingsProps) => {
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-full justify-start text-left font-normal border-brand",
+                    "w-full justify-start text-left font-normal border-brand bg-brand-background",
                     !settings.importDate && "text-brand-muted"
                   )}
                 >
@@ -108,7 +108,7 @@ const ImportSettings = ({ channel, onSettingsChange }: ImportSettingsProps) => {
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 border-brand bg-brand-background" align="start">
+              <PopoverContent className="w-auto p-0 border-brand bg-brand-background shadow-lg z-50" align="start">
                 {/* Calendário responsivo com cores dinâmicas */}
                 <Calendar
                   mode="single"
@@ -116,7 +116,7 @@ const ImportSettings = ({ channel, onSettingsChange }: ImportSettingsProps) => {
                   onSelect={(date) => updateSetting('importDate', date)}
                   disabled={(date) => date > new Date() || date < new Date("2020-01-01")}
                   initialFocus
-                  className={cn("p-3 pointer-events-auto")}
+                  className="p-3"
                 />
               </PopoverContent>
             </Popover>
@@ -126,18 +126,20 @@ const ImportSettings = ({ channel, onSettingsChange }: ImportSettingsProps) => {
           </div>
         )}
 
-        {/* Configurações de indicadores de status */}
-        <div className="space-y-3 pt-2 border-t border-brand">
+        {/* Configurações de indicadores de status com toggles destacados */}
+        <div className="space-y-4 pt-2 border-t border-brand">
           <Label className="text-sm font-medium text-brand-foreground">
             Indicadores de Status do Atendente
           </Label>
           
-          {/* Toggle para indicador "Digitando..." */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <MessageSquareMore className="h-4 w-4 text-brand-muted" />
+          {/* Toggle para indicador "Digitando..." com maior destaque */}
+          <div className="flex items-center justify-between p-3 rounded-lg border border-brand bg-brand-muted/10 hover:bg-brand-muted/20 transition-colors">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <MessageSquareMore className="h-4 w-4 text-primary" />
+              </div>
               <div>
-                <Label className="text-sm text-brand-foreground">Digitando...</Label>
+                <Label className="text-sm text-brand-foreground cursor-pointer">Digitando...</Label>
                 <p className="text-xs text-brand-muted">
                   Mostra quando atendente está digitando
                 </p>
@@ -146,16 +148,18 @@ const ImportSettings = ({ channel, onSettingsChange }: ImportSettingsProps) => {
             <Switch
               checked={settings.showTyping}
               onCheckedChange={(checked) => updateSetting('showTyping', checked)}
-              className="data-[state=checked]:bg-primary"
+              className="data-[state=checked]:bg-primary data-[state=unchecked]:bg-gray-300 dark:data-[state=unchecked]:bg-gray-600 scale-110"
             />
           </div>
 
-          {/* Toggle para indicador "Gravando" */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Mic className="h-4 w-4 text-brand-muted" />
+          {/* Toggle para indicador "Gravando" com maior destaque */}
+          <div className="flex items-center justify-between p-3 rounded-lg border border-brand bg-brand-muted/10 hover:bg-brand-muted/20 transition-colors">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <Mic className="h-4 w-4 text-primary" />
+              </div>
               <div>
-                <Label className="text-sm text-brand-foreground">Gravando</Label>
+                <Label className="text-sm text-brand-foreground cursor-pointer">Gravando</Label>
                 <p className="text-xs text-brand-muted">
                   Mostra quando atendente está gravando áudio
                 </p>
@@ -164,16 +168,9 @@ const ImportSettings = ({ channel, onSettingsChange }: ImportSettingsProps) => {
             <Switch
               checked={settings.showRecording}
               onCheckedChange={(checked) => updateSetting('showRecording', checked)}
-              className="data-[state=checked]:bg-primary"
+              className="data-[state=checked]:bg-primary data-[state=unchecked]:bg-gray-300 dark:data-[state=unchecked]:bg-gray-600 scale-110"
             />
           </div>
-        </div>
-
-        {/* Informações técnicas para o backend */}
-        <div className="text-xs text-brand-muted bg-brand-muted/10 p-2 rounded">
-          <strong>Para Backend:</strong> APIs devem consultar estes status via endpoints:
-          GET /api/connection/{`{connectionId}`}/typing-status e 
-          GET /api/connection/{`{connectionId}`}/recording-status
         </div>
       </CardContent>
     </Card>
