@@ -23,7 +23,7 @@ import {
 
 interface ImportContactsModalProps {
   isOpen: boolean;
-  onClose: () -> void;
+  onClose: () => void;
   onImport: (contacts: any[]) => void;
 }
 
