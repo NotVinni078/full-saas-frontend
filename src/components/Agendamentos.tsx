@@ -10,8 +10,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth, addMonths, subMonths } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import NewScheduleModal from './modals/NewScheduleModal';
 
 interface Contact {
   id: number;
@@ -41,37 +42,37 @@ interface Agendamento {
 }
 
 const Agendamentos = () => {
-  const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [periodFilter, setPeriodFilter] = useState('all');
-  const [isNewAgendamentoOpen, setIsNewAgendamentoOpen] = useState(false);
-  const [selectedAgendamento, setSelectedAgendamento] = useState<Agendamento | null>(null);
-  const [isEditAgendamentoOpen, setIsEditAgendamentoOpen] = useState(false);
+  // Estados principais de controle da interface
+  const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar'); // Modo de visualização: calendário ou lista
+  const [searchTerm, setSearchTerm] = useState(''); // Termo de busca para filtrar agendamentos
+  const [statusFilter, setStatusFilter] = useState('all'); // Filtro por status dos agendamentos
+  const [periodFilter, setPeriodFilter] = useState('all'); // Filtro por período de tempo
+  const [isNewAgendamentoOpen, setIsNewAgendamentoOpen] = useState(false); // Controla abertura do modal de novo agendamento
+  const [selectedAgendamento, setSelectedAgendamento] = useState<Agendamento | null>(null); // Agendamento selecionado para edição
+  const [isEditAgendamentoOpen, setIsEditAgendamentoOpen] = useState(false); // Controla abertura do modal de edição
   
-  // Estados do calendário
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const currentYear = currentDate.getFullYear();
-  const currentMonth = currentDate.getMonth();
+  // Estados da nova navegação unificada de data
+  const [currentDate, setCurrentDate] = useState(new Date()); // Data atual para navegação do calendário
+  const [showDatePicker, setShowDatePicker] = useState(false); // Controla exibição do mini calendário de navegação
 
-  // Estados do formulário
-  const [contactSearch, setContactSearch] = useState('');
-  const [selectedContacts, setSelectedContacts] = useState<Contact[]>([]);
-  const [selectedTag, setSelectedTag] = useState('');
-  const [messageType, setMessageType] = useState<'text' | 'audio'>('text');
-  const [messageText, setMessageText] = useState('');
-  const [includeSignature, setIncludeSignature] = useState(false);
-  const [hasAttachments, setHasAttachments] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date>();
-  const [selectedTime, setSelectedTime] = useState('');
-  const [hasRecurrence, setHasRecurrence] = useState(false);
-  const [recurrenceType, setRecurrenceType] = useState<'daily' | 'weekly' | 'monthly' | 'quarterly' | 'semiannual' | 'annual' | 'custom'>('daily');
-  const [customDays, setCustomDays] = useState<number>(1);
-  const [selectedChannel, setSelectedChannel] = useState<'WhatsApp' | 'Instagram' | 'Facebook' | 'Telegram'>('WhatsApp');
-  const [ticketStatus, setTicketStatus] = useState<'Finalizado' | 'Aguardando' | 'Em Atendimento'>('Aguardando');
-  const [selectedSector, setSelectedSector] = useState('');
+  // Estados do formulário de agendamento
+  const [contactSearch, setContactSearch] = useState(''); // Busca de contatos no formulário
+  const [selectedContacts, setSelectedContacts] = useState<Contact[]>([]); // Contatos selecionados para o agendamento
+  const [selectedTag, setSelectedTag] = useState(''); // Tag selecionada para filtrar contatos
+  const [messageType, setMessageType] = useState<'text' | 'audio'>('text'); // Tipo de mensagem: texto ou áudio
+  const [messageText, setMessageText] = useState(''); // Conteúdo da mensagem de texto
+  const [includeSignature, setIncludeSignature] = useState(false); // Incluir assinatura na mensagem
+  const [hasAttachments, setHasAttachments] = useState(false); // Anexar mídia à mensagem
+  const [selectedDate, setSelectedDate] = useState<Date>(); // Data selecionada para envio
+  const [selectedTime, setSelectedTime] = useState(''); // Horário selecionado para envio
+  const [hasRecurrence, setHasRecurrence] = useState(false); // Ativar recorrência do agendamento
+  const [recurrenceType, setRecurrenceType] = useState<'daily' | 'weekly' | 'monthly' | 'quarterly' | 'semiannual' | 'annual' | 'custom'>('daily'); // Tipo de recorrência
+  const [customDays, setCustomDays] = useState<number>(1); // Dias personalizados para recorrência
+  const [selectedChannel, setSelectedChannel] = useState<'WhatsApp' | 'Instagram' | 'Facebook' | 'Telegram'>('WhatsApp'); // Canal de envio
+  const [ticketStatus, setTicketStatus] = useState<'Finalizado' | 'Aguardando' | 'Em Atendimento'>('Aguardando'); // Status do ticket
+  const [selectedSector, setSelectedSector] = useState(''); // Setor responsável pelo agendamento
 
-  // Mock data
+  // Mock data - dados de exemplo para demonstração
   const mockContacts: Contact[] = [
     { id: 1, name: 'João Silva', phone: '(11) 99999-0001', tags: ['Cliente VIP', 'São Paulo'] },
     { id: 2, name: 'Maria Santos', phone: '(11) 99999-0002', tags: ['Prospect', 'Rio de Janeiro'] },
@@ -80,9 +81,12 @@ const Agendamentos = () => {
     { id: 5, name: 'Carlos Pereira', phone: '(11) 99999-0005', tags: ['Cliente Ativo', 'Curitiba'] },
   ];
 
+  // Tags disponíveis para filtrar contatos
   const availableTags = ['Cliente VIP', 'Prospect', 'Cliente Ativo', 'São Paulo', 'Rio de Janeiro', 'Belo Horizonte', 'Curitiba'];
+  // Setores disponíveis para classificar agendamentos
   const availableSectors = ['Vendas', 'Suporte', 'Marketing', 'Financeiro'];
 
+  // Mock data - agendamentos de exemplo
   const mockAgendamentos: Agendamento[] = [
     {
       id: 1,
@@ -186,12 +190,20 @@ const Agendamentos = () => {
     }
   ];
 
+  /**
+   * Filtro inteligente de agendamentos baseado em múltiplos critérios
+   * Aplica filtros de busca por texto, status e período simultaneamente
+   */
   const filteredAgendamentos = useMemo(() => {
     return mockAgendamentos.filter(agendamento => {
+      // Filtro de busca por título ou nome do contato
       const matchesSearch = agendamento.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            agendamento.contacts.some(contact => contact.name.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      // Filtro por status do agendamento
       const matchesStatus = statusFilter === 'all' || agendamento.status === statusFilter;
       
+      // Filtro por período de tempo
       let matchesPeriod = true;
       if (periodFilter !== 'all') {
         const today = new Date();
@@ -219,26 +231,36 @@ const Agendamentos = () => {
     });
   }, [mockAgendamentos, searchTerm, statusFilter, periodFilter]);
 
+  /**
+   * Obtém agendamentos para uma data específica
+   * Usado para exibir agendamentos no calendário
+   */
   const getAgendamentosForDate = (date: Date) => {
     return filteredAgendamentos.filter(agendamento => 
       isSameDay(agendamento.scheduledDate, date)
     );
   };
 
+  /**
+   * Filtra contatos baseado na tag selecionada e termo de busca
+   * Automaticamente seleciona contatos quando uma tag é aplicada
+   */
   const filteredContacts = useMemo(() => {
     let contacts = mockContacts;
     
+    // Filtro por tag selecionada
     if (selectedTag && selectedTag !== 'none') {
       contacts = mockContacts.filter(contact =>
         contact.tags.includes(selectedTag)
       );
       
-      // Se uma tag foi selecionada, adiciona todos os contatos com essa tag
+      // Auto-seleção de contatos quando uma tag é escolhida
       if (selectedTag && !selectedContacts.some(sc => contacts.some(c => c.id === sc.id))) {
         setSelectedContacts(contacts);
       }
     }
     
+    // Filtro por termo de busca
     if (contactSearch) {
       contacts = contacts.filter(contact =>
         contact.name.toLowerCase().includes(contactSearch.toLowerCase()) ||
@@ -249,6 +271,37 @@ const Agendamentos = () => {
     return contacts;
   }, [contactSearch, selectedTag, mockContacts, selectedContacts]);
 
+  /**
+   * Navegação para o mês anterior
+   * Subtrai um mês da data atual de visualização
+   */
+  const navigateToPreviousMonth = () => {
+    setCurrentDate(prevDate => subMonths(prevDate, 1));
+  };
+
+  /**
+   * Navegação para o próximo mês
+   * Adiciona um mês à data atual de visualização
+   */
+  const navigateToNextMonth = () => {
+    setCurrentDate(prevDate => addMonths(prevDate, 1));
+  };
+
+  /**
+   * Manipula seleção de data no mini calendário
+   * Atualiza a data de visualização e fecha o seletor
+   */
+  const handleDateSelect = (date: Date | undefined) => {
+    if (date) {
+      setCurrentDate(date);
+      setShowDatePicker(false);
+    }
+  };
+
+  /**
+   * Salva novo agendamento
+   * Processa dados do formulário e envia para backend (mock)
+   */
   const handleSaveAgendamento = () => {
     console.log('Salvando agendamento:', {
       contacts: selectedContacts,
@@ -270,10 +323,14 @@ const Agendamentos = () => {
     setIsNewAgendamentoOpen(false);
   };
 
+  /**
+   * Prepara formulário para edição de agendamento existente
+   * Popula todos os campos com dados do agendamento selecionado
+   */
   const handleEditAgendamento = (agendamento: Agendamento) => {
     setSelectedAgendamento(agendamento);
     
-    // Preenche o formulário com os dados do agendamento
+    // Preenchimento completo do formulário
     setSelectedContacts(agendamento.contacts);
     setMessageType(agendamento.messageType);
     setMessageText(agendamento.message || '');
@@ -291,6 +348,10 @@ const Agendamentos = () => {
     setIsEditAgendamentoOpen(true);
   };
 
+  /**
+   * Salva alterações de agendamento editado
+   * Atualiza agendamento existente com novos dados
+   */
   const handleSaveEditAgendamento = () => {
     console.log('Salvando edição do agendamento:', selectedAgendamento?.id);
     
@@ -299,6 +360,10 @@ const Agendamentos = () => {
     setIsEditAgendamentoOpen(false);
   };
 
+  /**
+   * Limpa todos os campos do formulário
+   * Usado após salvar ou cancelar operações
+   */
   const resetForm = () => {
     setContactSearch('');
     setSelectedContacts([]);
@@ -317,77 +382,77 @@ const Agendamentos = () => {
     setSelectedSector('');
   };
 
+  /**
+   * Descarta novo agendamento sem salvar
+   * Limpa formulário e fecha modal
+   */
   const handleDiscardAgendamento = () => {
     resetForm();
     setIsNewAgendamentoOpen(false);
   };
 
+  /**
+   * Descarta edição de agendamento sem salvar
+   * Limpa formulário e fecha modal de edição
+   */
   const handleDiscardEditAgendamento = () => {
     resetForm();
     setSelectedAgendamento(null);
     setIsEditAgendamentoOpen(false);
   };
 
+  /**
+   * Envia agendamento imediatamente
+   * Bypassa agendamento e executa envio instantâneo
+   */
   const handleSendNow = (agendamento: Agendamento) => {
     console.log('Enviando agendamento agora:', agendamento.id);
   };
 
+  /**
+   * Exclui agendamento permanentemente
+   * Remove agendamento da lista (mock)
+   */
   const handleDeleteAgendamento = (agendamento: Agendamento) => {
     console.log('Excluindo agendamento:', agendamento.id);
   };
 
-  const navigateMonth = (direction: 'prev' | 'next') => {
-    const newDate = new Date(currentDate);
-    if (direction === 'prev') {
-      newDate.setMonth(currentMonth - 1);
-    } else {
-      newDate.setMonth(currentMonth + 1);
-    }
-    setCurrentDate(newDate);
-  };
-
-  const navigateYear = (direction: 'prev' | 'next') => {
-    const newDate = new Date(currentDate);
-    if (direction === 'prev') {
-      newDate.setFullYear(currentYear - 1);
-    } else {
-      newDate.setFullYear(currentYear + 1);
-    }
-    setCurrentDate(newDate);
-  };
-
+  // Cálculo das datas do calendário baseado na data atual de navegação
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
   const calendarDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
   return (
     <TooltipProvider>
-      <div className="p-3 sm:p-6 bg-background dark:bg-background min-h-screen">
-        {/* Header */}
+      {/* Container principal com cores dinâmicas da marca e responsividade completa */}
+      <div className="p-3 sm:p-6 bg-background min-h-screen">
+        {/* Cabeçalho da página com título e contador de agendamentos */}
         <div className="mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold text-foreground dark:text-foreground mb-4 sm:mb-6">
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-4 sm:mb-6">
             Agendamentos ({filteredAgendamentos.length})
           </h1>
 
-          {/* Barra de pesquisa */}
+          {/* Barra de pesquisa responsiva com ícone */}
           <div className="relative mb-4">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
               placeholder="Pesquisar agendamento ou contato"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 border-border dark:border-border bg-background dark:bg-background text-foreground dark:text-foreground"
+              className="pl-10 border-border bg-background text-foreground"
             />
           </div>
 
+          {/* Container de filtros e controles principais */}
           <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center mb-6">
-            {/* Filtros */}
+            {/* Seção de filtros responsivos */}
             <div className="flex flex-col sm:flex-row gap-4 flex-1">
+              {/* Filtro por status com cores dinâmicas */}
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="border-border dark:border-border bg-background dark:bg-background text-foreground dark:text-foreground min-w-40">
+                <SelectTrigger className="border-border bg-background text-foreground min-w-40">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
-                <SelectContent className="bg-background dark:bg-background border border-border dark:border-border shadow-lg z-50">
+                <SelectContent className="bg-background border border-border shadow-lg z-50">
                   <SelectItem value="all">Todos os Status</SelectItem>
                   <SelectItem value="Agendado">Agendado</SelectItem>
                   <SelectItem value="Enviado">Enviado</SelectItem>
@@ -395,11 +460,12 @@ const Agendamentos = () => {
                 </SelectContent>
               </Select>
 
+              {/* Filtro por período com cores dinâmicas */}
               <Select value={periodFilter} onValueChange={setPeriodFilter}>
-                <SelectTrigger className="border-border dark:border-border bg-background dark:bg-background text-foreground dark:text-foreground min-w-40">
+                <SelectTrigger className="border-border bg-background text-foreground min-w-40">
                   <SelectValue placeholder="Período" />
                 </SelectTrigger>
-                <SelectContent className="bg-background dark:bg-background border border-border dark:border-border shadow-lg z-50">
+                <SelectContent className="bg-background border border-border shadow-lg z-50">
                   <SelectItem value="all">Todos os Períodos</SelectItem>
                   <SelectItem value="today">Hoje</SelectItem>
                   <SelectItem value="week">Esta Semana</SelectItem>
@@ -408,8 +474,8 @@ const Agendamentos = () => {
               </Select>
             </div>
 
-            {/* Toggle de visualização */}
-            <div className="flex items-center bg-muted dark:bg-muted rounded-lg p-1">
+            {/* Toggle de visualização calendário/lista com cores da marca */}
+            <div className="flex items-center bg-muted rounded-lg p-1">
               <Button
                 variant={viewMode === 'calendar' ? 'default' : 'ghost'}
                 size="sm"
@@ -418,7 +484,7 @@ const Agendamentos = () => {
                   "flex items-center gap-2",
                   viewMode === 'calendar' 
                     ? "bg-primary text-primary-foreground hover:bg-primary/90" 
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent dark:hover:bg-accent"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
                 )}
               >
                 <CalendarIcon className="h-4 w-4" />
@@ -432,7 +498,7 @@ const Agendamentos = () => {
                   "flex items-center gap-2",
                   viewMode === 'list' 
                     ? "bg-primary text-primary-foreground hover:bg-primary/90" 
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent dark:hover:bg-accent"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
                 )}
               >
                 <List className="h-4 w-4" />
@@ -440,352 +506,78 @@ const Agendamentos = () => {
               </Button>
             </div>
 
-            {/* Botão Novo Agendamento */}
-            <Dialog open={isNewAgendamentoOpen} onOpenChange={setIsNewAgendamentoOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Novo Agendamento
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-2xl bg-background dark:bg-background border border-border dark:border-border max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Novo Agendamento</DialogTitle>
-                </DialogHeader>
-                
-                <div className="space-y-6">
-                  {/* Seleção de Contatos */}
-                  <div className="space-y-4">
-                    <div className="flex flex-col sm:flex-row gap-4">
-                      <div className="flex-1">
-                        <label className="text-sm font-medium mb-2 block">Pesquisar Contatos</label>
-                        <div className="relative">
-                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                          <Input
-                            placeholder="Digite o nome ou telefone"
-                            value={contactSearch}
-                            onChange={(e) => setContactSearch(e.target.value)}
-                            className="pl-10 border-gray-300"
-                          />
-                        </div>
-                      </div>
-                      <div className="min-w-48">
-                        <label className="text-sm font-medium mb-2 block">Filtrar por TAG</label>
-                        <Select value={selectedTag} onValueChange={setSelectedTag}>
-                          <SelectTrigger className="border-gray-300 bg-white">
-                            <SelectValue placeholder="Selecionar TAG" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
-                            <SelectItem value="none">Nenhuma TAG</SelectItem>
-                            {availableTags.map((tag) => (
-                              <SelectItem key={tag} value={tag}>
-                                {tag}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-
-                    {selectedContacts.length > 0 && (
-                      <div>
-                        <label className="text-sm font-medium mb-2 block">Agendamento para:</label>
-                        <div className="bg-gray-50 p-3 rounded-lg">
-                          <div className="flex flex-wrap gap-2">
-                            {selectedContacts.map((contact) => (
-                              <span key={contact.id} className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-sm rounded-full border border-blue-200">
-                                {contact.name}
-                                <button
-                                  onClick={() => setSelectedContacts(selectedContacts.filter(c => c.id !== contact.id))}
-                                  className="text-blue-600 hover:text-blue-800"
-                                >
-                                  <X className="h-3 w-3" />
-                                </button>
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Tipo de Mensagem */}
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Tipo de Mensagem</label>
-                    <div className="flex gap-4">
-                      <label className="flex items-center space-x-2">
-                        <input
-                          type="radio"
-                          name="messageType"
-                          value="text"
-                          checked={messageType === 'text'}
-                          onChange={(e) => setMessageType(e.target.value as 'text' | 'audio')}
-                          className="text-black"
-                        />
-                        <span>Texto</span>
-                      </label>
-                      <label className="flex items-center space-x-2">
-                        <input
-                          type="radio"
-                          name="messageType"
-                          value="audio"
-                          checked={messageType === 'audio'}
-                          onChange={(e) => setMessageType(e.target.value as 'text' | 'audio')}
-                          className="text-black"
-                        />
-                        <span>Áudio</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  {/* Conteúdo da Mensagem */}
-                  {messageType === 'text' ? (
-                    <div className="space-y-4">
-                      <div>
-                        <label className="text-sm font-medium mb-2 block">Mensagem</label>
-                        <Textarea
-                          placeholder="Digite sua mensagem aqui..."
-                          value={messageText}
-                          onChange={(e) => setMessageText(e.target.value)}
-                          className="border-gray-300 min-h-24"
-                        />
-                      </div>
-                      
-                      <div className="flex flex-col sm:flex-row gap-4">
-                        <label className="flex items-center space-x-2">
-                          <Checkbox
-                            checked={includeSignature}
-                            onCheckedChange={(checked) => setIncludeSignature(checked as boolean)}
-                          />
-                          <span className="text-sm">Incluir assinatura</span>
-                        </label>
-                        
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setHasAttachments(!hasAttachments)}
-                          className={cn(
-                            "flex items-center gap-2 border-gray-300",
-                            hasAttachments && "bg-gray-100"
-                          )}
-                        >
-                          <Paperclip className="h-4 w-4" />
-                          Anexar mídia
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Áudio</label>
-                      <Button variant="outline" className="flex items-center gap-2 border-gray-300">
-                        <Mic className="h-4 w-4" />
-                        Gravar áudio
-                      </Button>
-                    </div>
-                  )}
-
-                  {/* Data e Hora */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Data de Envio</label>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button variant="outline" className="w-full justify-start border-gray-300">
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {selectedDate ? format(selectedDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : "Selecionar data"}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0 bg-white border border-gray-300 shadow-lg">
-                          <Calendar
-                            mode="single"
-                            selected={selectedDate}
-                            onSelect={setSelectedDate}
-                            locale={ptBR}
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                    
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Horário de Envio</label>
-                      <Input
-                        type="time"
-                        value={selectedTime}
-                        onChange={(e) => setSelectedTime(e.target.value)}
-                        className="border-gray-300"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Recorrência */}
-                  <div className="space-y-4">
-                    <label className="flex items-center space-x-2">
-                      <Checkbox
-                        checked={hasRecurrence}
-                        onCheckedChange={(checked) => setHasRecurrence(checked as boolean)}
-                      />
-                      <span className="text-sm font-medium">Cadastrar recorrência</span>
-                    </label>
-                    
-                    {hasRecurrence && (
-                      <div className="space-y-4 pl-6">
-                        <Select value={recurrenceType} onValueChange={(value) => setRecurrenceType(value as any)}>
-                          <SelectTrigger className="border-gray-300 bg-white">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
-                            <SelectItem value="daily">Diária (todo dia)</SelectItem>
-                            <SelectItem value="weekly">Semanal</SelectItem>
-                            <SelectItem value="monthly">Mensal (todo mês)</SelectItem>
-                            <SelectItem value="quarterly">Trimestral (cada 3 meses)</SelectItem>
-                            <SelectItem value="semiannual">Semestral (cada 6 meses)</SelectItem>
-                            <SelectItem value="annual">Anual (1 vez por ano)</SelectItem>
-                            <SelectItem value="custom">Personalizado</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        
-                        {recurrenceType === 'custom' && (
-                          <div>
-                            <label className="text-sm font-medium mb-2 block">Repetir a cada quantos dias?</label>
-                            <Input
-                              type="number"
-                              min="1"
-                              value={customDays}
-                              onChange={(e) => setCustomDays(Number(e.target.value))}
-                              className="border-gray-300"
-                              placeholder="Número de dias"
-                            />
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Canal e Configurações */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Canal de Envio</label>
-                      <Select value={selectedChannel} onValueChange={(value) => setSelectedChannel(value as any)}>
-                        <SelectTrigger className="border-gray-300 bg-white">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
-                          <SelectItem value="WhatsApp">WhatsApp</SelectItem>
-                          <SelectItem value="Instagram">Instagram</SelectItem>
-                          <SelectItem value="Facebook">Facebook</SelectItem>
-                          <SelectItem value="Telegram">Telegram</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Status do Ticket</label>
-                      <Select value={ticketStatus} onValueChange={(value) => setTicketStatus(value as any)}>
-                        <SelectTrigger className="border-gray-300 bg-white">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
-                          <SelectItem value="Finalizado">Finalizado</SelectItem>
-                          <SelectItem value="Aguardando">Aguardando</SelectItem>
-                          <SelectItem value="Em Atendimento">Em Atendimento</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Setor</label>
-                    <Select value={selectedSector} onValueChange={setSelectedSector}>
-                      <SelectTrigger className="border-gray-300 bg-white">
-                        <SelectValue placeholder="Selecionar setor" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
-                        {availableSectors.map((sector) => (
-                          <SelectItem key={sector} value={sector}>
-                            {sector}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Botões */}
-                  <div className="flex flex-col sm:flex-row justify-between gap-3 pt-4">
-                    <Button
-                      variant="outline"
-                      onClick={handleDiscardAgendamento}
-                      className="border-gray-300"
-                    >
-                      <X className="h-4 w-4 mr-2" />
-                      Descartar
-                    </Button>
-                    <Button
-                      onClick={handleSaveAgendamento}
-                      className="bg-black text-white hover:bg-gray-800"
-                    >
-                      <Save className="h-4 w-4 mr-2" />
-                      Salvar
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
+            {/* Botão de novo agendamento com novo modal */}
+            <NewScheduleModal
+              isOpen={isNewAgendamentoOpen}
+              onClose={() => setIsNewAgendamentoOpen(false)}
+            />
+            <Button 
+              onClick={() => setIsNewAgendamentoOpen(true)}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Novo Agendamento
+            </Button>
           </div>
         </div>
 
-        {/* Conteúdo Principal */}
+        {/* Conteúdo principal: calendário ou lista */}
         {viewMode === 'calendar' ? (
-          <div className="bg-card dark:bg-card border border-border dark:border-border rounded-lg">
-            {/* Header do Calendário */}
-            <div className="flex items-center justify-between p-4 border-b border-border dark:border-border">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => navigateMonth('prev')}
-                    className="border-border dark:border-border"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => navigateMonth('next')}
-                    className="border-border dark:border-border"
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-                
-                <h2 className="text-lg font-semibold">
-                  {format(currentDate, "MMMM", { locale: ptBR })}
-                </h2>
-              </div>
-              
-              <div className="flex items-center gap-2">
+          <div className="bg-card border border-border rounded-lg">
+            {/* Nova barra de navegação unificada responsiva */}
+            <div className="flex flex-col sm:flex-row items-center justify-between p-4 border-b border-border gap-4">
+              {/* Navegação de mês anterior/próximo */}
+              <div className="flex items-center gap-2 order-2 sm:order-1">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => navigateYear('prev')}
-                  className="border-border dark:border-border"
+                  onClick={navigateToPreviousMonth}
+                  className="border-border flex items-center gap-1 px-2 sm:px-3"
                 >
                   <ChevronLeft className="h-4 w-4" />
+                  <span className="hidden sm:inline">Anterior</span>
                 </Button>
-                <span className="font-semibold min-w-16 text-center">{currentYear}</span>
+                
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => navigateYear('next')}
-                  className="border-border dark:border-border"
+                  onClick={navigateToNextMonth}
+                  className="border-border flex items-center gap-1 px-2 sm:px-3"
                 >
+                  <span className="hidden sm:inline">Próximo</span>
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
+              
+              {/* Exibição do mês/ano atual com mini calendário */}
+              <div className="order-1 sm:order-2">
+                <Popover open={showDatePicker} onOpenChange={setShowDatePicker}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="text-lg sm:text-xl font-semibold hover:bg-accent px-3 py-2"
+                    >
+                      {format(currentDate, "MMMM 'de' yyyy", { locale: ptBR })}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-background border border-border shadow-lg z-50">
+                    <Calendar
+                      mode="single"
+                      selected={currentDate}
+                      onSelect={handleDateSelect}
+                      locale={ptBR}
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              
+              {/* Espaço para manter alinhamento */}
+              <div className="hidden sm:block order-3 w-24"></div>
             </div>
 
-            {/* Grid do Calendário */}
-            <div className="p-4">
+            {/* Grid do calendário responsivo */}
+            <div className="p-2 sm:p-4">
               {/* Cabeçalho dos dias da semana */}
               <div className="grid grid-cols-7 gap-1 mb-2">
                 {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map((day) => (
@@ -795,7 +587,7 @@ const Agendamentos = () => {
                 ))}
               </div>
 
-              {/* Dias do calendário */}
+              {/* Dias do calendário com agendamentos */}
               <div className="grid grid-cols-7 gap-1">
                 {calendarDays.map((day) => {
                   const dayAgendamentos = getAgendamentosForDate(day);
@@ -805,25 +597,28 @@ const Agendamentos = () => {
                     <div
                       key={day.toISOString()}
                       className={cn(
-                        "min-h-20 p-1 border border-border dark:border-border rounded",
-                        !isCurrentMonth && "bg-muted dark:bg-muted text-muted-foreground"
+                        "min-h-16 sm:min-h-20 p-1 border border-border rounded",
+                        !isCurrentMonth && "bg-muted text-muted-foreground"
                       )}
                     >
-                      <div className="text-sm font-medium mb-1">
+                      {/* Número do dia */}
+                      <div className="text-xs sm:text-sm font-medium mb-1">
                         {format(day, "d")}
                       </div>
                       
+                      {/* Agendamentos do dia */}
                       {dayAgendamentos.length > 0 && (
                         <div className="space-y-1">
                           {dayAgendamentos.slice(0, 2).map((agendamento) => (
                             <div
                               key={agendamento.id}
-                              className="text-xs p-1 bg-blue-100 text-blue-800 rounded truncate cursor-pointer hover:bg-blue-200"
+                              className="text-xs p-1 bg-primary/10 text-primary rounded truncate cursor-pointer hover:bg-primary/20 transition-colors"
                               title={agendamento.title}
                             >
                               {agendamento.title}
                             </div>
                           ))}
+                          {/* Indicador de mais agendamentos */}
                           {dayAgendamentos.length > 2 && (
                             <div className="text-xs text-muted-foreground">
                               +{dayAgendamentos.length - 2} mais
@@ -838,22 +633,26 @@ const Agendamentos = () => {
             </div>
           </div>
         ) : (
+          // Lista de agendamentos responsiva
           <div className="space-y-4">
             {filteredAgendamentos.map((agendamento) => (
-              <div key={agendamento.id} className="bg-card dark:bg-card border border-border dark:border-border rounded-lg p-4 hover:bg-accent dark:hover:bg-accent transition-colors">
+              <div key={agendamento.id} className="bg-card border border-border rounded-lg p-4 hover:bg-accent transition-colors">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                  {/* Informações principais do agendamento */}
                   <div className="flex-1 space-y-2">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                      <h3 className="font-semibold text-foreground dark:text-foreground">{agendamento.title}</h3>
+                      <h3 className="font-semibold text-foreground">{agendamento.title}</h3>
+                      {/* Badges de status e canal */}
                       <div className="flex flex-wrap gap-2">
-                        <span className="px-2 py-1 bg-blue-100 text-xs rounded-full border border-blue-200">
+                        <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full border border-primary/20">
                           {agendamento.channel}
                         </span>
-                        <span className="px-2 py-1 bg-green-100 text-xs rounded-full border border-green-200">
+                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full border border-green-200">
                           {agendamento.status}
                         </span>
+                        {/* Indicador de recorrência */}
                         {agendamento.hasRecurrence && (
-                          <span className="px-2 py-1 bg-purple-100 text-xs rounded-full border border-purple-200">
+                          <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full border border-purple-200">
                             <RefreshCw className="h-3 w-3 inline mr-1" />
                             Recorrente
                           </span>
@@ -861,6 +660,7 @@ const Agendamentos = () => {
                       </div>
                     </div>
                     
+                    {/* Detalhes do agendamento */}
                     <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
@@ -876,22 +676,26 @@ const Agendamentos = () => {
                       </div>
                     </div>
                     
+                    {/* Preview da mensagem */}
                     {agendamento.messageType === 'text' && agendamento.message && (
-                      <p className="text-sm text-muted-foreground bg-muted dark:bg-muted p-2 rounded line-clamp-2">
+                      <p className="text-sm text-muted-foreground bg-muted p-2 rounded line-clamp-2">
                         {agendamento.message}
                       </p>
                     )}
                     
+                    {/* Lista de contatos */}
                     <div className="flex flex-wrap gap-1">
                       {agendamento.contacts.map((contact) => (
-                        <span key={contact.id} className="px-2 py-1 bg-muted dark:bg-muted text-xs rounded-full border border-border dark:border-border">
+                        <span key={contact.id} className="px-2 py-1 bg-muted text-xs rounded-full border border-border">
                           {contact.name}
                         </span>
                       ))}
                     </div>
                   </div>
                   
+                  {/* Botões de ação responsivos */}
                   <div className="flex flex-row lg:flex-col gap-2">
+                    {/* Botão excluir */}
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
@@ -906,6 +710,7 @@ const Agendamentos = () => {
                       <TooltipContent><p>Excluir Agendamento</p></TooltipContent>
                     </Tooltip>
                     
+                    {/* Botão enviar agora */}
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
@@ -920,13 +725,14 @@ const Agendamentos = () => {
                       <TooltipContent><p>Enviar Agora</p></TooltipContent>
                     </Tooltip>
                     
+                    {/* Botão editar */}
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => handleEditAgendamento(agendamento)}
-                          className="border-border dark:border-border"
+                          className="border-border"
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -940,9 +746,9 @@ const Agendamentos = () => {
           </div>
         )}
 
-        {/* Dialog de Editar Agendamento */}
+        {/* Modal de edição de agendamento existente */}
         <Dialog open={isEditAgendamentoOpen} onOpenChange={setIsEditAgendamentoOpen}>
-          <DialogContent className="sm:max-w-2xl bg-background dark:bg-background border border-border dark:border-border max-h-[90vh] overflow-y-auto">
+          <DialogContent className="sm:max-w-2xl bg-background border border-border max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Editar Agendamento</DialogTitle>
             </DialogHeader>
@@ -951,7 +757,6 @@ const Agendamentos = () => {
               <div className="space-y-6">
                 {/* Formulário de edição com os mesmos campos do novo agendamento */}
                 <div className="space-y-6">
-                  {/* Seleção de Contatos */}
                   <div className="space-y-4">
                     <div className="flex flex-col sm:flex-row gap-4">
                       <div className="flex-1">
@@ -1006,7 +811,6 @@ const Agendamentos = () => {
                     )}
                   </div>
 
-                  {/* Tipo de Mensagem */}
                   <div>
                     <label className="text-sm font-medium mb-2 block">Tipo de Mensagem</label>
                     <div className="flex gap-4">
@@ -1207,18 +1011,19 @@ const Agendamentos = () => {
                   </div>
                 </div>
                 
+                {/* Botões de ação do modal de edição */}
                 <div className="flex flex-col sm:flex-row justify-between gap-3 pt-4">
                   <Button
                     variant="outline"
                     onClick={handleDiscardEditAgendamento}
-                    className="border-gray-300"
+                    className="border-border"
                   >
                     <X className="h-4 w-4 mr-2" />
                     Descartar
                   </Button>
                   <Button
                     onClick={handleSaveEditAgendamento}
-                    className="bg-black text-white hover:bg-gray-800"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90"
                   >
                     <Save className="h-4 w-4 mr-2" />
                     Salvar
