@@ -571,7 +571,7 @@ const NewScheduleModal = ({
                 <Label className="text-foreground font-medium">Data e Hora *</Label>
               </div>
 
-              <DateTimeP icker
+              <DateTimePicker
                 selectedDate={selectedDate}
                 selectedTime={selectedTime}
                 onDateChange={setSelectedDate}
