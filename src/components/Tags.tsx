@@ -7,11 +7,13 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Plus, Edit, Trash2, Tag, UserPlus } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Plus, Edit, Trash2, Tag, UserPlus, Search, Phone, Mail, MessageCircle } from 'lucide-react';
 import { EllipsisVertical } from "lucide-react";
 import { useTags } from '@/hooks/useTags';
 import { useContacts } from '@/hooks/useContacts';
-import ContactSelector from '@/components/selectors/ContactSelector';
+import TagBadge from '@/components/shared/TagBadge';
 import { Contact } from '@/types/global';
 
 /**
@@ -29,6 +31,8 @@ const Tags = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isContatosDialogOpen, setIsContatosDialogOpen] = useState(false);
   const [selectedTagForContatos, setSelectedTagForContatos] = useState<any>(null);
+  const [contactSearchTerm, setContactSearchTerm] = useState('');
+  const [selectedContactIds, setSelectedContactIds] = useState<string[]>([]);
   
   // Estado para nova tag
   const [novaTag, setNovaTag] = useState({
@@ -38,7 +42,7 @@ const Tags = () => {
 
   // Hooks para gerenciamento de dados
   const { tags, addTag, updateTag, removeTag } = useTags();
-  const { contacts, updateContact } = useContacts();
+  const { contacts, updateContact, searchContacts } = useContacts();
 
   /**
    * Calcula a quantidade de contatos associados a uma tag específica
@@ -85,6 +89,130 @@ const Tags = () => {
       tag.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
       tag.descricao?.toLowerCase().includes(searchTerm.toLowerCase())
     );
+  };
+
+  /**
+   * Filtra contatos para o popup de adição baseado no termo de busca
+   * Exclui contatos que já possuem a tag selecionada
+   * @returns {Contact[]} Lista de contatos filtrados
+   */
+  const getFilteredContactsForTag = (): Contact[] => {
+    if (!selectedTagForContatos) return [];
+    
+    // Filtrar contatos baseado no termo de busca ou usar todos
+    const baseContacts = contactSearchTerm.trim() 
+      ? searchContacts(contactSearchTerm)
+      : contacts;
+    
+    // Excluir contatos que já possuem a tag
+    return baseContacts.filter(contact => 
+      !contact.tags || !contact.tags.includes(selectedTagForContatos.id)
+    );
+  };
+
+  /**
+   * Gera iniciais do nome para avatar
+   * @param {string} nome - Nome do contato
+   * @returns {string} Iniciais do nome
+   */
+  const getInitials = (nome: string): string => {
+    return nome
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  /**
+   * Formata telefone para exibição
+   * @param {string} telefone - Número de telefone
+   * @returns {string} Telefone formatado
+   */
+  const formatPhone = (telefone?: string): string => {
+    if (!telefone) return '';
+    
+    // Remove caracteres não numéricos
+    const numbers = telefone.replace(/\D/g, '');
+    
+    // Aplica formatação básica para telefones brasileiros
+    if (numbers.length === 11) {
+      return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7)}`;
+    } else if (numbers.length === 10) {
+      return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)}-${numbers.slice(6)}`;
+    }
+    
+    return telefone;
+  };
+
+  /**
+   * Obtém ícone do canal de comunicação com cores específicas
+   * @param {string} canal - Canal de comunicação
+   * @returns {JSX.Element} Ícone do canal com cor apropriada
+   */
+  const getChannelIcon = (canal: string) => {
+    const iconProps = { className: "h-4 w-4" };
+    
+    switch (canal) {
+      case 'whatsapp':
+        return <MessageCircle {...iconProps} className="h-4 w-4 text-green-500" />;
+      case 'instagram':
+        return <MessageCircle {...iconProps} className="h-4 w-4 text-pink-500" />;
+      case 'facebook':
+        return <MessageCircle {...iconProps} className="h-4 w-4 text-blue-600" />;
+      case 'telegram':
+        return <MessageCircle {...iconProps} className="h-4 w-4 text-blue-400" />;
+      default:
+        return <MessageCircle {...iconProps} className="h-4 w-4 text-gray-500" />;
+    }
+  };
+
+  /**
+   * Gerencia seleção/deseleção de contatos via checkbox
+   * @param {string} contactId - ID do contato
+   * @param {boolean} checked - Estado do checkbox
+   */
+  const handleContactSelection = (contactId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedContactIds(prev => [...prev, contactId]);
+    } else {
+      setSelectedContactIds(prev => prev.filter(id => id !== contactId));
+    }
+  };
+
+  /**
+   * Salva as tags nos contatos selecionados
+   * Adiciona a tag a todos os contatos marcados nos checkboxes
+   */
+  const handleSaveContactsToTag = () => {
+    if (!selectedTagForContatos || selectedContactIds.length === 0) {
+      alert('Selecione pelo menos um contato para adicionar à tag');
+      return;
+    }
+
+    let addedCount = 0;
+    
+    // Adicionar tag a todos os contatos selecionados
+    selectedContactIds.forEach(contactId => {
+      const contact = contacts.find(c => c.id === contactId);
+      if (contact) {
+        const updatedContact = {
+          ...contact,
+          tags: [...(contact.tags || []), selectedTagForContatos.id],
+          atualizadoEm: new Date()
+        };
+        updateContact(updatedContact);
+        addedCount++;
+      }
+    });
+
+    console.log(`Tag "${selectedTagForContatos.nome}" adicionada a ${addedCount} contato(s)`);
+    
+    // Fechar modal e limpar seleções
+    handleCloseContatosDialog();
+    
+    // Mostrar feedback de sucesso
+    alert(`Tag "${selectedTagForContatos.nome}" adicionada a ${addedCount} contato(s) com sucesso!`);
   };
 
   /**
@@ -191,6 +319,8 @@ const Tags = () => {
    */
   const handleAdicionarContatos = (tag: any) => {
     setSelectedTagForContatos(tag);
+    setContactSearchTerm('');
+    setSelectedContactIds([]);
     setIsContatosDialogOpen(true);
   };
 
@@ -200,36 +330,8 @@ const Tags = () => {
   const handleCloseContatosDialog = () => {
     setIsContatosDialogOpen(false);
     setSelectedTagForContatos(null);
-  };
-
-  /**
-   * Adiciona tag a um contato específico
-   * Verifica se o contato já possui a tag antes de adicionar
-   * @param {Contact} contato - Contato selecionado para receber a tag
-   */
-  const handleSelecionarContato = (contato: Contact) => {
-    if (!selectedTagForContatos) return;
-
-    // Verificar se o contato já possui a tag
-    const jaTemTag = contato.tags && contato.tags.includes(selectedTagForContatos.id);
-    
-    if (jaTemTag) {
-      alert(`O contato ${contato.nome} já possui a tag "${selectedTagForContatos.nome}"`);
-      return;
-    }
-
-    // Adicionar tag ao contato
-    const contatoAtualizado = {
-      ...contato,
-      tags: [...(contato.tags || []), selectedTagForContatos.id],
-      atualizadoEm: new Date()
-    };
-    
-    updateContact(contatoAtualizado);
-    console.log(`Tag "${selectedTagForContatos.nome}" adicionada ao contato "${contato.nome}"`);
-    
-    // Fechar modal após adicionar
-    handleCloseContatosDialog();
+    setContactSearchTerm('');
+    setSelectedContactIds([]);
   };
 
   return (
@@ -461,10 +563,10 @@ const Tags = () => {
         </CardContent>
       </Card>
 
-      {/* Modal para Adicionar Contatos à Tag com badge colorido */}
+      {/* Modal aprimorado para Adicionar Contatos à Tag com checkboxes */}
       <Dialog open={isContatosDialogOpen} onOpenChange={setIsContatosDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] mx-4 bg-card border-border max-h-[80vh] overflow-hidden">
-          <DialogHeader>
+        <DialogContent className="sm:max-w-[700px] mx-4 bg-card border-border max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle className="text-foreground flex items-center gap-2">
               Adicionar Contatos à Tag
               {selectedTagForContatos && (
@@ -477,24 +579,144 @@ const Tags = () => {
               )}
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-4 overflow-hidden">
-            {/* Componente de seleção de contatos da gestão */}
-            <div className="max-h-96 overflow-y-auto">
-              <ContactSelector
-                onSelectContact={handleSelecionarContato}
-                placeholder="Buscar contatos para adicionar à tag..."
-                showTags={true}
-              />
+          
+          <div className="flex-1 space-y-4 py-4 overflow-hidden flex flex-col">
+            {/* Campo de busca para contatos */}
+            <div className="flex-shrink-0">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  value={contactSearchTerm}
+                  onChange={(e) => setContactSearchTerm(e.target.value)}
+                  placeholder="Buscar contatos para adicionar à tag..."
+                  className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground"
+                />
+              </div>
+            </div>
+
+            {/* Lista de contatos com checkboxes - área scrollável */}
+            <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
+              {getFilteredContactsForTag().length > 0 ? (
+                getFilteredContactsForTag().map((contact) => (
+                  <Card 
+                    key={contact.id} 
+                    className="border-border hover:bg-accent/30 transition-colors"
+                  >
+                    <CardContent className="p-3">
+                      <div className="flex items-start gap-3">
+                        {/* Checkbox para seleção do contato */}
+                        <div className="flex-shrink-0 pt-1">
+                          <Checkbox
+                            id={`contact-${contact.id}`}
+                            checked={selectedContactIds.includes(contact.id)}
+                            onCheckedChange={(checked) => 
+                              handleContactSelection(contact.id, checked as boolean)
+                            }
+                            className="border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                          />
+                        </div>
+
+                        {/* Avatar do contato */}
+                        <Avatar className="h-10 w-10 flex-shrink-0">
+                          <AvatarImage src={contact.avatar} alt={contact.nome} />
+                          <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
+                            {getInitials(contact.nome)}
+                          </AvatarFallback>
+                        </Avatar>
+
+                        {/* Informações do contato */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <label 
+                              htmlFor={`contact-${contact.id}`}
+                              className="font-medium text-foreground truncate cursor-pointer"
+                            >
+                              {contact.nome}
+                            </label>
+                            {/* Ícone do canal de comunicação */}
+                            <div className="flex-shrink-0" title={`Canal: ${contact.canal}`}>
+                              {getChannelIcon(contact.canal)}
+                            </div>
+                          </div>
+                          
+                          {/* Contatos de comunicação */}
+                          <div className="flex flex-col sm:flex-row gap-1 sm:gap-3 text-xs text-muted-foreground mb-2">
+                            {contact.telefone && (
+                              <div className="flex items-center gap-1">
+                                <Phone className="h-3 w-3" />
+                                <span>{formatPhone(contact.telefone)}</span>
+                              </div>
+                            )}
+                            {contact.email && (
+                              <div className="flex items-center gap-1">
+                                <Mail className="h-3 w-3" />
+                                <span className="truncate">{contact.email}</span>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Tags do contato com cores personalizadas */}
+                          {contact.tags && contact.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                              {contact.tags.slice(0, 3).map((tagId) => (
+                                <TagBadge 
+                                  key={tagId} 
+                                  tagId={tagId} 
+                                  size="sm"
+                                />
+                              ))}
+                              {contact.tags.length > 3 && (
+                                <Badge variant="outline" className="text-xs px-1.5 py-0.5">
+                                  +{contact.tags.length - 3}
+                                </Badge>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <div className="text-center py-8">
+                  <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                    <Search className="h-8 w-8 opacity-50" />
+                    <p>
+                      {contactSearchTerm 
+                        ? 'Nenhum contato encontrado' 
+                        : 'Todos os contatos já possuem esta tag'
+                      }
+                    </p>
+                    {contactSearchTerm && (
+                      <p className="text-sm">Tente ajustar sua pesquisa</p>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
             
-            {/* Botão para fechar modal */}
-            <div className="flex justify-end pt-4 border-t border-border">
+            {/* Contador de seleções */}
+            {selectedContactIds.length > 0 && (
+              <div className="flex-shrink-0 text-sm text-muted-foreground text-center">
+                {selectedContactIds.length} contato(s) selecionado(s)
+              </div>
+            )}
+
+            {/* Botões de ação do modal */}
+            <div className="flex-shrink-0 flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 pt-4 border-t border-border">
               <Button 
                 variant="outline" 
                 onClick={handleCloseContatosDialog} 
-                className="border-border text-foreground hover:bg-accent"
+                className="w-full sm:w-auto border-border text-foreground hover:bg-accent"
               >
-                Fechar
+                Cancelar
+              </Button>
+              <Button 
+                onClick={handleSaveContactsToTag}
+                disabled={selectedContactIds.length === 0}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 w-full sm:w-auto"
+              >
+                Salvar ({selectedContactIds.length})
               </Button>
             </div>
           </div>
