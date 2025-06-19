@@ -391,10 +391,18 @@ export const FiltrosCampanhasComponent: React.FC<FiltrosCampanhasProps> = ({
                 Responsável
               </label>
               <Select
-                value={filtros.responsaveis?.[0] || ''}
+                value={filtros.responsaveis?.[0] || 'all'}
                 onValueChange={(value) => {
-                  if (value) {
-                    toggleResponsavel(value);
+                  if (value === 'all') {
+                    onFiltrosChange({
+                      ...filtros,
+                      responsaveis: undefined
+                    });
+                  } else {
+                    onFiltrosChange({
+                      ...filtros,
+                      responsaveis: [value]
+                    });
                   }
                 }}
               >
@@ -402,7 +410,7 @@ export const FiltrosCampanhasComponent: React.FC<FiltrosCampanhasProps> = ({
                   <SelectValue placeholder="Todos os responsáveis" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos os responsáveis</SelectItem>
+                  <SelectItem value="all">Todos os responsáveis</SelectItem>
                   {responsaveis.map((responsavel) => (
                     <SelectItem key={responsavel.id} value={responsavel.id}>
                       {responsavel.nome}
