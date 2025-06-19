@@ -9,7 +9,8 @@ import {
   HardDrive,
   Wifi,
   Activity,
-  Info
+  Info,
+  Server
 } from 'lucide-react';
 import { useBrand } from '@/contexts/BrandContext';
 
@@ -76,18 +77,37 @@ const InfrastructureDashboard = () => {
     return 'text-red-600 dark:text-red-400';
   };
 
-  const getUsageBgColor = (percentage: number) => {
-    if (percentage < 50) return 'bg-green-100 dark:bg-green-900/20';
-    if (percentage < 75) return 'bg-yellow-100 dark:bg-yellow-900/20';
-    return 'bg-red-100 dark:bg-red-900/20';
+  const getUsageBarColor = (percentage: number) => {
+    if (percentage < 50) return 'bg-green-500';
+    if (percentage < 75) return 'bg-yellow-500';
+    return 'bg-red-500';
+  };
+
+  const getPingColor = (ping: number) => {
+    if (ping < 20) return 'text-green-600 dark:text-green-400';
+    if (ping < 50) return 'text-yellow-600 dark:text-yellow-400';
+    return 'text-red-600 dark:text-red-400';
+  };
+
+  const getPingIndicatorColor = (ping: number) => {
+    if (ping < 20) return 'bg-green-500';
+    if (ping < 50) return 'bg-yellow-500';
+    return 'bg-red-500';
+  };
+
+  const getPingStatus = (ping: number) => {
+    if (ping < 20) return 'Excelente';
+    if (ping < 50) return 'Bom';
+    return 'Alto';
   };
 
   return (
-    <div className="p-4 lg:p-6 space-y-6 min-h-screen bg-background">
+    <div className="p-4 lg:p-6 space-y-6 min-h-screen bg-background overflow-y-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-foreground">
+          <h1 className="text-2xl lg:text-3xl font-bold text-foreground flex items-center gap-2">
+            <Server className="h-8 w-8 text-primary" />
             Dashboard de Infraestrutura
           </h1>
           <p className="text-muted-foreground mt-1 text-sm lg:text-base">
@@ -106,7 +126,7 @@ const InfrastructureDashboard = () => {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 lg:gap-6">
         {/* Versão do Software */}
-        <Card className="border-border bg-card hover:shadow-md transition-shadow">
+        <Card className="border bg-card hover:shadow-md transition-shadow">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -126,7 +146,7 @@ const InfrastructureDashboard = () => {
         </Card>
 
         {/* CPU Usage */}
-        <Card className="border-border bg-card hover:shadow-md transition-shadow">
+        <Card className="border bg-card hover:shadow-md transition-shadow">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -141,13 +161,7 @@ const InfrastructureDashboard = () => {
             </div>
             <div className="w-full bg-secondary rounded-full h-2 mb-2">
               <div 
-                className={`h-2 rounded-full transition-all duration-500 ${
-                  serverStats.cpuUsage < 50 
-                    ? 'bg-green-500' 
-                    : serverStats.cpuUsage < 75 
-                    ? 'bg-yellow-500' 
-                    : 'bg-red-500'
-                }`}
+                className={`h-2 rounded-full transition-all duration-500 ${getUsageBarColor(serverStats.cpuUsage)}`}
                 style={{ width: `${serverStats.cpuUsage}%` }}
               />
             </div>
@@ -158,7 +172,7 @@ const InfrastructureDashboard = () => {
         </Card>
 
         {/* Memory Usage */}
-        <Card className="border-border bg-card hover:shadow-md transition-shadow">
+        <Card className="border bg-card hover:shadow-md transition-shadow">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -173,13 +187,7 @@ const InfrastructureDashboard = () => {
             </div>
             <div className="w-full bg-secondary rounded-full h-2 mb-2">
               <div 
-                className={`h-2 rounded-full transition-all duration-500 ${
-                  serverStats.memoryUsage.percentage < 50 
-                    ? 'bg-green-500' 
-                    : serverStats.memoryUsage.percentage < 75 
-                    ? 'bg-yellow-500' 
-                    : 'bg-red-500'
-                }`}
+                className={`h-2 rounded-full transition-all duration-500 ${getUsageBarColor(serverStats.memoryUsage.percentage)}`}
                 style={{ width: `${serverStats.memoryUsage.percentage}%` }}
               />
             </div>
@@ -190,7 +198,7 @@ const InfrastructureDashboard = () => {
         </Card>
 
         {/* Disk Usage */}
-        <Card className="border-border bg-card hover:shadow-md transition-shadow">
+        <Card className="border bg-card hover:shadow-md transition-shadow">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -205,13 +213,7 @@ const InfrastructureDashboard = () => {
             </div>
             <div className="w-full bg-secondary rounded-full h-2 mb-2">
               <div 
-                className={`h-2 rounded-full transition-all duration-500 ${
-                  serverStats.diskUsage.percentage < 50 
-                    ? 'bg-green-500' 
-                    : serverStats.diskUsage.percentage < 75 
-                    ? 'bg-yellow-500' 
-                    : 'bg-red-500'
-                }`}
+                className={`h-2 rounded-full transition-all duration-500 ${getUsageBarColor(serverStats.diskUsage.percentage)}`}
                 style={{ width: `${serverStats.diskUsage.percentage}%` }}
               />
             </div>
@@ -222,7 +224,7 @@ const InfrastructureDashboard = () => {
         </Card>
 
         {/* Ping */}
-        <Card className="border-border bg-card hover:shadow-md transition-shadow">
+        <Card className="border bg-card hover:shadow-md transition-shadow">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -232,25 +234,13 @@ const InfrastructureDashboard = () => {
             </div>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className={`text-2xl font-bold mb-1 ${
-              serverStats.ping < 20 
-                ? 'text-green-600 dark:text-green-400' 
-                : serverStats.ping < 50 
-                ? 'text-yellow-600 dark:text-yellow-400' 
-                : 'text-red-600 dark:text-red-400'
-            }`}>
+            <div className={`text-2xl font-bold mb-1 ${getPingColor(serverStats.ping)}`}>
               {serverStats.ping}ms
             </div>
             <div className="flex items-center gap-1 mb-2">
-              <div className={`w-2 h-2 rounded-full ${
-                serverStats.ping < 20 
-                  ? 'bg-green-500' 
-                  : serverStats.ping < 50 
-                  ? 'bg-yellow-500' 
-                  : 'bg-red-500'
-              }`} />
+              <div className={`w-2 h-2 rounded-full ${getPingIndicatorColor(serverStats.ping)}`} />
               <span className="text-xs text-muted-foreground">
-                {serverStats.ping < 20 ? 'Excelente' : serverStats.ping < 50 ? 'Bom' : 'Alto'}
+                {getPingStatus(serverStats.ping)}
               </span>
             </div>
             <p className="text-xs text-muted-foreground">
@@ -261,7 +251,7 @@ const InfrastructureDashboard = () => {
       </div>
 
       {/* Status Information */}
-      <Card className="border-border bg-card">
+      <Card className="border bg-card">
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
             <Info className="h-5 w-5 text-primary" />
@@ -269,29 +259,29 @@ const InfrastructureDashboard = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-            <div>
-              <span className="font-medium text-foreground">Sistema Operacional:</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+            <div className="space-y-1">
+              <span className="font-medium text-foreground block">Sistema Operacional:</span>
               <p className="text-muted-foreground">Ubuntu 22.04 LTS</p>
             </div>
-            <div>
-              <span className="font-medium text-foreground">Última Reinicialização:</span>
+            <div className="space-y-1">
+              <span className="font-medium text-foreground block">Última Reinicialização:</span>
               <p className="text-muted-foreground">Há 7 dias</p>
             </div>
-            <div>
-              <span className="font-medium text-foreground">Processos Ativos:</span>
+            <div className="space-y-1">
+              <span className="font-medium text-foreground block">Processos Ativos:</span>
               <p className="text-muted-foreground">142 processos</p>
             </div>
-            <div>
-              <span className="font-medium text-foreground">Conexões Ativas:</span>
+            <div className="space-y-1">
+              <span className="font-medium text-foreground block">Conexões Ativas:</span>
               <p className="text-muted-foreground">89 conexões</p>
             </div>
-            <div>
-              <span className="font-medium text-foreground">Temperatura CPU:</span>
+            <div className="space-y-1">
+              <span className="font-medium text-foreground block">Temperatura CPU:</span>
               <p className="text-muted-foreground">52°C</p>
             </div>
-            <div>
-              <span className="font-medium text-foreground">Próxima Manutenção:</span>
+            <div className="space-y-1">
+              <span className="font-medium text-foreground block">Próxima Manutenção:</span>
               <p className="text-muted-foreground">Em 15 dias</p>
             </div>
           </div>

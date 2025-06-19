@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,7 +22,7 @@ import GestaoContatos from "./pages/GestaoContatos";
 import Tags from "./pages/Tags";
 import GestaoUsuarios from "./pages/GestaoUsuarios";
 import Conexoes from "./pages/Conexoes";
-import DashboardGerencial from "./pages/DashboardGerencial";
+import DashboardInfraestrutura from "./pages/DashboardInfraestrutura";
 import DashboardAdmin from "./pages/DashboardAdmin";
 import DashboardUsuario from "./pages/DashboardUsuario";
 import Avaliacao from "./pages/Avaliacao";
@@ -66,7 +67,7 @@ const App = () => (
                 <Route path="/tags" element={<Tags />} />
                 <Route path="/gestao-usuarios" element={<GestaoUsuarios />} />
                 <Route path="/conexoes" element={<Conexoes />} />
-                <Route path="/dashboard-gerencial" element={<DashboardGerencial />} />
+                <Route path="/dashboard-infraestrutura" element={<DashboardInfraestrutura />} />
                 <Route path="/dashboard-admin" element={<DashboardAdmin />} />
                 <Route path="/dashboard-usuario" element={<DashboardUsuario />} />
                 <Route path="/avaliacao" element={<Avaliacao />} />
