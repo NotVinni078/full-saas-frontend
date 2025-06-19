@@ -126,10 +126,10 @@ const AtendimentosOmnichannel = () => {
   );
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
-      {/* Sidebar - Lista de Conversas (VERMELHO) */}
+    <div className="flex h-[calc(100vh-80px)] bg-background overflow-hidden">
+      {/* Sidebar - Lista de Conversas */}
       <div className="w-full md:w-96 bg-card border-r border-border flex flex-col">
-        {/* Header da Sidebar (AMARELO) - Fixo sem rolagem */}
+        {/* Header da Sidebar - Fixo sem rolagem */}
         <div className="flex-shrink-0 p-4 border-b border-border bg-card">
           {/* Título da Página */}
           <div className="flex items-center justify-between mb-4">
@@ -147,79 +147,82 @@ const AtendimentosOmnichannel = () => {
                 placeholder="Buscar atendimento e mensagens"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 bg-background border-border"
               />
             </div>
-            <Button variant="outline" size="sm" className="flex-shrink-0">
+            <Button variant="outline" size="sm" className="flex-shrink-0 border-border">
               <Filter className="w-4 h-4" />
             </Button>
           </div>
 
-          {/* Tabs de Status - Primeira Linha */}
-          <div className="flex gap-1 mb-2">
+          {/* Tabs de Status - Grid responsivo */}
+          <div className="grid grid-cols-2 gap-1 mb-2">
             <button
               onClick={() => setActiveTab('finalizado')}
-              className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors flex-1 justify-center ${
+              className={`flex items-center px-2 py-2 rounded-lg text-xs font-medium transition-colors justify-center ${
                 activeTab === 'finalizado' 
                   ? 'bg-primary text-primary-foreground' 
                   : 'text-muted-foreground hover:bg-muted'
               }`}
             >
-              <CheckCircle className="w-4 h-4 mr-1" />
+              <CheckCircle className="w-3 h-3 mr-1" />
               FINALIZADO
             </button>
             <button
               onClick={() => setActiveTab('grupos')}
-              className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors flex-1 justify-center ${
+              className={`flex items-center px-2 py-2 rounded-lg text-xs font-medium transition-colors justify-center ${
                 activeTab === 'grupos' 
                   ? 'bg-primary text-primary-foreground' 
                   : 'text-muted-foreground hover:bg-muted'
               }`}
             >
-              <Users className="w-4 h-4 mr-1" />
+              <Users className="w-3 h-3 mr-1" />
               GRUPOS
             </button>
           </div>
 
-          {/* Tabs de Status - Segunda Linha */}
-          <div className="flex gap-1">
+          {/* Segunda linha de tabs - Grid responsivo */}
+          <div className="grid grid-cols-3 gap-1">
             <button
               onClick={() => setActiveTab('em-atendimento')}
-              className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors flex-1 justify-center ${
+              className={`flex items-center px-2 py-2 rounded-lg text-xs font-medium transition-colors justify-center ${
                 activeTab === 'em-atendimento' 
                   ? 'bg-primary text-primary-foreground' 
                   : 'text-muted-foreground hover:bg-muted'
               }`}
             >
-              <MessageSquare className="w-4 h-4 mr-1" />
-              EM ATENDIMENTO
+              <MessageSquare className="w-3 h-3 mr-1" />
+              <span className="hidden sm:inline">EM ATENDIMENTO</span>
+              <span className="sm:hidden">ATEND.</span>
             </button>
             <button
               onClick={() => setActiveTab('aguardando')}
-              className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors flex-1 justify-center ${
+              className={`flex items-center px-2 py-2 rounded-lg text-xs font-medium transition-colors justify-center ${
                 activeTab === 'aguardando' 
                   ? 'bg-primary text-primary-foreground' 
                   : 'text-muted-foreground hover:bg-muted'
               }`}
             >
-              <Clock className="w-4 h-4 mr-1" />
-              AGUARDANDO
+              <Clock className="w-3 h-3 mr-1" />
+              <span className="hidden sm:inline">AGUARDANDO</span>
+              <span className="sm:hidden">AGUARD.</span>
             </button>
             <button
               onClick={() => setActiveTab('chatbot')}
-              className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors flex-1 justify-center ${
+              className={`flex items-center px-2 py-2 rounded-lg text-xs font-medium transition-colors justify-center ${
                 activeTab === 'chatbot' 
                   ? 'bg-primary text-primary-foreground' 
                   : 'text-muted-foreground hover:bg-muted'
               }`}
             >
-              <Bot className="w-4 h-4 mr-1" />
-              CHATBOT
+              <Bot className="w-3 h-3 mr-1" />
+              <span className="hidden sm:inline">CHATBOT</span>
+              <span className="sm:hidden">BOT</span>
             </button>
           </div>
         </div>
 
-        {/* Lista de Conversas (VERMELHO) - Rolagem independente */}
+        {/* Lista de Conversas - Rolagem independente */}
         <div className="flex-1 overflow-y-auto">
           {filteredContacts.map((contact) => (
             <div
@@ -239,7 +242,7 @@ const AtendimentosOmnichannel = () => {
                       {contact.name.split(' ').map(n => n[0]).join('')}
                     </AvatarFallback>
                   </Avatar>
-                  <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${getStatusColor(contact.status)}`}></div>
+                  <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-card ${getStatusColor(contact.status)}`}></div>
                   <div className="absolute -top-1 -right-1 text-lg">
                     {getChannelIcon(contact.channel)}
                   </div>
@@ -286,7 +289,7 @@ const AtendimentosOmnichannel = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         {selectedContact ? (
           <>
-            {/* Header do Chat (AMARELO) - Fixo sem rolagem */}
+            {/* Header do Chat - Fixo sem rolagem */}
             <div className="flex-shrink-0 p-4 bg-card border-b border-border">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
@@ -297,7 +300,7 @@ const AtendimentosOmnichannel = () => {
                         {selectedContact.name.split(' ').map(n => n[0]).join('')}
                       </AvatarFallback>
                     </Avatar>
-                    <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${getStatusColor(selectedContact.status)}`}></div>
+                    <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-card ${getStatusColor(selectedContact.status)}`}></div>
                   </div>
                   <div>
                     <h3 className="font-medium text-foreground">{selectedContact.name}</h3>
@@ -331,9 +334,9 @@ const AtendimentosOmnichannel = () => {
               </div>
             </div>
 
-            {/* Área de Mensagens (VERDE) - Rolagem independente */}
-            <div className="flex-1 overflow-y-auto bg-muted/20 p-4" style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23f0f0f0' fill-opacity='0.1'%3E%3Cpath d='M20 20c0-11.046 8.954-20 20-20s20 8.954 20 20-8.954 20-20 20-20-8.954-20-20zm20-16c-8.837 0-16 7.163-16 16s7.163 16 16 16 16-7.163 16-16-7.163-16-16-16z'/%3E%3C/g%3E%3C/svg%3E")`
+            {/* Área de Mensagens - Altura calculada dinamicamente */}
+            <div className="flex-1 overflow-y-auto bg-muted/10 p-4 min-h-0" style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='hsl(var(--muted))' fill-opacity='0.1'%3E%3Cpath d='M20 20c0-11.046 8.954-20 20-20s20 8.954 20 20-8.954 20-20 20-20-8.954-20-20zm20-16c-8.837 0-16 7.163-16 16s7.163 16 16 16 16-7.163 16-16-7.163-16-16-16z'/%3E%3C/g%3E%3C/svg%3E")`
             }}>
               <div className="space-y-4">
                 {messages.map((msg) => (
@@ -351,7 +354,7 @@ const AtendimentosOmnichannel = () => {
                       <p className="text-sm">{msg.text}</p>
                       <p className={`text-xs mt-1 ${
                         msg.sender === 'user' 
-                          ? 'text-primary-foreground opacity-70' 
+                          ? 'text-primary-foreground/70' 
                           : 'text-muted-foreground'
                       }`}>
                         {msg.time}
@@ -363,19 +366,19 @@ const AtendimentosOmnichannel = () => {
               
               {/* Indicador de Status do Atendimento */}
               <div className="text-center my-4">
-                <div className="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-800 text-xs">
+                <div className="inline-flex items-center px-3 py-1 rounded-full bg-muted text-muted-foreground text-xs border border-border">
                   ✓ Atendimento finalizado por Suporte Komvvo, em 15/06/2025 - 15:47
                 </div>
               </div>
             </div>
 
-            {/* Input de Mensagem (AZUL) - Fixo no viewport */}
+            {/* Input de Mensagem - Fixo no viewport, sempre visível */}
             <div className="flex-shrink-0 p-4 bg-card border-t border-border">
               <div className="flex items-end space-x-2">
                 <Button variant="ghost" size="sm" className="flex-shrink-0">
                   <Paperclip className="w-5 h-5" />
                 </Button>
-                <div className="flex-1 bg-card border border-border rounded-lg">
+                <div className="flex-1 bg-background border border-border rounded-lg">
                   <Input
                     placeholder="Digite uma mensagem"
                     value={message}
@@ -388,7 +391,7 @@ const AtendimentosOmnichannel = () => {
                   <Smile className="w-5 h-5" />
                 </Button>
                 {message ? (
-                  <Button onClick={handleSendMessage} size="sm" className="bg-primary flex-shrink-0">
+                  <Button onClick={handleSendMessage} size="sm" className="bg-primary text-primary-foreground flex-shrink-0">
                     <Send className="w-4 h-4" />
                   </Button>
                 ) : (
@@ -401,7 +404,7 @@ const AtendimentosOmnichannel = () => {
           </>
         ) : (
           /* Estado Vazio */
-          <div className="flex-1 flex items-center justify-center bg-muted/20">
+          <div className="flex-1 flex items-center justify-center bg-muted/10">
             <div className="text-center">
               <MessageSquare className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-medium text-foreground mb-2">

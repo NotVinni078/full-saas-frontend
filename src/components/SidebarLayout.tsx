@@ -50,7 +50,7 @@ const SidebarLayout = ({ children }: SidebarLayoutProps) => {
   };
 
   return (
-    <div className={`h-screen brand-background flex w-full overflow-hidden ${isDarkMode ? 'dark' : ''}`}>
+    <div className={`h-screen bg-background flex w-full overflow-hidden ${isDarkMode ? 'dark' : ''}`}>
       {/* Sidebar - comportamento responsivo corrigido */}
       <div className={`
         fixed inset-y-0 left-0 z-50 md:relative md:z-auto
@@ -75,7 +75,7 @@ const SidebarLayout = ({ children }: SidebarLayoutProps) => {
       )}
       
       {/* Conteúdo principal */}
-      <div className="flex-1 flex flex-col min-w-0 h-full brand-background">
+      <div className="flex-1 flex flex-col min-w-0 h-full bg-background">
         <NavBar
           isDarkMode={isDarkMode}
           onToggleTheme={toggleTheme}
@@ -85,7 +85,7 @@ const SidebarLayout = ({ children }: SidebarLayoutProps) => {
           isSidebarCollapsed={sidebarCollapsed}
         />
         
-        <main className="flex-1 overflow-auto brand-background min-h-0">
+        <main className="flex-1 overflow-auto bg-background min-h-0">
           {children}
         </main>
       </div>
