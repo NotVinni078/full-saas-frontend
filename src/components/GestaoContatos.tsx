@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,15 +9,19 @@ import {
   Upload,
   Search
 } from "lucide-react";
+import { useNavigate } from 'react-router-dom';
 import { useContacts } from '@/hooks/useContacts';
 import ContactModal from './modals/ContactModal';
 import BlockedContactsList from './contacts/BlockedContactsList';
 import ContactsFilter from './contacts/ContactsFilter';
 import ImportContactsModal from './contacts/ImportContactsModal';
 import ContactsTable from './contacts/ContactsTable';
-import CreateScheduleShortcut from './contacts/CreateScheduleShortcut';
+import ConfirmationDialog from './contacts/ConfirmationDialog';
+import StartServiceDialog from './contacts/StartServiceDialog';
 
 const GestaoContatos = () => {
+  const navigate = useNavigate();
+  
   // Estados principais para controle da interface
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -27,14 +30,16 @@ const GestaoContatos = () => {
   const [showBlockedContacts, setShowBlockedContacts] = useState(false);
   const [blockedContacts, setBlockedContacts] = useState([]);
   
-  // Novos estados para filtros e importação
+  // Estados para filtros e importação
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'blocked'>('all');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [showImportModal, setShowImportModal] = useState(false);
   
-  // Novo estado para modal de agendamento
-  const [showScheduleModal, setShowScheduleModal] = useState(false);
-  const [selectedContactForSchedule, setSelectedContactForSchedule] = useState(null);
+  // Estados para diálogos de confirmação e iniciar atendimento
+  const [showBlockConfirmation, setShowBlockConfirmation] = useState(false);
+  const [showUnblockConfirmation, setShowUnblockConfirmation] = useState(false);
+  const [showStartServiceDialog, setShowStartServiceDialog] = useState(false);
+  const [selectedContactForAction, setSelectedContactForAction] = useState(null);
 
   // Hook customizado para gerenciamento de contatos
   const { contacts, updateContact, addContact, removeContact, getContactTags, searchContacts } = useContacts();
@@ -116,47 +121,91 @@ const GestaoContatos = () => {
   };
 
   /**
-   * Bloqueia/desbloqueia contato para envio e recebimento de mensagens
-   * @param {Object} contato - Contato a ser bloqueado/desbloqueado
+   * Abre diálogo de confirmação para bloquear contato
+   * @param {Object} contato - Contato a ser bloqueado
    */
   const handleBloquearContato = (contato) => {
     const isCurrentlyBlocked = blockedContacts.some(blocked => blocked.id === contato.id);
     
+    setSelectedContactForAction(contato);
+    
     if (isCurrentlyBlocked) {
-      // Desbloquear contato
-      setBlockedContacts(prev => prev.filter(blocked => blocked.id !== contato.id));
-      console.log('Contato desbloqueado:', contato.nome);
+      // Abrir confirmação de desbloqueio
+      setShowUnblockConfirmation(true);
     } else {
-      // Bloquear contato - adiciona à lista de bloqueados
-      setBlockedContacts(prev => [...prev, contato]);
-      console.log('Contato bloqueado para envio e recebimento de mensagens:', contato.nome);
+      // Abrir confirmação de bloqueio
+      setShowBlockConfirmation(true);
     }
   };
 
   /**
-   * Inicia atendimento para o contato selecionado
-   * Redireciona para tela de atendimentos após seleção do canal
+   * Confirma bloqueio do contato
+   */
+  const confirmBlockContact = () => {
+    if (selectedContactForAction) {
+      setBlockedContacts(prev => [...prev, selectedContactForAction]);
+      console.log('Contato bloqueado para envio e recebimento de mensagens:', selectedContactForAction.nome);
+    }
+    setSelectedContactForAction(null);
+  };
+
+  /**
+   * Confirma desbloqueio do contato
+   */
+  const confirmUnblockContact = () => {
+    if (selectedContactForAction) {
+      setBlockedContacts(prev => prev.filter(blocked => blocked.id !== selectedContactForAction.id));
+      console.log('Contato desbloqueado:', selectedContactForAction.nome);
+    }
+    setSelectedContactForAction(null);
+  };
+
+  /**
+   * Abre diálogo para iniciar atendimento
    * @param {Object} contato - Contato para iniciar atendimento
    */
   const handleIniciarAtendimento = (contato) => {
-    // TODO: Implementar seleção de canal antes de abrir atendimento
-    console.log('Iniciando atendimento para:', contato.nome, 'Canal:', contato.canal);
-    // Deve redirecionar para /atendimentos após seleção do canal
+    setSelectedContactForAction(contato);
+    setShowStartServiceDialog(true);
   };
 
   /**
-   * Abre modal de agendamento usando o componente de atalho
-   * Reutiliza funcionalidade existente da página /agendamentos
+   * Processa início do atendimento com setor selecionado
+   * @param {string} contactId - ID do contato
+   * @param {string} sectorId - ID do setor selecionado
+   * @param {string} action - Ação escolhida ('start' ou 'waiting')
+   */
+  const handleStartService = (contactId: string, sectorId: string, action: 'start' | 'waiting') => {
+    const contato = contacts.find(c => c.id === contactId);
+    if (contato) {
+      console.log(`Atendimento ${action === 'start' ? 'iniciado' : 'movido para aguardando'} para:`, contato.nome, 'Setor:', sectorId);
+      // TODO: Implementar lógica de redirecionamento para /atendimentos com os parâmetros necessários
+      // navigate('/atendimentos', { state: { contactId, sectorId, action } });
+    }
+    setSelectedContactForAction(null);
+  };
+
+  /**
+   * Redireciona para página de agendamentos com dados do contato
    * @param {Object} contato - Contato para criar agendamento
    */
   const handleCriarAgendamento = (contato) => {
-    setSelectedContactForSchedule(contato);
-    setShowScheduleModal(true);
-    console.log('Abrindo modal de agendamento para:', contato.nome);
+    console.log('Redirecionando para página de agendamentos com contato:', contato.nome);
+    // Redireciona para /agendamentos passando dados do contato via state
+    navigate('/agendamentos', { 
+      state: { 
+        preSelectedContact: {
+          id: contato.id,
+          nome: contato.nome,
+          telefone: contato.telefone,
+          email: contato.email
+        }
+      }
+    });
   };
 
   /**
-   * Processa importação de contatos via CSV
+   * Processa importação de contatos via JSON
    * @param {Array} importedContacts - Lista de contatos importados
    */
   const handleImportContacts = (importedContacts) => {
@@ -175,10 +224,10 @@ const GestaoContatos = () => {
   };
 
   /**
-   * Exporta todos os contatos para arquivo CSV
-   * Melhoria: agora inclui TODAS as tags dos contatos
+   * Exporta todos os contatos para arquivo JSON
+   * Corrigido: agora todas as tags ficam em uma única célula/propriedade
    */
-  const handleExportarCSV = () => {
+  const handleExportarJSON = () => {
     const contatosParaExportar = filtrarContatos();
     
     if (contatosParaExportar.length === 0) {
@@ -186,33 +235,33 @@ const GestaoContatos = () => {
       return;
     }
 
-    // Cabeçalho do CSV
-    const csvHeader = 'nome,telefone,email,observacoes,tags,canal\n';
-    
-    // Dados dos contatos - agora com TODAS as tags
-    const csvData = contatosParaExportar.map(contato => {
+    // Prepara dados para exportação com tags em uma única propriedade
+    const exportData = contatosParaExportar.map(contato => {
       const tags = getContactTags(contato);
-      const allTagNames = tags.map(tag => tag.nome).join(';'); // Todas as tags separadas por ;
+      const allTagNames = tags.map(tag => tag.nome).join('; '); // Todas as tags separadas por ponto e vírgula
       
-      return [
-        `"${contato.nome || ''}"`,
-        `"${contato.telefone || ''}"`,
-        `"${contato.email || ''}"`,
-        `"${contato.observacoes || ''}"`,
-        `"${allTagNames}"`, // Exporta todas as tags
-        `"${contato.canal || ''}"`
-      ].join(',');
-    }).join('\n');
+      return {
+        nome: contato.nome || '',
+        telefone: contato.telefone || '',
+        email: contato.email || '',
+        endereco: contato.endereco || '',
+        observacoes: contato.observacoes || '',
+        tags: allTagNames, // Tags unificadas em uma única propriedade
+        canal: contato.canal || '',
+        setor: contato.setor || '',
+        status: contato.status || ''
+      };
+    });
 
-    // Cria e baixa o arquivo
-    const csvContent = csvHeader + csvData;
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    // Cria e baixa o arquivo JSON
+    const jsonContent = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([jsonContent], { type: 'application/json;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `contatos_${new Date().toISOString().split('T')[0]}.csv`;
+    link.download = `contatos_${new Date().toISOString().split('T')[0]}.json`;
     link.click();
     
-    console.log(`${contatosParaExportar.length} contatos exportados para CSV com todas as tags`);
+    console.log(`${contatosParaExportar.length} contatos exportados para JSON com todas as tags unificadas`);
   };
 
   /**
@@ -237,24 +286,24 @@ const GestaoContatos = () => {
         
         {/* Botões de ação principais - responsivos */}
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-          {/* Botão de exportar CSV */}
+          {/* Botão de exportar JSON (alterado de CSV) */}
           <Button 
             variant="outline" 
-            onClick={handleExportarCSV}
+            onClick={handleExportarJSON}
             className="w-full sm:w-auto border-border text-foreground hover:bg-accent"
           >
             <Download className="h-4 w-4 mr-2" />
-            Exportar CSV
+            Exportar JSON
           </Button>
 
-          {/* Botão de importar CSV */}
+          {/* Botão de importar JSON (alterado de CSV) */}
           <Button 
             variant="outline" 
             onClick={() => setShowImportModal(true)}
             className="w-full sm:w-auto border-border text-foreground hover:bg-accent"
           >
             <Upload className="h-4 w-4 mr-2" />
-            Importar CSV
+            Importar JSON
           </Button>
 
           {/* Botão de novo contato */}
@@ -299,7 +348,7 @@ const GestaoContatos = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {/* Tabela/Cards de contatos usando o novo componente */}
+          {/* Tabela/Cards de contatos usando o componente existente */}
           {filtrarContatos().length > 0 ? (
             <ContactsTable
               contacts={filtrarContatos()}
@@ -363,21 +412,43 @@ const GestaoContatos = () => {
         onDelete={(contactId)=> handleExcluirContato(contactId)}
       />
 
-      {/* Modal de importação de contatos */}
+      {/* Modal de importação de contatos (agora JSON) */}
       <ImportContactsModal
         isOpen={showImportModal}
         onClose={() => setShowImportModal(false)}
         onImport={handleImportContacts}
       />
 
-      {/* Modal de atalho para criar agendamento */}
-      <CreateScheduleShortcut
-        isOpen={showScheduleModal}
-        onClose={() => {
-          setShowScheduleModal(false);
-          setSelectedContactForSchedule(null);
-        }}
-        contact={selectedContactForSchedule}
+      {/* Diálogo de confirmação para bloquear contato */}
+      <ConfirmationDialog
+        isOpen={showBlockConfirmation}
+        onClose={() => setShowBlockConfirmation(false)}
+        onConfirm={confirmBlockContact}
+        title="Bloquear Contato"
+        description="Tem certeza que deseja bloquear este contato? Ele não poderá mais enviar ou receber mensagens."
+        confirmText="Bloquear Contato"
+        contact={selectedContactForAction}
+        variant="destructive"
+      />
+
+      {/* Diálogo de confirmação para desbloquear contato */}
+      <ConfirmationDialog
+        isOpen={showUnblockConfirmation}
+        onClose={() => setShowUnblockConfirmation(false)}
+        onConfirm={confirmUnblockContact}
+        title="Desbloquear Contato"
+        description="Tem certeza que deseja desbloquear este contato? Ele poderá voltar a enviar e receber mensagens."
+        confirmText="Desbloquear Contato"
+        contact={selectedContactForAction}
+        variant="default"
+      />
+
+      {/* Diálogo para iniciar atendimento com seleção de setor */}
+      <StartServiceDialog
+        isOpen={showStartServiceDialog}
+        onClose={() => setShowStartServiceDialog(false)}
+        contact={selectedContactForAction}
+        onStartService={handleStartService}
       />
     </div>
   );
