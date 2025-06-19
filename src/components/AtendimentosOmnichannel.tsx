@@ -1,10 +1,11 @@
 
 import React, { useState } from 'react';
-import { MessageSquare, Phone, Mail, Users, Clock, CheckCircle, AlertCircle, MoreVertical } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Search, MoreVertical, Phone, Video, Paperclip, Send, Smile, Mic, Filter, Users, UserCheck, MessageSquare, Bot } from 'lucide-react';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -12,273 +13,387 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 
-const AtendimentosOmnichannel = () => {
-  const [selectedChannel, setSelectedChannel] = useState('all');
+interface Contact {
+  id: number;
+  name: string;
+  avatar?: string;
+  lastMessage: string;
+  time: string;
+  unread: number;
+  status: 'online' | 'away' | 'offline';
+  channel: 'whatsapp' | 'telegram' | 'messenger' | 'email';
+  tags: string[];
+}
 
-  const conversations = [
+interface Message {
+  id: number;
+  text: string;
+  time: string;
+  sender: 'user' | 'contact';
+  status: 'sent' | 'delivered' | 'read';
+  type: 'text' | 'image' | 'file';
+}
+
+const AtendimentosOmnichannel = () => {
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const [message, setMessage] = useState('');
+  const [activeTab, setActiveTab] = useState('abertas');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const contacts: Contact[] = [
     {
       id: 1,
-      customer: 'João Silva',
+      name: 'João Vinícius',
       avatar: '',
+      lastMessage: 'Utilize nosso cardápio para realizar o pedido.',
+      time: '21:49',
+      unread: 2,
+      status: 'online',
       channel: 'whatsapp',
-      status: 'active',
-      priority: 'high',
-      lastMessage: 'Preciso de ajuda com meu pedido',
-      time: '2 min',
-      unread: 3,
-      department: 'Vendas'
+      tags: ['VIP', 'KOMVVN', 'SUPORTE']
     },
     {
       id: 2,
-      customer: 'Maria Santos',
+      name: 'Maria Silva',
       avatar: '',
-      channel: 'email',
-      status: 'waiting',
-      priority: 'medium',
-      lastMessage: 'Quando será entregue meu produto?',
-      time: '15 min',
+      lastMessage: 'Quando será entregue meu pedido?',
+      time: '20:15',
       unread: 1,
-      department: 'Suporte'
+      status: 'away',
+      channel: 'whatsapp',
+      tags: ['VENDAS']
     },
     {
       id: 3,
-      customer: 'Pedro Costa',
+      name: 'Pedro Santos',
       avatar: '',
-      channel: 'chat',
-      status: 'resolved',
-      priority: 'low',
-      lastMessage: 'Obrigado pela ajuda!',
-      time: '1h',
+      lastMessage: 'Obrigado pelo atendimento!',
+      time: '19:32',
       unread: 0,
-      department: 'Suporte'
+      status: 'offline',
+      channel: 'telegram',
+      tags: ['SUPORTE']
+    }
+  ];
+
+  const messages: Message[] = [
+    {
+      id: 1,
+      text: 'Olá! Como posso ajudá-lo hoje?',
+      time: '21:45',
+      sender: 'user',
+      status: 'read',
+      type: 'text'
+    },
+    {
+      id: 2,
+      text: 'Utilize nosso cardápio para realizar o pedido.',
+      time: '21:49',
+      sender: 'contact',
+      status: 'read',
+      type: 'text'
     }
   ];
 
   const getChannelIcon = (channel: string) => {
     switch (channel) {
-      case 'whatsapp': return <MessageSquare className="w-4 h-4" />;
-      case 'email': return <Mail className="w-4 h-4" />;
-      case 'chat': return <MessageSquare className="w-4 h-4" />;
-      default: return <MessageSquare className="w-4 h-4" />;
+      case 'whatsapp': return '📱';
+      case 'telegram': return '✈️';
+      case 'messenger': return '💬';
+      case 'email': return '📧';
+      default: return '💬';
     }
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active':
-        return <Badge variant="success">Ativo</Badge>;
-      case 'waiting':
-        return <Badge variant="warning">Aguardando</Badge>;
-      case 'resolved':
-        return <Badge variant="default">Resolvido</Badge>;
-      default:
-        return <Badge variant="outline">Desconhecido</Badge>;
+      case 'online': return 'bg-green-500';
+      case 'away': return 'bg-yellow-500';
+      case 'offline': return 'bg-gray-400';
+      default: return 'bg-gray-400';
     }
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high':
-        return 'brand-text-error';
-      case 'medium':
-        return 'brand-text-warning';
-      case 'low':
-        return 'brand-text-success';
-      default:
-        return 'brand-text-muted';
+  const handleSendMessage = () => {
+    if (message.trim()) {
+      // Aqui implementaríamos a lógica de envio
+      setMessage('');
     }
   };
+
+  const filteredContacts = contacts.filter(contact =>
+    contact.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold brand-text-foreground">Atendimentos Omnichannel</h2>
-          <p className="brand-text-muted">Gerencie conversas de todos os canais em um só lugar</p>
+    <div className="flex h-screen brand-background">
+      {/* Sidebar - Lista de Conversas */}
+      <div className="w-full md:w-96 brand-card brand-border-gray-200 flex flex-col">
+        {/* Header da Sidebar */}
+        <div className="p-4 brand-border-gray-200 border-b">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold brand-text-foreground">Atendimentos</h2>
+            <Button variant="ghost" size="sm">
+              <MoreVertical className="w-5 h-5" />
+            </Button>
+          </div>
+
+          {/* Tabs de Status */}
+          <div className="flex space-x-1 mb-4">
+            <button
+              onClick={() => setActiveTab('abertas')}
+              className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === 'abertas' 
+                  ? 'brand-primary brand-text-background' 
+                  : 'brand-text-muted brand-hover-gray-100'
+              }`}
+            >
+              <MessageSquare className="w-4 h-4 mr-1" />
+              ABERTAS
+            </button>
+            <button
+              onClick={() => setActiveTab('resolvidos')}
+              className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === 'resolvidos' 
+                  ? 'brand-primary brand-text-background' 
+                  : 'brand-text-muted brand-hover-gray-100'
+              }`}
+            >
+              <UserCheck className="w-4 h-4 mr-1" />
+              RESOLVIDOS
+            </button>
+            <button
+              onClick={() => setActiveTab('grupos')}
+              className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === 'grupos' 
+                  ? 'brand-primary brand-text-background' 
+                  : 'brand-text-muted brand-hover-gray-100'
+              }`}
+            >
+              <Users className="w-4 h-4 mr-1" />
+              GRUPOS
+            </button>
+            <button
+              onClick={() => setActiveTab('chatbot')}
+              className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === 'chatbot' 
+                  ? 'brand-primary brand-text-background' 
+                  : 'brand-text-muted brand-hover-gray-100'
+              }`}
+            >
+              <Bot className="w-4 h-4 mr-1" />
+              CHATBOT
+            </button>
+          </div>
+
+          {/* Barra de Busca */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 brand-text-gray-400" />
+            <Input
+              placeholder="Buscar atendimento e mensagens"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 brand-input brand-border brand-text-foreground"
+            />
+            <Button variant="ghost" size="sm" className="absolute right-2 top-1/2 transform -translate-y-1/2">
+              <Filter className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
-        <Button>
-          <MessageSquare className="w-4 h-4 mr-2" />
-          Nova Conversa
-        </Button>
-      </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="brand-text-muted text-sm font-medium">Conversas Ativas</p>
-                <p className="text-2xl font-bold brand-text-foreground">24</p>
-              </div>
-              <div className="brand-primary p-3 rounded-lg">
-                <MessageSquare className="w-6 h-6 brand-text-background" />
-              </div>
-            </div>
-            <div className="mt-4 flex items-center">
-              <span className="brand-text-success text-sm">+12%</span>
-              <span className="brand-text-muted text-sm ml-1">vs ontem</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="brand-text-muted text-sm font-medium">Tempo Médio</p>
-                <p className="text-2xl font-bold brand-text-foreground">3m 45s</p>
-              </div>
-              <div className="brand-warning p-3 rounded-lg">
-                <Clock className="w-6 h-6 brand-text-foreground" />
-              </div>
-            </div>
-            <div className="mt-4 flex items-center">
-              <span className="brand-text-error text-sm">+5%</span>
-              <span className="brand-text-muted text-sm ml-1">vs ontem</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="brand-text-muted text-sm font-medium">Resoluções</p>
-                <p className="text-2xl font-bold brand-text-foreground">18</p>
-              </div>
-              <div className="brand-success p-3 rounded-lg">
-                <CheckCircle className="w-6 h-6 brand-text-background" />
-              </div>
-            </div>
-            <div className="mt-4 flex items-center">
-              <span className="brand-text-success text-sm">+8%</span>
-              <span className="brand-text-muted text-sm ml-1">vs ontem</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="brand-text-muted text-sm font-medium">Satisfação</p>
-                <p className="text-2xl font-bold brand-text-foreground">4.8</p>
-              </div>
-              <div className="brand-info p-3 rounded-lg">
-                <Users className="w-6 h-6 brand-text-background" />
-              </div>
-            </div>
-            <div className="mt-4 flex items-center">
-              <span className="brand-text-success text-sm">+0.2</span>
-              <span className="brand-text-muted text-sm ml-1">vs ontem</span>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Channel Filter */}
-      <div className="flex space-x-2">
-        <Button 
-          variant={selectedChannel === 'all' ? 'default' : 'outline'}
-          onClick={() => setSelectedChannel('all')}
-          size="sm"
-        >
-          Todos
-        </Button>
-        <Button 
-          variant={selectedChannel === 'whatsapp' ? 'default' : 'outline'}
-          onClick={() => setSelectedChannel('whatsapp')}
-          size="sm"
-        >
-          <MessageSquare className="w-4 h-4 mr-1" />
-          WhatsApp
-        </Button>
-        <Button 
-          variant={selectedChannel === 'email' ? 'default' : 'outline'}
-          onClick={() => setSelectedChannel('email')}
-          size="sm"
-        >
-          <Mail className="w-4 h-4 mr-1" />
-          Email
-        </Button>
-        <Button 
-          variant={selectedChannel === 'chat' ? 'default' : 'outline'}
-          onClick={() => setSelectedChannel('chat')}
-          size="sm"
-        >
-          <MessageSquare className="w-4 h-4 mr-1" />
-          Chat
-        </Button>
-      </div>
-
-      {/* Conversations List */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Conversas Recentes</CardTitle>
-          <CardDescription>Lista de todas as conversas ativas e recentes</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {conversations.map((conversation) => (
-              <div 
-                key={conversation.id} 
-                className="flex items-center space-x-4 p-4 brand-gray-50 brand-hover-gray-100 rounded-lg cursor-pointer brand-border brand-card"
-              >
-                <Avatar>
-                  <AvatarImage src={conversation.avatar} />
-                  <AvatarFallback className="brand-primary brand-text-background">
-                    {conversation.customer.split(' ').map(n => n[0]).join('')}
-                  </AvatarFallback>
-                </Avatar>
+        {/* Lista de Conversas */}
+        <div className="flex-1 overflow-y-auto">
+          {filteredContacts.map((contact) => (
+            <div
+              key={contact.id}
+              onClick={() => setSelectedContact(contact)}
+              className={`p-4 cursor-pointer border-b brand-border-gray-100 transition-colors ${
+                selectedContact?.id === contact.id 
+                  ? 'brand-secondary' 
+                  : 'brand-hover-gray-50'
+              }`}
+            >
+              <div className="flex items-start space-x-3">
+                <div className="relative">
+                  <Avatar className="w-12 h-12">
+                    <AvatarImage src={contact.avatar} />
+                    <AvatarFallback className="brand-primary brand-text-background text-sm">
+                      {contact.name.split(' ').map(n => n[0]).join('')}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${getStatusColor(contact.status)}`}></div>
+                  <div className="absolute -top-1 -right-1 text-lg">
+                    {getChannelIcon(contact.channel)}
+                  </div>
+                </div>
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
+                    <h3 className="font-medium brand-text-foreground truncate">
+                      {contact.name}
+                    </h3>
                     <div className="flex items-center space-x-2">
-                      <p className="font-medium brand-text-foreground">{conversation.customer}</p>
-                      <div className="brand-gray-200 p-1 rounded">
-                        {getChannelIcon(conversation.channel)}
-                      </div>
-                      <span className="brand-text-gray-500 text-sm">{conversation.department}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      {getStatusBadge(conversation.status)}
-                      <AlertCircle className={`w-4 h-4 ${getPriorityColor(conversation.priority)}`} />
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center justify-between mt-1">
-                    <p className="brand-text-muted text-sm truncate">{conversation.lastMessage}</p>
-                    <div className="flex items-center space-x-2">
-                      <span className="brand-text-gray-500 text-xs">{conversation.time}</span>
-                      {conversation.unread > 0 && (
+                      <span className="text-xs brand-text-gray-500">{contact.time}</span>
+                      {contact.unread > 0 && (
                         <Badge variant="destructive" className="text-xs">
-                          {conversation.unread}
+                          {contact.unread}
                         </Badge>
                       )}
                     </div>
                   </div>
+                  
+                  <p className="text-sm brand-text-gray-600 truncate mt-1">
+                    {contact.lastMessage}
+                  </p>
+                  
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {contact.tags.map((tag, index) => (
+                      <Badge 
+                        key={index} 
+                        variant="outline" 
+                        className="text-xs brand-border brand-text-foreground"
+                      >
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
+      {/* Área Principal do Chat */}
+      <div className="flex-1 flex flex-col">
+        {selectedContact ? (
+          <>
+            {/* Header do Chat */}
+            <div className="p-4 brand-card brand-border-gray-200 border-b flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="relative">
+                  <Avatar className="w-10 h-10">
+                    <AvatarImage src={selectedContact.avatar} />
+                    <AvatarFallback className="brand-primary brand-text-background">
+                      {selectedContact.name.split(' ').map(n => n[0]).join('')}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${getStatusColor(selectedContact.status)}`}></div>
+                </div>
+                <div>
+                  <h3 className="font-medium brand-text-foreground">{selectedContact.name}</h3>
+                  <p className="text-sm brand-text-gray-500">
+                    Atribuído a: Suporte Komvvo | Setor: Suporte
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Button variant="ghost" size="sm">
+                  <Phone className="w-5 h-5" />
+                </Button>
+                <Button variant="ghost" size="sm">
+                  <Video className="w-5 h-5" />
+                </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm">
-                      <MoreVertical className="w-4 h-4" />
+                      <MoreVertical className="w-5 h-5" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    <DropdownMenuItem>Assumir conversa</DropdownMenuItem>
-                    <DropdownMenuItem>Transferir</DropdownMenuItem>
-                    <DropdownMenuItem>Marcar como resolvida</DropdownMenuItem>
-                    <DropdownMenuItem>Ver histórico</DropdownMenuItem>
+                    <DropdownMenuItem>Ver perfil</DropdownMenuItem>
+                    <DropdownMenuItem>Transferir atendimento</DropdownMenuItem>
+                    <DropdownMenuItem>Finalizar atendimento</DropdownMenuItem>
+                    <DropdownMenuItem>Bloquear contato</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
-            ))}
+            </div>
+
+            {/* Área de Mensagens */}
+            <div className="flex-1 p-4 overflow-y-auto brand-gray-50" style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23f0f0f0' fill-opacity='0.1'%3E%3Cpath d='M20 20c0-11.046 8.954-20 20-20s20 8.954 20 20-8.954 20-20 20-20-8.954-20-20zm20-16c-8.837 0-16 7.163-16 16s7.163 16 16 16 16-7.163 16-16-7.163-16-16-16z'/%3E%3C/g%3E%3C/svg%3E")`
+            }}>
+              <div className="space-y-4">
+                {messages.map((msg) => (
+                  <div
+                    key={msg.id}
+                    className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div
+                      className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                        msg.sender === 'user'
+                          ? 'brand-primary brand-text-background'
+                          : 'brand-card brand-text-foreground brand-border'
+                      }`}
+                    >
+                      <p className="text-sm">{msg.text}</p>
+                      <p className={`text-xs mt-1 ${
+                        msg.sender === 'user' 
+                          ? 'brand-text-background opacity-70' 
+                          : 'brand-text-gray-500'
+                      }`}>
+                        {msg.time}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Indicador de Status do Atendimento */}
+              <div className="text-center my-4">
+                <div className="inline-flex items-center px-3 py-1 rounded-full brand-success brand-text-background text-xs">
+                  ✓ Atendimento finalizado por Suporte Komvvo, em 15/06/2025 - 15:47
+                </div>
+              </div>
+            </div>
+
+            {/* Input de Mensagem */}
+            <div className="p-4 brand-card brand-border-gray-200 border-t">
+              <div className="flex items-end space-x-2">
+                <Button variant="ghost" size="sm">
+                  <Paperclip className="w-5 h-5" />
+                </Button>
+                <div className="flex-1 brand-card brand-border rounded-lg">
+                  <Input
+                    placeholder="Digite uma mensagem"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                    className="border-0 focus:ring-0 brand-input"
+                  />
+                </div>
+                <Button variant="ghost" size="sm">
+                  <Smile className="w-5 h-5" />
+                </Button>
+                {message ? (
+                  <Button onClick={handleSendMessage} size="sm" className="brand-primary">
+                    <Send className="w-4 h-4" />
+                  </Button>
+                ) : (
+                  <Button variant="ghost" size="sm">
+                    <Mic className="w-5 h-5" />
+                  </Button>
+                )}
+              </div>
+            </div>
+          </>
+        ) : (
+          /* Estado Vazio */
+          <div className="flex-1 flex items-center justify-center brand-gray-50">
+            <div className="text-center">
+              <MessageSquare className="w-16 h-16 brand-text-gray-300 mx-auto mb-4" />
+              <h3 className="text-lg font-medium brand-text-foreground mb-2">
+                Selecione uma conversa
+              </h3>
+              <p className="brand-text-gray-500">
+                Escolha uma conversa na lista para começar a atender
+              </p>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        )}
+      </div>
     </div>
   );
 };
