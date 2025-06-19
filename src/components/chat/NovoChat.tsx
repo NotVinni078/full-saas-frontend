@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ArrowLeft, Search, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Search, MessageCircle, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -183,7 +183,7 @@ export const NovoChat: React.FC<NovoChatProps> = ({
                 }
               </p>
               <Button 
-                onClick={on Back}
+                onClick={onBack}
                 variant="outline"
                 className="border-border hover:bg-accent"
               >
