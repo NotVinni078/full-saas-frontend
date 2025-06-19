@@ -23,7 +23,7 @@ interface ChatInicioProps {
 /**
  * Componente da tela inicial do Chat Interno
  * Exibe lista de chats existentes, barra de pesquisa e botões para novos chats
- * Utiliza cores dinâmicas da gestão de marca
+ * Layout similar ao painel lateral do WhatsApp Desktop
  * Responsivo para desktop, tablet e mobile
  */
 export const ChatInicio: React.FC<ChatInicioProps> = ({
@@ -56,92 +56,68 @@ export const ChatInicio: React.FC<ChatInicioProps> = ({
   };
 
   return (
-    <div className="w-full bg-card border-r border-border flex flex-col">
+    <div className="w-full h-full flex flex-col bg-card">
       {/* 
-        Cabeçalho da tela inicial
-        Contém título, barra de pesquisa e botões de ação
+        Cabeçalho estilo WhatsApp
+        Contém título e botões de ação
       */}
-      <div className="p-4 border-b border-border bg-card">
-        {/* Título da página */}
+      <div className="p-4 bg-card border-b border-border">
+        {/* Cabeçalho principal */}
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold text-foreground">Chat Interno</h1>
+          <h1 className="text-xl font-medium text-foreground">Conversas</h1>
           
-          {/* Botões para criar novos chats - Desktop */}
-          <div className="hidden md:flex items-center gap-2">
+          {/* Botões de ação - estilo WhatsApp */}
+          <div className="flex items-center gap-2">
             <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={onNewChat}
-              className="bg-background hover:bg-accent text-foreground border-border"
-            >
-              <MessageCircle className="w-4 h-4 mr-2" />
-              Novo Chat
-            </Button>
-            <Button 
-              variant="outline" 
+              variant="ghost" 
               size="sm" 
               onClick={onNewGroup}
-              className="bg-background hover:bg-accent text-foreground border-border"
+              className="h-8 w-8 p-0 hover:bg-accent"
             >
-              <Users className="w-4 h-4 mr-2" />
-              Novo Grupo
+              <Users className="w-4 h-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={onNewChat}
+              className="h-8 w-8 p-0 hover:bg-accent"
+            >
+              <MessageCircle className="w-4 h-4" />
             </Button>
           </div>
         </div>
         
-        {/* Barra de pesquisa responsiva */}
-        <div className="relative mb-3">
+        {/* Barra de pesquisa estilo WhatsApp */}
+        <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar conversas..."
+            placeholder="Buscar ou começar uma nova conversa"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground"
+            className="pl-10 bg-muted/50 border-0 focus:bg-background focus:ring-1 focus:ring-primary/20 rounded-lg"
           />
-        </div>
-
-        {/* Botões para mobile/tablet - Responsivos */}
-        <div className="flex md:hidden gap-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={onNewChat}
-            className="flex-1 bg-background hover:bg-accent text-foreground border-border"
-          >
-            <MessageCircle className="w-4 h-4 mr-2" />
-            Novo Chat
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={onNewGroup}
-            className="flex-1 bg-background hover:bg-accent text-foreground border-border"
-          >
-            <Users className="w-4 h-4 mr-2" />
-            Novo Grupo
-          </Button>
         </div>
       </div>
 
       {/* 
-        Lista de conversas existentes
-        Scrollável com todos os chats filtrados
+        Lista de conversas - estilo WhatsApp
+        Scrollável com todas as conversas
       */}
       <ScrollArea className="flex-1">
         {filteredChats.length > 0 ? (
-          <div className="p-2 space-y-1">
+          <div className="py-2">
             {filteredChats.map((chat) => (
               <div
                 key={chat.id}
                 onClick={() => onSelectChat(chat.id)}
-                className="flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-accent group"
+                className="flex items-center gap-3 p-3 hover:bg-muted/50 cursor-pointer transition-colors border-b border-border/50 last:border-0"
               >
-                {/* Avatar do chat (usuário ou grupo) */}
+                {/* Avatar do chat */}
                 <div className="relative flex-shrink-0">
                   <Avatar className="h-12 w-12">
                     <AvatarFallback className="bg-primary text-primary-foreground">
                       {chat.type === 'group' ? (
-                        <Users className="w-6 h-6" />
+                        <Users className="w-5 h-5" />
                       ) : (
                         chat.avatar || chat.name.slice(0, 2).toUpperCase()
                       )}
@@ -150,7 +126,7 @@ export const ChatInicio: React.FC<ChatInicioProps> = ({
                   
                   {/* Indicador de mensagens não lidas */}
                   {chat.unreadCount > 0 && (
-                    <div className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full min-w-[20px] h-5 flex items-center justify-center text-xs font-medium">
+                    <div className="absolute -top-1 -right-1 bg-primary text-primary-foreground rounded-full min-w-[18px] h-[18px] flex items-center justify-center text-xs font-medium">
                       {chat.unreadCount > 99 ? '99+' : chat.unreadCount}
                     </div>
                   )}
@@ -159,17 +135,9 @@ export const ChatInicio: React.FC<ChatInicioProps> = ({
                 {/* Informações do chat */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-medium text-foreground truncate group-hover:text-accent-foreground">
-                        {chat.name}
-                      </h3>
-                      {/* Badge para indicar tipo de chat */}
-                      {chat.type === 'group' && (
-                        <Badge variant="secondary" className="text-xs">
-                          {chat.participants.length} membros
-                        </Badge>
-                      )}
-                    </div>
+                    <h3 className="font-medium text-foreground truncate">
+                      {chat.name}
+                    </h3>
                     
                     {/* Horário da última mensagem */}
                     {chat.lastMessage && (
@@ -179,51 +147,57 @@ export const ChatInicio: React.FC<ChatInicioProps> = ({
                     )}
                   </div>
                   
-                  {/* Prévia da última mensagem */}
-                  {chat.lastMessage ? (
-                    <p className="text-sm text-muted-foreground truncate">
-                      {chat.lastMessage.isDeleted 
-                        ? '🗑️ Mensagem deletada'
-                        : `${chat.lastMessage.senderName}: ${chat.lastMessage.content}`
-                      }
-                    </p>
-                  ) : (
-                    <p className="text-sm text-muted-foreground italic">
-                      Nenhuma mensagem ainda
-                    </p>
-                  )}
+                  {/* Preview da última mensagem */}
+                  <div className="flex items-center justify-between">
+                    {chat.lastMessage ? (
+                      <p className="text-sm text-muted-foreground truncate">
+                        {chat.lastMessage.isDeleted 
+                          ? 'Esta mensagem foi deletada'
+                          : chat.lastMessage.content
+                        }
+                      </p>
+                    ) : (
+                      <p className="text-sm text-muted-foreground italic">
+                        Toque para enviar uma mensagem
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          /* Estado vazio quando não há chats */
+          /* Estado vazio */
           <div className="flex-1 flex items-center justify-center p-8 text-center">
-            <div className="max-w-md">
+            <div className="max-w-sm">
               <div className="mb-4">
-                <MessageCircle className="w-16 h-16 text-muted-foreground mx-auto opacity-50" />
+                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                  <MessageCircle className="w-8 h-8 text-muted-foreground" />
+                </div>
               </div>
               <h3 className="text-lg font-medium text-foreground mb-2">
-                {searchQuery ? 'Nenhum chat encontrado' : 'Nenhuma conversa ainda'}
+                {searchQuery ? 'Nenhuma conversa encontrada' : 'Nenhuma conversa'}
               </h3>
-              <p className="text-muted-foreground mb-4">
+              <p className="text-sm text-muted-foreground mb-4">
                 {searchQuery 
                   ? 'Tente buscar por outro termo'
-                  : 'Comece uma nova conversa clicando em "Novo Chat" ou "Novo Grupo"'
+                  : 'Inicie uma nova conversa para começar'
                 }
               </p>
               {!searchQuery && (
-                <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                <div className="flex flex-col gap-2">
                   <Button 
                     onClick={onNewChat}
+                    size="sm"
                     className="bg-primary text-primary-foreground hover:bg-primary/90"
                   >
                     <MessageCircle className="w-4 h-4 mr-2" />
-                    Novo Chat
+                    Nova Conversa
                   </Button>
                   <Button 
                     variant="outline" 
                     onClick={onNewGroup}
+                    size="sm"
                     className="border-border hover:bg-accent"
                   >
                     <Users className="w-4 h-4 mr-2" />

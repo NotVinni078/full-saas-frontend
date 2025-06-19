@@ -1,12 +1,5 @@
-
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Search, Smile, Paperclip, UserPlus, ArrowLeft, Users, MoreVertical, Trash2, Reply, Heart } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useUsers } from "@/hooks/useUsers";
 import { ChatInicio } from './chat/ChatInicio';
 import { NovoChat } from './chat/NovoChat';
@@ -57,7 +50,7 @@ type ChatState = 'inicio' | 'novo-chat' | 'novo-grupo' | 'conversa';
 /**
  * Componente principal do Chat Interno
  * Gerencia toda a interface e funcionalidades do sistema de chat
- * Utiliza cores dinâmicas da gestão de marca
+ * Layout similar ao WhatsApp Desktop
  * Totalmente responsivo para todos os tamanhos de tela
  */
 const ChatInterno = () => {
@@ -68,6 +61,9 @@ const ChatInterno = () => {
   const [chats, setChats] = useState<Chat[]>([]);
   const [currentMessage, setCurrentMessage] = useState('');
   const [replyingTo, setReplyingTo] = useState<Message | null>(null);
+  
+  // Hook para detectar dispositivos móveis
+  const isMobile = useIsMobile();
   
   // Hook para acessar dados dos usuários do sistema
   const { users, getActiveUsers } = useUsers();
@@ -298,57 +294,154 @@ const ChatInterno = () => {
    */
   const selectedChat = chats.find(chat => chat.id === selectedChatId);
 
-  // Renderização condicional baseada no estado atual
+  // No mobile, mostrar apenas uma tela por vez (similar ao WhatsApp mobile)
+  if (isMobile) {
+    return (
+      <div className="h-full bg-background">
+        {currentState === 'inicio' && (
+          <ChatInicio
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            filteredChats={filteredChats}
+            onSelectChat={(chatId) => {
+              setSelectedChatId(chatId);
+              setCurrentState('conversa');
+            }}
+            onNewChat={() => setCurrentState('novo-chat')}
+            onNewGroup={() => setCurrentState('novo-grupo')}
+          />
+        )}
+
+        {currentState === 'novo-chat' && (
+          <NovoChat
+            onBack={() => setCurrentState('inicio')}
+            onSelectUser={handleStartIndividualChat}
+            existingChats={chats}
+          />
+        )}
+
+        {currentState === 'novo-grupo' && (
+          <NovoGrupo
+            onBack={() => setCurrentState('inicio')}
+            onCreate={handleCreateGroup}
+          />
+        )}
+
+        {currentState === 'conversa' && selectedChat && (
+          <ChatConversa
+            chat={selectedChat}
+            currentMessage={currentMessage}
+            setCurrentMessage={setCurrentMessage}
+            replyingTo={replyingTo}
+            setReplyingTo={setReplyingTo}
+            onBack={() => setCurrentState('inicio')}
+            onSendMessage={handleSendMessage}
+            onReactToMessage={handleReactToMessage}
+            onDeleteMessage={handleDeleteMessage}
+            messagesEndRef={messagesEndRef}
+            messageInputRef={messageInputRef}
+          />
+        )}
+      </div>
+    );
+  }
+
+  // Layout desktop similar ao WhatsApp - duas colunas
   return (
     <div className="h-full bg-background flex">
-      {/* 
-        Renderização condicional dos componentes baseada no estado atual
-        Cada estado representa uma tela diferente da aplicação
-      */}
-      {currentState === 'inicio' && (
-        <ChatInicio
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          filteredChats={filteredChats}
-          onSelectChat={(chatId) => {
-            setSelectedChatId(chatId);
-            setCurrentState('conversa');
-          }}
-          onNewChat={() => setCurrentState('novo-chat')}
-          onNewGroup={() => setCurrentState('novo-grupo')}
-        />
-      )}
+      {/* Painel lateral esquerdo - Lista de chats */}
+      <div className="w-96 border-r border-border bg-card flex flex-col">
+        {(currentState === 'inicio' || currentState === 'conversa') && (
+          <ChatInicio
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            filteredChats={filteredChats}
+            onSelectChat={(chatId) => {
+              setSelectedChatId(chatId);
+              setCurrentState('conversa');
+            }}
+            onNewChat={() => setCurrentState('novo-chat')}
+            onNewGroup={() => setCurrentState('novo-grupo')}
+          />
+        )}
 
-      {currentState === 'novo-chat' && (
-        <NovoChat
-          onBack={() => setCurrentState('inicio')}
-          onSelectUser={handleStartIndividualChat}
-          existingChats={chats}
-        />
-      )}
+        {currentState === 'novo-chat' && (
+          <NovoChat
+            onBack={() => setCurrentState('inicio')}
+            onSelectUser={handleStartIndividualChat}
+            existingChats={chats}
+          />
+        )}
 
-      {currentState === 'novo-grupo' && (
-        <NovoGrupo
-          onBack={() => setCurrentState('inicio')}
-          onCreate={handleCreateGroup}
-        />
-      )}
+        {currentState === 'novo-grupo' && (
+          <NovoGrupo
+            onBack={() => setCurrentState('inicio')}
+            onCreate={handleCreateGroup}
+          />
+        )}
+      </div>
 
-      {currentState === 'conversa' && selectedChat && (
-        <ChatConversa
-          chat={selectedChat}
-          currentMessage={currentMessage}
-          setCurrentMessage={setCurrentMessage}
-          replyingTo={replyingTo}
-          setReplyingTo={setReplyingTo}
-          onBack={() => setCurrentState('inicio')}
-          onSendMessage={handleSendMessage}
-          onReactToMessage={handleReactToMessage}
-          onDeleteMessage={handleDeleteMessage}
-          messagesEndRef={messagesEndRef}
-          messageInputRef={messageInputRef}
-        />
-      )}
+      {/* Painel principal direito - Conversa ativa */}
+      <div className="flex-1 flex flex-col">
+        {selectedChat && currentState === 'conversa' ? (
+          <ChatConversa
+            chat={selectedChat}
+            currentMessage={currentMessage}
+            setCurrentMessage={setCurrentMessage}
+            replyingTo={replyingTo}
+            setReplyingTo={setReplyingTo}
+            onBack={() => {
+              setCurrentState('inicio');
+              setSelectedChatId('');
+            }}
+            onSendMessage={handleSendMessage}
+            onReactToMessage={handleReactToMessage}
+            onDeleteMessage={handleDeleteMessage}
+            messagesEndRef={messagesEndRef}
+            messageInputRef={messageInputRef}
+          />
+        ) : (
+          /* Estado inicial sem conversa selecionada - similar ao WhatsApp */
+          <div className="flex-1 flex items-center justify-center bg-muted/20">
+            <div className="text-center max-w-md">
+              <div className="mb-6">
+                <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="1" 
+                    className="w-12 h-12 text-primary/60"
+                  >
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                  </svg>
+                </div>
+              </div>
+              <h2 className="text-2xl font-light text-foreground mb-2">
+                Chat Interno
+              </h2>
+              <p className="text-muted-foreground mb-6">
+                Envie e receba mensagens de forma rápida e segura.<br />
+                Selecione uma conversa para começar.
+              </p>
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={() => setCurrentState('novo-chat')}
+                  className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                >
+                  Novo Chat
+                </button>
+                <button
+                  onClick={() => setCurrentState('novo-grupo')}
+                  className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors"
+                >
+                  Novo Grupo
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
