@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import SidebarLayout from '@/components/SidebarLayout';
 import { Button } from '@/components/ui/button';
@@ -61,8 +60,10 @@ const Planos = () => {
   /**
    * Calcula o total de conexões permitidas somando todos os canais
    */
-  const getTotalConnections = (channels: any): number => {
-    return Object.values(channels).reduce((sum: number, count: unknown) => sum + (count as number), 0);
+  const getTotalConnections = (channels: Record<string, number>): number => {
+    return Object.values(channels).reduce((sum: number, count: number) => {
+      return sum + (typeof count === 'number' ? count : 0);
+    }, 0);
   };
 
   /**
