@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { RotateCcw, WifiOff, Trash2, MessageSquare, Send, Instagram, Facebook, Globe } from 'lucide-react';
+import { RotateCcw, WifiOff, Trash2, MessageSquare, Send, Instagram, Facebook, Globe, Edit } from 'lucide-react';
 
 interface Connection {
   id: string;
@@ -20,20 +20,21 @@ interface ConnectionCardProps {
   onRestart: (id: string) => void;
   onDisconnect: (id: string) => void;
   onDelete: (id: string) => void;
+  onEdit: (connection: Connection) => void;
 }
 
 /**
  * Componente de card para exibir conexões existentes
- * Mostra informações da conexão e ações disponíveis
- * Usa logos oficiais das empresas ao invés de ícones genéricos
- * Responsivo para desktop, tablet e mobile
- * Utiliza cores dinâmicas da gestão de marca
+ * Melhorias implementadas:
+ * - Adicionado botão "Editar" com ícone específico
+ * - Reorganização dos botões de ação com melhor responsividade
+ * - Mantém logos oficiais das empresas e cores dinâmicas
+ * - Layout otimizado para desktop, tablet e mobile
  */
-const ConnectionCard = ({ connection, onRestart, onDisconnect, onDelete }: ConnectionCardProps) => {
+const ConnectionCard = ({ connection, onRestart, onDisconnect, onDelete, onEdit }: ConnectionCardProps) => {
   
   /**
    * Retorna a logo oficial da empresa correspondente ao canal
-   * Substitui ícones genéricos por logos reais das plataformas
    */
   const getChannelLogo = (channel: string) => {
     const logos = {
@@ -79,7 +80,6 @@ const ConnectionCard = ({ connection, onRestart, onDisconnect, onDelete }: Conne
 
   /**
    * Retorna as cores do badge baseado no status da conexão
-   * Utiliza o sistema de cores dinâmicas
    */
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -123,7 +123,6 @@ const ConnectionCard = ({ connection, onRestart, onDisconnect, onDelete }: Conne
                 alt={`${getChannelName(connection.channel)} logo`}
                 className="h-8 w-8 object-contain"
                 onError={(e) => {
-                  // Fallback para ícone se logo não carregar
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
                   const fallbackDiv = target.nextElementSibling as HTMLDivElement;
@@ -161,18 +160,29 @@ const ConnectionCard = ({ connection, onRestart, onDisconnect, onDelete }: Conne
           Última atividade: {connection.lastActivity}
         </div>
 
-        {/* Botões de ação responsivos */}
-        <div className="flex flex-col sm:flex-row gap-2">
+        {/* Botões de ação reorganizados com novo botão Editar */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          {/* Botão Editar - Novo */}
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => onEdit(connection)}
+            className="border-brand text-brand-foreground hover:bg-brand-accent"
+          >
+            <Edit className="h-4 w-4 mr-1" />
+            <span className="hidden sm:inline">Editar</span>
+          </Button>
+
           {/* Botão Reiniciar */}
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="flex-1 border-brand text-brand-foreground hover:bg-brand-accent"
+                className="border-brand text-brand-foreground hover:bg-brand-accent"
               >
-                <RotateCcw className="h-4 w-4 mr-2" />
-                Reiniciar
+                <RotateCcw className="h-4 w-4 mr-1" />
+                <span className="hidden sm:inline">Reiniciar</span>
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent className="border-brand bg-brand-background">
@@ -205,10 +215,10 @@ const ConnectionCard = ({ connection, onRestart, onDisconnect, onDelete }: Conne
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="flex-1 border-brand text-brand-foreground hover:bg-brand-accent"
+                className="border-brand text-brand-foreground hover:bg-brand-accent"
               >
-                <WifiOff className="h-4 w-4 mr-2" />
-                Desconectar
+                <WifiOff className="h-4 w-4 mr-1" />
+                <span className="hidden sm:inline">Desconectar</span>
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent className="border-brand bg-brand-background">
@@ -241,10 +251,10 @@ const ConnectionCard = ({ connection, onRestart, onDisconnect, onDelete }: Conne
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="flex-1 border-red-300 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950"
+                className="border-red-300 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950"
               >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Excluir
+                <Trash2 className="h-4 w-4 mr-1" />
+                <span className="hidden sm:inline">Excluir</span>
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent className="border-brand bg-brand-background">

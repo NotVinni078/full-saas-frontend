@@ -4,12 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, Search, QrCode } from 'lucide-react';
+import { Plus, Search, QrCode, Edit } from 'lucide-react';
 import { useSectors } from '@/hooks/useSectors';
 import SectorSelector from '@/components/selectors/SectorSelector';
+import MultipleSectorSelector from '@/components/selectors/MultipleSectorSelector';
 import ChannelSelector from '@/components/selectors/ChannelSelector';
 import ImportSettings from '@/components/selectors/ImportSettings';
 import ConnectionCard from '@/components/cards/ConnectionCard';
+import QRCodeDisplay from '@/components/qr/QRCodeDisplay';
 
 /**
  * Interface para definir uma conexão
@@ -19,7 +21,7 @@ interface Connection {
   id: string;
   name: string;
   channel: string;
-  sector: string;
+  sector: string | string[]; // Agora suporta múltiplos setores
   status: 'connected' | 'disconnected' | 'error';
   lastActivity: string;
   importSettings?: {
@@ -35,7 +37,7 @@ interface Connection {
  */
 interface NewConnection {
   name: string;
-  sector: string;
+  sector: string | string[];
   channel: string;
   importSettings?: any;
 }
@@ -43,16 +45,20 @@ interface NewConnection {
 /**
  * Componente principal de Gerenciamento de Conexões
  * Melhorias implementadas:
- * - Removido alert desnecessário de estatísticas
- * - Seletor de canais convertido para dropdown com logos oficiais
- * - Seletor de setores com fundo sólido e alta visibilidade
- * - Toggles com maior destaque seguindo cores dinâmicas
- * - Instruções técnicas removidas da interface (mantidas em comentários)
- * - Responsivo para desktop, tablet e mobile
+ * - Botão "Editar" adicionado aos cards de conexão
+ * - Instruções completas para Facebook e Instagram
+ * - Seleção múltipla de setores no formulário
+ * - Layout para exibição de QR Code da API Baileys
+ * - Modal de edição de conexões existentes
+ * - Responsividade aprimorada para todas as telas
+ * - Cores dinâmicas da gestão de marca mantidas
  */
 const Conexoes = () => {
   // Estado para controlar o diálogo de nova conexão
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  
+  // Estado para controlar o diálogo de edição
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   
   // Estado para pesquisa de conexões
   const [searchTerm, setSearchTerm] = useState('');
@@ -60,21 +66,27 @@ const Conexoes = () => {
   // Estado para nova conexão sendo criada
   const [newConnection, setNewConnection] = useState<NewConnection>({
     name: '',
-    sector: '',
+    sector: [],
     channel: '',
     importSettings: undefined
   });
 
-  // Hook para acessar setores disponíveis
-  const { getActiveSectors } = useSectors();
+  // Estado para conexão sendo editada
+  const [editingConnection, setEditingConnection] = useState<Connection | null>(null);
 
-  // Estado para conexões existentes (dados mock para exemplo)
+  // Estado para controlar exibição do QR Code
+  const [showQRCode, setShowQRCode] = useState<string | null>(null);
+
+  // Hook para acessar setores disponíveis
+  const { getActiveSectors, getSectorById } = useSectors();
+
+  // Estado para conexões existentes (dados mock atualizados)
   const [connections, setConnections] = useState<Connection[]>([
     {
       id: '1',
       name: 'WhatsApp Principal',
       channel: 'whatsapp-qr',
-      sector: 'Vendas',
+      sector: ['vendas', 'suporte'], // Múltiplos setores
       status: 'connected',
       lastActivity: '2024-01-15 14:30'
     },
@@ -82,7 +94,7 @@ const Conexoes = () => {
       id: '2',
       name: 'Instagram Oficial',
       channel: 'instagram',
-      sector: 'Marketing',
+      sector: ['marketing'],
       status: 'connected',
       lastActivity: '2024-01-15 14:25'
     },
@@ -90,25 +102,44 @@ const Conexoes = () => {
       id: '3',
       name: 'Telegram Suporte',
       channel: 'telegram',
-      sector: 'Suporte',
+      sector: ['suporte', 'vendas'],
       status: 'disconnected',
       lastActivity: '2024-01-14 09:15'
     }
   ]);
 
   /**
-   * Filtra conexões baseado no termo de pesquisa
-   * Busca por nome, canal ou setor
+   * Formata a exibição dos setores para o card
    */
-  const filteredConnections = connections.filter(connection =>
-    connection.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    connection.channel.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    connection.sector.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const formatSectors = (sectors: string | string[]): string => {
+    if (typeof sectors === 'string') {
+      const sector = getSectorById(sectors);
+      return sector?.nome || sectors;
+    }
+    
+    if (Array.isArray(sectors)) {
+      return sectors
+        .map(id => getSectorById(id)?.nome || id)
+        .join(', ');
+    }
+    
+    return '';
+  };
+
+  /**
+   * Filtra conexões baseado no termo de pesquisa
+   */
+  const filteredConnections = connections.filter(connection => {
+    const searchLower = searchTerm.toLowerCase();
+    const sectorNames = formatSectors(connection.sector).toLowerCase();
+    
+    return connection.name.toLowerCase().includes(searchLower) ||
+           connection.channel.toLowerCase().includes(searchLower) ||
+           sectorNames.includes(searchLower);
+  });
 
   /**
    * Manipula a criação de uma nova conexão
-   * Valida dados e adiciona à lista
    */
   const handleCreateConnection = () => {
     if (!newConnection.name || !newConnection.sector || !newConnection.channel) {
@@ -131,19 +162,46 @@ const Conexoes = () => {
     // Reset do formulário
     setNewConnection({
       name: '',
-      sector: '',
+      sector: [],
       channel: '',
       importSettings: undefined
     });
     
     setIsDialogOpen(false);
     
+    // Mostra QR Code se for WhatsApp Baileys
+    if (newConnection.channel === 'whatsapp-qr') {
+      setShowQRCode(connection.id);
+    }
+    
     console.log('Nova conexão criada:', connection);
   };
 
   /**
+   * Manipula a edição de uma conexão existente
+   */
+  const handleEditConnection = (connection: Connection) => {
+    setEditingConnection(connection);
+    setIsEditDialogOpen(true);
+  };
+
+  /**
+   * Salva as alterações da conexão editada
+   */
+  const handleSaveEdit = () => {
+    if (!editingConnection) return;
+
+    setConnections(prev => prev.map(conn => 
+      conn.id === editingConnection.id ? editingConnection : conn
+    ));
+    
+    setIsEditDialogOpen(false);
+    setEditingConnection(null);
+    console.log('Conexão editada:', editingConnection);
+  };
+
+  /**
    * Manipula o reinício de uma conexão
-   * Backend deve implementar lógica de reconexão
    */
   const handleRestart = (id: string) => {
     setConnections(prev => prev.map(conn => 
@@ -156,7 +214,6 @@ const Conexoes = () => {
 
   /**
    * Manipula a desconexão de uma conexão
-   * Backend deve parar os webhooks e limpeza necessária
    */
   const handleDisconnect = (id: string) => {
     setConnections(prev => prev.map(conn => 
@@ -169,7 +226,6 @@ const Conexoes = () => {
 
   /**
    * Manipula a exclusão de uma conexão
-   * Backend deve remover todos os dados relacionados
    */
   const handleDelete = (id: string) => {
     setConnections(prev => prev.filter(conn => conn.id !== id));
@@ -188,7 +244,6 @@ const Conexoes = () => {
 
   /**
    * Renderiza o código do WebChat quando selecionado
-   * Fornece instruções completas para incorporação
    */
   const renderWebChatCode = () => {
     if (newConnection.channel !== 'webchat') return null;
@@ -268,7 +323,7 @@ const Conexoes = () => {
 
   return (
     <div className="p-4 lg:p-6 space-y-4 lg:space-y-6">
-      {/* Cabeçalho principal simplificado */}
+      {/* Cabeçalho principal */}
       <div className="flex flex-col space-y-4">
         <div>
           <h1 className="text-xl lg:text-2xl font-bold text-brand-foreground">
@@ -280,9 +335,9 @@ const Conexoes = () => {
         </div>
       </div>
 
-      {/* Barra de ferramentas com pesquisa e botão criar */}
+      {/* Barra de ferramentas */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        {/* Barra de pesquisa responsiva */}
+        {/* Barra de pesquisa */}
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-brand-muted" />
           <Input
@@ -326,17 +381,17 @@ const Conexoes = () => {
                 />
               </div>
 
-              {/* Seletor de setor com dropdown melhorado */}
+              {/* Seletor múltiplo de setores */}
               <div className="space-y-2">
-                <Label className="text-brand-foreground">Setor Responsável *</Label>
-                <SectorSelector
-                  value={newConnection.sector}
-                  onValueChange={(sector) => setNewConnection({...newConnection, sector})}
-                  placeholder="Selecione o setor responsável"
+                <Label className="text-brand-foreground">Setores Responsáveis *</Label>
+                <MultipleSectorSelector
+                  value={Array.isArray(newConnection.sector) ? newConnection.sector : []}
+                  onValueChange={(sectors) => setNewConnection({...newConnection, sector: sectors})}
+                  placeholder="Selecione os setores responsáveis"
                 />
               </div>
 
-              {/* Seletor de canal como dropdown */}
+              {/* Seletor de canal */}
               <div className="space-y-2">
                 <ChannelSelector
                   value={newConnection.channel}
@@ -344,7 +399,7 @@ const Conexoes = () => {
                 />
               </div>
 
-              {/* Configurações de importação com toggles melhorados */}
+              {/* Configurações de importação */}
               {newConnection.channel && (
                 <ImportSettings
                   channel={newConnection.channel}
@@ -352,13 +407,13 @@ const Conexoes = () => {
                 />
               )}
 
-              {/* Código do WebChat se selecionado */}
+              {/* Código do WebChat */}
               {renderWebChatCode()}
 
-              {/* Informações do QR Code para WhatsApp Baileys */}
+              {/* Informações do QR Code */}
               {renderQRCodeInfo()}
 
-              {/* Botões de ação do modal */}
+              {/* Botões de ação */}
               <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 pt-4 border-t border-brand">
                 <Button 
                   variant="outline" 
@@ -378,7 +433,105 @@ const Conexoes = () => {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Modal de edição de conexão */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto mx-4 border-brand bg-brand-background">
+            <DialogHeader>
+              <DialogTitle className="text-brand-foreground flex items-center gap-2">
+                <Edit className="h-5 w-5" />
+                Editar Conexão
+              </DialogTitle>
+              <DialogDescription className="text-brand-muted">
+                Modifique as configurações da conexão selecionada
+              </DialogDescription>
+            </DialogHeader>
+            
+            {editingConnection && (
+              <div className="space-y-6 py-4">
+                {/* Campo nome da conexão */}
+                <div className="space-y-2">
+                  <Label className="text-brand-foreground">Nome da Conexão *</Label>
+                  <Input
+                    value={editingConnection.name}
+                    onChange={(e) => setEditingConnection({...editingConnection, name: e.target.value})}
+                    placeholder="Ex: WhatsApp Principal"
+                    className="border-brand bg-brand-background text-brand-foreground"
+                  />
+                </div>
+
+                {/* Seletor de setores (usando seletor único para compatibilidade) */}
+                <div className="space-y-2">
+                  <Label className="text-brand-foreground">Setor Responsável *</Label>
+                  <SectorSelector
+                    value={Array.isArray(editingConnection.sector) ? editingConnection.sector[0] : editingConnection.sector}
+                    onValueChange={(sector) => setEditingConnection({...editingConnection, sector})}
+                    placeholder="Selecione o setor responsável"
+                  />
+                </div>
+
+                {/* Canal (somente leitura) */}
+                <div className="space-y-2">
+                  <Label className="text-brand-foreground">Canal de Comunicação</Label>
+                  <Input
+                    value={editingConnection.channel}
+                    disabled
+                    className="border-brand bg-brand-muted text-brand-muted"
+                  />
+                  <p className="text-xs text-brand-muted">
+                    O canal não pode ser alterado após a criação da conexão.
+                  </p>
+                </div>
+
+                {/* Botões de ação */}
+                <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 pt-4 border-t border-brand">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setIsEditDialogOpen(false)}
+                    className="w-full sm:w-auto border-brand text-brand-foreground hover:bg-brand-accent"
+                  >
+                    Cancelar
+                  </Button>
+                  <Button 
+                    onClick={handleSaveEdit}
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground w-full sm:w-auto"
+                  >
+                    Salvar Alterações
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
+
+      {/* Exibição do QR Code quando necessário */}
+      {showQRCode && (
+        <div className="mb-6">
+          <QRCodeDisplay
+            connectionId={showQRCode}
+            connectionName={connections.find(c => c.id === showQRCode)?.name || 'Conexão'}
+            onStatusChange={(status) => {
+              if (status === 'connected') {
+                setConnections(prev => prev.map(conn => 
+                  conn.id === showQRCode 
+                    ? { ...conn, status: 'connected', lastActivity: new Date().toLocaleString('pt-BR') }
+                    : conn
+                ));
+              }
+            }}
+          />
+          <div className="mt-4 text-center">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowQRCode(null)}
+              className="border-brand text-brand-foreground hover:bg-brand-accent"
+            >
+              Fechar QR Code
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Grid de conexões existentes */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
@@ -386,10 +539,14 @@ const Conexoes = () => {
           filteredConnections.map((connection) => (
             <ConnectionCard
               key={connection.id}
-              connection={connection}
+              connection={{
+                ...connection,
+                sector: formatSectors(connection.sector) // Converte para string para exibição
+              }}
               onRestart={handleRestart}
               onDisconnect={handleDisconnect}
               onDelete={handleDelete}
+              onEdit={handleEditConnection}
             />
           ))
         ) : (
@@ -418,7 +575,7 @@ const Conexoes = () => {
         )}
       </div>
 
-      {/* Instruções de uso */}
+      {/* Instruções de configuração atualizadas com Facebook e Instagram */}
       <Card className="border-brand bg-brand-background">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-brand-foreground">
@@ -427,8 +584,8 @@ const Conexoes = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Instrução WhatsApp */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* WhatsApp QR Code */}
             <div className="space-y-2">
               <h4 className="font-medium text-brand-foreground">WhatsApp QR Code</h4>
               <p className="text-sm text-brand-muted">
@@ -437,7 +594,7 @@ const Conexoes = () => {
               </p>
             </div>
             
-            {/* Instrução WhatsApp Oficial */}
+            {/* WhatsApp API Oficial */}
             <div className="space-y-2">
               <h4 className="font-medium text-brand-foreground">WhatsApp API Oficial</h4>
               <p className="text-sm text-brand-muted">
@@ -445,15 +602,33 @@ const Conexoes = () => {
               </p>
             </div>
             
-            {/* Instrução Telegram */}
+            {/* Telegram */}
             <div className="space-y-2">
               <h4 className="font-medium text-brand-foreground">Telegram</h4>
               <p className="text-sm text-brand-muted">
-                Configure um bot via @BotFather e conecte através do QR Code gerado.
+                Configure um bot via @BotFather e conecte através do token gerado.
               </p>
             </div>
             
-            {/* Instrução WebChat */}
+            {/* Facebook - Nova instrução */}
+            <div className="space-y-2">
+              <h4 className="font-medium text-brand-foreground">Facebook</h4>
+              <p className="text-sm text-brand-muted">
+                Conecte via Meta Business API. Requer conta business e permissões de páginas 
+                para gerenciar mensagens do Messenger.
+              </p>
+            </div>
+            
+            {/* Instagram - Nova instrução */}
+            <div className="space-y-2">
+              <h4 className="font-medium text-brand-foreground">Instagram</h4>
+              <p className="text-sm text-brand-muted">
+                Conecte via Instagram Business API. Conta business obrigatória e 
+                vinculação com página do Facebook necessária.
+              </p>
+            </div>
+            
+            {/* WebChat */}
             <div className="space-y-2">
               <h4 className="font-medium text-brand-foreground">WebChat</h4>
               <p className="text-sm text-brand-muted">
