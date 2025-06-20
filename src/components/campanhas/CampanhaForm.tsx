@@ -2,16 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { ChannelSelector } from './ChannelSelector';
 import { ContactUpload } from './ContactUpload';
 import { MessagePreview } from './MessagePreview';
 import { ScheduleSettings } from './ScheduleSettings';
-import { useToast } from '@/hooks/use-toast';
-import { Calendar, Users, MessageSquare, Settings, Eye } from 'lucide-react';
+import { Save, X, Eye } from 'lucide-react';
 
 // Interface para dados de campanha
 interface Campanha {
@@ -38,11 +36,9 @@ interface CampanhaFormProps {
 }
 
 /**
- * Formulário completo para criação/edição de campanhas
- * Contém todas as seções: dados básicos, canais, contatos, mensagem, agendamento
- * Validação de campos obrigatórios com feedback visual
- * Preview da mensagem em tempo real
- * Layout responsivo e modular
+ * Formulário para criação e edição de campanhas
+ * Permite configurar todos os aspectos de uma campanha de marketing
+ * Inclui validação e preview da mensagem
  */
 export const CampanhaForm: React.FC<CampanhaFormProps> = ({
   campanha,
@@ -51,314 +47,278 @@ export const CampanhaForm: React.FC<CampanhaFormProps> = ({
 }) => {
   // Estados do formulário
   const [nome, setNome] = useState('');
-  const [canaisSelecionados, setCanaisSelecionados] = useState<('whatsapp' | 'facebook' | 'instagram' | 'telegram')[]>([]);
-  const [mensagem, setMensagem] = useState('');
-  const [arquivo, setArquivo] = useState<string>('');
-  const [contatos, setContatos] = useState<any[]>([]);
   const [remetente, setRemetente] = useState('');
-  const [agendamento, setAgendamento] = useState<Date | null>(null);
-  const [configuracoes, setConfiguracoes] = useState({
-    intervalo: 1,
-    unidadeIntervalo: 'minutos' as 'segundos' | 'minutos' | 'horas',
-    limiteTentativas: 3
+  const [mensagem, setMensagem] = useState('');
+  const [canaisSelecionados, setCanaisSelecionados] = useState<('whatsapp' | 'facebook' | 'instagram' | 'telegram')[]>([]);
+  const [contatos, setContatos] = useState<any[]>([]);
+  const [agendamento, setAgendamento] = useState({
+    imediato: true,
+    dataInicio: '',
+    horaInicio: '09:00',
+    dataFim: undefined as string | undefined,
+    horaFim: undefined as string | undefined
   });
-
-  // Estados de controle
+  const [mostrarPreview, setMostrarPreview] = useState(false);
   const [salvando, setSalvando] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [erros, setErros] = useState<Record<string, string>>({});
 
-  const { toast } = useToast();
-
-  /**
-   * Carrega dados da campanha para edição
-   */
+  // Preenche formulário ao editar campanha
   useEffect(() => {
     if (campanha) {
       setNome(campanha.nome);
-      setCanaisSelecionados(campanha.canais);
-      setMensagem(campanha.mensagem);
-      setArquivo(campanha.arquivo || '');
       setRemetente(campanha.remetente);
-      // TODO: Carregar contatos e configurações da API
+      setMensagem(campanha.mensagem);
+      setCanaisSelecionados(campanha.canais);
+      
+      // Configura agendamento baseado nos dados da campanha
+      const agora = new Date();
+      const inicioIsFuture = campanha.dataInicio > agora;
+      
+      setAgendamento({
+        imediato: !inicioIsFuture,
+        dataInicio: campanha.dataInicio.toISOString().split('T')[0],
+        horaInicio: campanha.dataInicio.toTimeString().slice(0, 5),
+        dataFim: campanha.dataFim?.toISOString().split('T')[0],
+        horaFim: campanha.dataFim?.toTimeString().slice(0, 5)
+      });
+    } else {
+      // Valores padrão para nova campanha
+      const hoje = new Date();
+      setAgendamento(prev => ({
+        ...prev,
+        dataInicio: hoje.toISOString().split('T')[0]
+      }));
     }
   }, [campanha]);
 
   /**
-   * Valida os campos obrigatórios do formulário
+   * Valida os dados do formulário
    */
-  const validarFormulario = (): boolean => {
-    const novosErrors: Record<string, string> = {};
+  const validarFormulario = () => {
+    const novosErros: Record<string, string> = {};
 
     if (!nome.trim()) {
-      novosErrors.nome = 'Nome da campanha é obrigatório';
-    }
-
-    if (canaisSelecionados.length === 0) {
-      novosErrors.canais = 'Selecione pelo menos um canal';
-    }
-
-    if (!mensagem.trim()) {
-      novosErrors.mensagem = 'Mensagem é obrigatória';
-    }
-
-    if (contatos.length === 0) {
-      novosErrors.contatos = 'Adicione pelo menos um contato';
+      novosErros.nome = 'Nome da campanha é obrigatório';
     }
 
     if (!remetente.trim()) {
-      novosErrors.remetente = 'Remetente é obrigatório';
+      novosErros.remetente = 'Remetente é obrigatório';
     }
 
-    setErrors(novosErrors);
-    return Object.keys(novosErrors).length === 0;
+    if (!mensagem.trim()) {
+      novosErros.mensagem = 'Mensagem é obrigatória';
+    }
+
+    if (canaisSelecionados.length === 0) {
+      novosErros.canais = 'Selecione pelo menos um canal';
+    }
+
+    if (contatos.length === 0) {
+      novosErros.contatos = 'Adicione pelo menos um contato';
+    }
+
+    if (!agendamento.imediato) {
+      if (!agendamento.dataInicio) {
+        novosErros.agendamento = 'Data de início é obrigatória';
+      }
+      if (!agendamento.horaInicio) {
+        novosErros.agendamento = 'Hora de início é obrigatória';
+      }
+    }
+
+    setErros(novosErros);
+    return Object.keys(novosErros).length === 0;
   };
 
   /**
    * Manipula o envio do formulário
    */
-  const handleSubmit = async (acao: 'salvar' | 'agendar' | 'enviar') => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
     if (!validarFormulario()) {
-      toast({
-        title: "Erro na validação",
-        description: "Corrija os campos destacados antes de continuar.",
-        variant: "destructive"
-      });
       return;
     }
 
     setSalvando(true);
-
+    
     try {
+      // Prepara dados da campanha
+      const dataInicio = agendamento.imediato 
+        ? new Date()
+        : new Date(`${agendamento.dataInicio}T${agendamento.horaInicio}:00`);
+        
+      const dataFim = agendamento.dataFim && agendamento.horaFim
+        ? new Date(`${agendamento.dataFim}T${agendamento.horaFim}:00`)
+        : undefined;
+
       const dadosCampanha: Partial<Campanha> = {
         nome: nome.trim(),
-        canais: canaisSelecionados,
-        mensagem: mensagem.trim(),
-        arquivo: arquivo || undefined,
         remetente: remetente.trim(),
-        dataInicio: agendamento || new Date(),
+        mensagem: mensagem.trim(),
+        canais: canaisSelecionados,
+        dataInicio,
+        dataFim,
+        status: agendamento.imediato ? 'em_andamento' : 'agendada',
         contatosTotal: contatos.length,
-        status: acao === 'enviar' ? 'em_andamento' : 'agendada'
+        contatosEnviados: 0,
+        taxaSucesso: 0
       };
 
       await onSalvar(dadosCampanha);
-
-      toast({
-        title: "Sucesso!",
-        description: acao === 'enviar' 
-          ? "Campanha iniciada com sucesso!" 
-          : "Campanha salva com sucesso!"
-      });
-
+      
     } catch (error) {
       console.error('Erro ao salvar campanha:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível salvar a campanha. Tente novamente.",
-        variant: "destructive"
-      });
     } finally {
       setSalvando(false);
     }
   };
 
   return (
-    <div className="space-y-6">
-      {/* Seção 1: Informações Básicas */}
+    <form onSubmit={handleSubmit} className="space-y-6">
+      
+      {/* Informações básicas */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-foreground">
-            <MessageSquare className="w-5 h-5" />
-            Informações Básicas
-          </CardTitle>
+          <CardTitle>Informações Básicas</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Nome da campanha */}
-          <div className="space-y-2">
-            <Label htmlFor="nome">Nome da Campanha *</Label>
-            <Input
-              id="nome"
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-              placeholder="Ex: Promoção Black Friday 2024"
-              className={errors.nome ? 'border-red-500 focus:border-red-500' : ''}
-            />
-            {errors.nome && (
-              <p className="text-sm text-red-500">{errors.nome}</p>
-            )}
-          </div>
-
-          {/* Remetente */}
-          <div className="space-y-2">
-            <Label htmlFor="remetente">Remetente *</Label>
-            <Input
-              id="remetente"
-              value={remetente}
-              onChange={(e) => setRemetente(e.target.value)}
-              placeholder="Ex: Loja Principal"
-              className={errors.remetente ? 'border-red-500 focus:border-red-500' : ''}
-            />
-            {errors.remetente && (
-              <p className="text-sm text-red-500">{errors.remetente}</p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Seção 2: Seleção de Canais */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-foreground">
-            <Settings className="w-5 h-5" />
-            Canais de Envio
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ChannelSelector
-            canaisSelecionados={canaisSelecionados}
-            onChange={setCanaisSelecionados}
-            error={errors.canais}
-          />
-        </CardContent>
-      </Card>
-
-      {/* Seção 3: Upload de Contatos */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-foreground">
-            <Users className="w-5 h-5" />
-            Contatos ({contatos.length})
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ContactUpload
-            contatos={contatos}
-            onChange={setContatos}
-            error={errors.contatos}
-          />
-        </CardContent>
-      </Card>
-
-      {/* Seção 4: Mensagem e Anexos */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-foreground">
-            <MessageSquare className="w-5 h-5" />
-            Mensagem
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Campo de mensagem */}
-          <div className="space-y-2">
-            <Label htmlFor="mensagem">Texto da Mensagem *</Label>
-            <Textarea
-              id="mensagem"
-              value={mensagem}
-              onChange={(e) => setMensagem(e.target.value)}
-              placeholder="Digite sua mensagem aqui. Use {nome} para personalizar..."
-              rows={4}
-              className={`resize-none ${errors.mensagem ? 'border-red-500 focus:border-red-500' : ''}`}
-            />
-            {errors.mensagem && (
-              <p className="text-sm text-red-500">{errors.mensagem}</p>
-            )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="nome" className="text-sm font-medium">
+                Nome da Campanha *
+              </Label>
+              <Input
+                id="nome"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                placeholder="Ex: Promoção Black Friday 2024"
+                className="mt-1"
+              />
+              {erros.nome && (
+                <p className="text-sm text-red-500 mt-1">{erros.nome}</p>
+              )}
+            </div>
             
-            {/* Dica sobre variáveis */}
-            <p className="text-xs text-muted-foreground">
-              💡 Use variáveis como {'{nome}'}, {'{email}'}, {'{telefone}'} para personalizar a mensagem
-            </p>
-          </div>
-
-          {/* Upload de arquivo */}
-          <div className="space-y-2">
-            <Label>Anexar Arquivo (Opcional)</Label>
-            <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:bg-muted/20 transition-colors">
-              <p className="text-sm text-muted-foreground mb-2">
-                Arraste um arquivo aqui ou clique para selecionar
-              </p>
-              <Button variant="outline" size="sm">
-                Selecionar Arquivo
-              </Button>
-              <p className="text-xs text-muted-foreground mt-2">
-                Suporte: Imagens, vídeos, documentos (máx. 16MB)
-              </p>
+            <div>
+              <Label htmlFor="remetente" className="text-sm font-medium">
+                Remetente *
+              </Label>
+              <Input
+                id="remetente"
+                value={remetente}
+                onChange={(e) => setRemetente(e.target.value)}
+                placeholder="Ex: Loja Principal"
+                className="mt-1"
+              />
+              {erros.remetente && (
+                <p className="text-sm text-red-500 mt-1">{erros.remetente}</p>
+              )}
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Seção 5: Agendamento */}
+      {/* Seleção de canais */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-foreground">
-            <Calendar className="w-5 h-5" />
-            Agendamento e Configurações
-          </CardTitle>
+          <CardTitle>Canais de Envio</CardTitle>
         </CardHeader>
         <CardContent>
-          <ScheduleSettings
-            agendamento={agendamento}
-            onAgendamentoChange={setAgendamento}
-            configuracoes={configuracoes}
-            onConfiguracoesChange={setConfiguracoes}
+          <ChannelSelector
+            canaisSelecionados={canaisSelecionados}
+            onChange={setCanaisSelecionados}
+            error={erros.canais}
           />
         </CardContent>
       </Card>
 
-      {/* Seção 6: Preview da Mensagem */}
+      {/* Upload de contatos */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-foreground">
-            <Eye className="w-5 h-5" />
-            Visualização
-          </CardTitle>
+          <CardTitle>Lista de Contatos</CardTitle>
         </CardHeader>
         <CardContent>
-          <MessagePreview
-            canais={canaisSelecionados}
-            mensagem={mensagem}
-            arquivo={arquivo}
-            remetente={remetente}
+          <ContactUpload
+            contatos={contatos}
+            onChange={setContatos}
+            error={erros.contatos}
           />
         </CardContent>
       </Card>
+
+      {/* Mensagem */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>Mensagem da Campanha</CardTitle>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setMostrarPreview(!mostrarPreview)}
+            >
+              <Eye className="w-4 h-4 mr-2" />
+              {mostrarPreview ? 'Ocultar' : 'Preview'}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label htmlFor="mensagem" className="text-sm font-medium">
+              Texto da Mensagem *
+            </Label>
+            <Textarea
+              id="mensagem"
+              value={mensagem}
+              onChange={(e) => setMensagem(e.target.value)}
+              placeholder="Digite sua mensagem aqui... Use {nome} para personalizar com o nome do contato."
+              rows={4}
+              className="mt-1"
+            />
+            {erros.mensagem && (
+              <p className="text-sm text-red-500 mt-1">{erros.mensagem}</p>
+            )}
+          </div>
+          
+          {mostrarPreview && (
+            <MessagePreview
+              mensagem={mensagem}
+              canais={canaisSelecionados}
+              contatoExemplo={{ nome: 'João Silva', telefone: '(11) 99999-9999' }}
+            />
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Configurações de agendamento */}
+      <ScheduleSettings
+        agendamento={agendamento}
+        onChange={setAgendamento}
+        error={erros.agendamento}
+      />
 
       {/* Botões de ação */}
-      <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-border">
+      <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
         <Button
+          type="button"
           variant="outline"
           onClick={onCancelar}
           disabled={salvando}
-          className="order-2 sm:order-1"
         >
+          <X className="w-4 h-4 mr-2" />
           Cancelar
         </Button>
-
-        <div className="flex flex-col sm:flex-row gap-2 order-1 sm:order-2 sm:ml-auto">
-          <Button
-            variant="outline"
-            onClick={() => handleSubmit('salvar')}
-            disabled={salvando}
-          >
-            {salvando ? 'Salvando...' : 'Salvar Rascunho'}
-          </Button>
-
-          <Button
-            variant="secondary"
-            onClick={() => handleSubmit('agendar')}
-            disabled={salvando || !agendamento}
-          >
-            {salvando ? 'Agendando...' : 'Agendar'}
-          </Button>
-
-          <Button
-            onClick={() => handleSubmit('enviar')}
-            disabled={salvando}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
-          >
-            {salvando ? 'Enviando...' : 'Enviar Agora'}
-          </Button>
-        </div>
+        
+        <Button
+          type="submit"
+          disabled={salvando}
+          className="min-w-[120px]"
+        >
+          <Save className="w-4 h-4 mr-2" />
+          {salvando ? 'Salvando...' : campanha ? 'Atualizar' : 'Criar Campanha'}
+        </Button>
       </div>
-    </div>
+    </form>
   );
 };
