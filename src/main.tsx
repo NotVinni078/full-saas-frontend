@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrandProvider } from "./contexts/BrandContext";
 import { AnunciosProvider } from "./contexts/AnunciosContext";
 import { SupabaseDataProvider } from "./contexts/SupabaseDataContext";
+import { TenantProvider } from "./contexts/TenantContext";
 
 const queryClient = new QueryClient();
 
@@ -16,11 +17,13 @@ createRoot(document.getElementById("root")!).render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <BrandProvider>
-          <AnunciosProvider>
-            <SupabaseDataProvider>
-              <App />
-            </SupabaseDataProvider>
-          </AnunciosProvider>
+          <TenantProvider>
+            <AnunciosProvider>
+              <SupabaseDataProvider>
+                <App />
+              </SupabaseDataProvider>
+            </AnunciosProvider>
+          </TenantProvider>
         </BrandProvider>
       </BrowserRouter>
     </QueryClientProvider>

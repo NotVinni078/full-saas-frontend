@@ -261,6 +261,142 @@ export type Database = {
         }
         Relationships: []
       }
+      tenant_activity_logs: {
+        Row: {
+          action: string
+          created_at: string | null
+          details: Json | null
+          id: string
+          ip_address: unknown | null
+          tenant_id: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          tenant_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          tenant_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_activity_logs_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenant_subscriptions: {
+        Row: {
+          created_at: string | null
+          end_date: string | null
+          id: string
+          plan: Database["public"]["Enums"]["subscription_plan"]
+          price_per_month: number | null
+          start_date: string
+          status: string
+          tenant_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          plan: Database["public"]["Enums"]["subscription_plan"]
+          price_per_month?: number | null
+          start_date?: string
+          status?: string
+          tenant_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          price_per_month?: number | null
+          start_date?: string
+          status?: string
+          tenant_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_subscriptions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenants: {
+        Row: {
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string | null
+          database_url: string
+          domain: string | null
+          features: Json | null
+          id: string
+          max_contacts: number | null
+          max_users: number | null
+          metadata: Json | null
+          name: string
+          slug: string
+          status: Database["public"]["Enums"]["tenant_status"]
+          updated_at: string | null
+        }
+        Insert: {
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          database_url: string
+          domain?: string | null
+          features?: Json | null
+          id?: string
+          max_contacts?: number | null
+          max_users?: number | null
+          metadata?: Json | null
+          name: string
+          slug: string
+          status?: Database["public"]["Enums"]["tenant_status"]
+          updated_at?: string | null
+        }
+        Update: {
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          database_url?: string
+          domain?: string | null
+          features?: Json | null
+          id?: string
+          max_contacts?: number | null
+          max_users?: number | null
+          metadata?: Json | null
+          name?: string
+          slug?: string
+          status?: Database["public"]["Enums"]["tenant_status"]
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       user_sectors: {
         Row: {
           created_at: string | null
@@ -366,6 +502,8 @@ export type Database = {
         | "telegram"
         | "webchat"
       contact_status: "online" | "offline" | "ausente"
+      subscription_plan: "basic" | "professional" | "enterprise" | "custom"
+      tenant_status: "active" | "inactive" | "suspended" | "trial"
       user_profile: "admin" | "gerente" | "atendente"
       user_status: "ativo" | "inativo"
     }
@@ -508,6 +646,8 @@ export const Constants = {
         "webchat",
       ],
       contact_status: ["online", "offline", "ausente"],
+      subscription_plan: ["basic", "professional", "enterprise", "custom"],
+      tenant_status: ["active", "inactive", "suspended", "trial"],
       user_profile: ["admin", "gerente", "atendente"],
       user_status: ["ativo", "inativo"],
     },
