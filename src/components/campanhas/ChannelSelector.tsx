@@ -63,11 +63,11 @@ export const ChannelSelector: React.FC<ChannelSelectorProps> = ({
   /**
    * Manipula seleção/deseleção de canal
    */
-  const handleToggleCanal = (canal: Canal) => {
-    if (canaisSelecionados.includes(canal)) {
-      onChange(canaisSelecionados.filter(c => c !== canal));
-    } else {
+  const handleToggleCanal = (canal: Canal, checked: boolean) => {
+    if (checked) {
       onChange([...canaisSelecionados, canal]);
+    } else {
+      onChange(canaisSelecionados.filter(c => c !== canal));
     }
   };
 
@@ -78,12 +78,11 @@ export const ChannelSelector: React.FC<ChannelSelectorProps> = ({
         {canaisDisponiveis.map((canal) => (
           <Card
             key={canal.id}
-            className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
+            className={`transition-all duration-200 hover:shadow-md ${
               canaisSelecionados.includes(canal.id)
                 ? 'ring-2 ring-primary bg-primary/5 border-primary'
                 : 'border-border hover:border-primary/50'
-            } ${!canal.disponivel ? 'opacity-50 cursor-not-allowed' : ''}`}
-            onClick={() => canal.disponivel && handleToggleCanal(canal.id)}
+            } ${!canal.disponivel ? 'opacity-50' : ''}`}
           >
             <CardContent className="p-4">
               <div className="flex items-start gap-3">
@@ -91,6 +90,9 @@ export const ChannelSelector: React.FC<ChannelSelectorProps> = ({
                 <Checkbox
                   checked={canaisSelecionados.includes(canal.id)}
                   disabled={!canal.disponivel}
+                  onCheckedChange={(checked) => 
+                    canal.disponivel && handleToggleCanal(canal.id, checked === true)
+                  }
                   className="mt-1"
                 />
 
