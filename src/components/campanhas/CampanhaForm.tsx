@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -285,7 +284,7 @@ export const CampanhaForm: React.FC<CampanhaFormProps> = ({
             <MessagePreview
               mensagem={mensagem}
               canais={canaisSelecionados}
-              contatoExemplo={{ nome: 'João Silva', telefone: '(11) 99999-9999' }}
+              remetente={remetente}
             />
           )}
         </CardContent>
