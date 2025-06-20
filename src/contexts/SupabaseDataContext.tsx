@@ -95,7 +95,7 @@ export const SupabaseDataProvider = ({ children }: { children: ReactNode }) => {
 
       if (error) throw error;
       showSuccessToast('Contato atualizado com sucesso');
-      await data.refetchData?.();
+      await data.refetchData();
     } catch (error) {
       console.error('Error updating contact:', error);
       showErrorToast('Erro ao atualizar contato');
@@ -135,7 +135,7 @@ export const SupabaseDataProvider = ({ children }: { children: ReactNode }) => {
       }
 
       showSuccessToast('Contato adicionado com sucesso');
-      await data.refetchData?.();
+      await data.refetchData();
     } catch (error) {
       console.error('Error adding contact:', error);
       showErrorToast('Erro ao adicionar contato');
@@ -151,7 +151,7 @@ export const SupabaseDataProvider = ({ children }: { children: ReactNode }) => {
 
       if (error) throw error;
       showSuccessToast('Contato removido com sucesso');
-      await data.refetchData?.();
+      await data.refetchData();
     } catch (error) {
       console.error('Error removing contact:', error);
       showErrorToast('Erro ao remover contato');
@@ -173,7 +173,7 @@ export const SupabaseDataProvider = ({ children }: { children: ReactNode }) => {
 
       if (error) throw error;
       showSuccessToast('Setor atualizado com sucesso');
-      await data.refetchData?.();
+      await data.refetchData();
     } catch (error) {
       console.error('Error updating sector:', error);
       showErrorToast('Erro ao atualizar setor');
@@ -193,7 +193,7 @@ export const SupabaseDataProvider = ({ children }: { children: ReactNode }) => {
 
       if (error) throw error;
       showSuccessToast('Setor adicionado com sucesso');
-      await data.refetchData?.();
+      await data.refetchData();
     } catch (error) {
       console.error('Error adding sector:', error);
       showErrorToast('Erro ao adicionar setor');
@@ -209,7 +209,7 @@ export const SupabaseDataProvider = ({ children }: { children: ReactNode }) => {
 
       if (error) throw error;
       showSuccessToast('Setor removido com sucesso');
-      await data.refetchData?.();
+      await data.refetchData();
     } catch (error) {
       console.error('Error removing sector:', error);
       showErrorToast('Erro ao remover setor');
@@ -231,7 +231,7 @@ export const SupabaseDataProvider = ({ children }: { children: ReactNode }) => {
 
       if (error) throw error;
       showSuccessToast('Tag atualizada com sucesso');
-      await data.refetchData?.();
+      await data.refetchData();
     } catch (error) {
       console.error('Error updating tag:', error);
       showErrorToast('Erro ao atualizar tag');
@@ -251,7 +251,7 @@ export const SupabaseDataProvider = ({ children }: { children: ReactNode }) => {
 
       if (error) throw error;
       showSuccessToast('Tag adicionada com sucesso');
-      await data.refetchData?.();
+      await data.refetchData();
     } catch (error) {
       console.error('Error adding tag:', error);
       showErrorToast('Erro ao adicionar tag');
@@ -267,7 +267,7 @@ export const SupabaseDataProvider = ({ children }: { children: ReactNode }) => {
 
       if (error) throw error;
       showSuccessToast('Tag removida com sucesso');
-      await data.refetchData?.();
+      await data.refetchData();
     } catch (error) {
       console.error('Error removing tag:', error);
       showErrorToast('Erro ao remover tag');
@@ -310,7 +310,7 @@ export const SupabaseDataProvider = ({ children }: { children: ReactNode }) => {
 
       if (error) throw error;
       showSuccessToast('Usuário atualizado com sucesso');
-      await data.refetchData?.();
+      await data.refetchData();
     } catch (error) {
       console.error('Error updating user:', error);
       showErrorToast('Erro ao atualizar usuário');
@@ -319,10 +319,13 @@ export const SupabaseDataProvider = ({ children }: { children: ReactNode }) => {
 
   const addUser = async (userData: Omit<User, 'id' | 'criadoEm' | 'atualizadoEm'>) => {
     try {
-      // First create the user - this will require proper auth setup
+      // Generate a UUID for the user (in a real app, this would come from auth)
+      const userId = crypto.randomUUID();
+      
       const { data: newUser, error } = await supabase
         .from('users')
         .insert({
+          id: userId,
           nome: userData.nome,
           email: userData.email,
           telefone: userData.telefone,
@@ -349,7 +352,7 @@ export const SupabaseDataProvider = ({ children }: { children: ReactNode }) => {
       }
 
       showSuccessToast('Usuário adicionado com sucesso');
-      await data.refetchData?.();
+      await data.refetchData();
     } catch (error) {
       console.error('Error adding user:', error);
       showErrorToast('Erro ao adicionar usuário');
@@ -365,7 +368,7 @@ export const SupabaseDataProvider = ({ children }: { children: ReactNode }) => {
 
       if (error) throw error;
       showSuccessToast('Usuário removido com sucesso');
-      await data.refetchData?.();
+      await data.refetchData();
     } catch (error) {
       console.error('Error removing user:', error);
       showErrorToast('Erro ao remover usuário');
@@ -388,7 +391,7 @@ export const SupabaseDataProvider = ({ children }: { children: ReactNode }) => {
 
       if (error) throw error;
       showSuccessToast('Conexão atualizada com sucesso');
-      await data.refetchData?.();
+      await data.refetchData();
     } catch (error) {
       console.error('Error updating connection:', error);
       showErrorToast('Erro ao atualizar conexão');
@@ -409,7 +412,7 @@ export const SupabaseDataProvider = ({ children }: { children: ReactNode }) => {
 
       if (error) throw error;
       showSuccessToast('Conexão adicionada com sucesso');
-      await data.refetchData?.();
+      await data.refetchData();
     } catch (error) {
       console.error('Error adding connection:', error);
       showErrorToast('Erro ao adicionar conexão');
@@ -425,7 +428,7 @@ export const SupabaseDataProvider = ({ children }: { children: ReactNode }) => {
 
       if (error) throw error;
       showSuccessToast('Conexão removida com sucesso');
-      await data.refetchData?.();
+      await data.refetchData();
     } catch (error) {
       console.error('Error removing connection:', error);
       showErrorToast('Erro ao remover conexão');
@@ -433,7 +436,7 @@ export const SupabaseDataProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const refetchData = async () => {
-    await data.refetchData?.();
+    await data.refetchData();
   };
 
   return (

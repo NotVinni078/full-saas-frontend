@@ -12,6 +12,7 @@ interface SupabaseData {
   connections: Connection[];
   loading: boolean;
   error: string | null;
+  refetchData: () => Promise<void>;
 }
 
 export const useSupabaseData = (): SupabaseData => {
@@ -126,7 +127,9 @@ export const useSupabaseData = (): SupabaseData => {
         tipo: connection.tipo,
         setor: connection.sector_id,
         status: connection.status,
-        configuracao: connection.configuracao,
+        configuracao: typeof connection.configuracao === 'object' && connection.configuracao !== null 
+          ? connection.configuracao as Record<string, any>
+          : {},
         criadoEm: new Date(connection.created_at),
         atualizadoEm: new Date(connection.updated_at)
       }));
@@ -198,6 +201,10 @@ export const useSupabaseData = (): SupabaseData => {
     }
   };
 
+  const refetchData = async () => {
+    await fetchAllData();
+  };
+
   useEffect(() => {
     fetchAllData();
   }, []);
@@ -209,6 +216,7 @@ export const useSupabaseData = (): SupabaseData => {
     users,
     connections,
     loading,
-    error
+    error,
+    refetchData
   };
 };
