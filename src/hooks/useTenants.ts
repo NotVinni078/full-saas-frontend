@@ -40,15 +40,19 @@ export const useTenants = (): TenantsData => {
         slug: tenant.slug,
         domain: tenant.domain || undefined,
         database_url: tenant.database_url,
-        status: tenant.status,
+        status: tenant.status as 'active' | 'inactive' | 'suspended' | 'trial',
         created_at: new Date(tenant.created_at),
         updated_at: new Date(tenant.updated_at),
         contact_email: tenant.contact_email || undefined,
         contact_phone: tenant.contact_phone || undefined,
         max_users: tenant.max_users,
         max_contacts: tenant.max_contacts,
-        features: tenant.features || {},
-        metadata: tenant.metadata || {}
+        features: (tenant.features && typeof tenant.features === 'object' && !Array.isArray(tenant.features)) 
+          ? tenant.features as Record<string, any> 
+          : {},
+        metadata: (tenant.metadata && typeof tenant.metadata === 'object' && !Array.isArray(tenant.metadata)) 
+          ? tenant.metadata as Record<string, any> 
+          : {}
       }));
       
       setTenants(mappedTenants);
@@ -100,7 +104,9 @@ export const useTenants = (): TenantsData => {
         id: log.id,
         tenant_id: log.tenant_id,
         action: log.action,
-        details: log.details || undefined,
+        details: (log.details && typeof log.details === 'object' && !Array.isArray(log.details)) 
+          ? log.details as Record<string, any> 
+          : undefined,
         user_id: log.user_id || undefined,
         ip_address: log.ip_address || undefined,
         user_agent: log.user_agent || undefined,
@@ -152,9 +158,16 @@ export const useTenants = (): TenantsData => {
 
   const updateTenant = async (tenantId: string, updates: Partial<Tenant>) => {
     try {
+      // Convert Date objects to strings for Supabase
+      const supabaseUpdates = {
+        ...updates,
+        created_at: updates.created_at ? updates.created_at.toISOString() : undefined,
+        updated_at: updates.updated_at ? updates.updated_at.toISOString() : undefined
+      };
+
       const { error } = await supabase
         .from('tenants')
-        .update(updates)
+        .update(supabaseUpdates)
         .eq('id', tenantId);
 
       if (error) throw error;

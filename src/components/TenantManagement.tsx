@@ -24,7 +24,7 @@ const TenantManagement = () => {
     slug: '',
     domain: '',
     database_url: '',
-    status: 'trial' as const,
+    status: 'trial' as 'active' | 'inactive' | 'suspended' | 'trial',
     contact_email: '',
     contact_phone: '',
     max_users: 10,
@@ -150,7 +150,7 @@ const TenantManagement = () => {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="status">Status</Label>
-                <Select value={formData.status} onValueChange={(value: any) => setFormData({ ...formData, status: value })}>
+                <Select value={formData.status} onValueChange={(value: 'active' | 'inactive' | 'suspended' | 'trial') => setFormData({ ...formData, status: value })}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
