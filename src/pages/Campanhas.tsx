@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Plus, MoreHorizontal, Play, Pause, Copy, Trash2, Eye, Edit, TrendingUp, Users, Send, Clock } from 'lucide-react';
 import SidebarLayout from '@/components/SidebarLayout';
@@ -32,8 +31,9 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { FiltrosCampanhasComponent } from '@/components/campanhas/FiltrosCampanhas';
+import { CriarCampanhaModal } from '@/components/campanhas/CriarCampanhaModal';
 import { useCampanhas } from '@/hooks/useCampanhas';
-import { StatusCampanha, TipoCanal, Campanha } from '@/types/campanhas';
+import { StatusCampanha, TipoCanal, Campanha, CampanhaFormData } from '@/types/campanhas';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -55,7 +55,8 @@ const Campanhas = () => {
     cancelarCampanha,
     excluirCampanha,
     clonarCampanha,
-    carregarDetalhesCampanha
+    carregarDetalhesCampanha,
+    criarCampanha
   } = useCampanhas();
 
   // Estados para controle de modais e ações
@@ -63,6 +64,7 @@ const Campanhas = () => {
   const [campanhaParaCancelar, setCampanhaParaCancelar] = useState<Campanha | null>(null);
   const [mostrarModalCriacao, setMostrarModalCriacao] = useState(false);
   const [mostrarModalDetalhes, setMostrarModalDetalhes] = useState(false);
+  const [isCreatingCampanha, setIsCreatingCampanha] = useState(false);
 
   /**
    * Lista mock de responsáveis para filtros
@@ -73,6 +75,23 @@ const Campanhas = () => {
     {id: 'user-002', nome: 'Maria Santos'},
     {id: 'user-003', nome: 'Pedro Costa'}
   ];
+
+  /**
+   * Handler para criar nova campanha
+   */
+  const handleCriarCampanha = async (dados: CampanhaFormData) => {
+    setIsCreatingCampanha(true);
+    try {
+      const resultado = await criarCampanha(dados);
+      if (resultado.success) {
+        setMostrarModalCriacao(false);
+      }
+    } catch (error) {
+      console.error('Erro ao criar campanha:', error);
+    } finally {
+      setIsCreatingCampanha(false);
+    }
+  };
 
   /**
    * Retorna a classe CSS apropriada para o badge de status
@@ -519,6 +538,15 @@ const Campanhas = () => {
           </CardContent>
         </Card>
 
+        {/* Modal de criação de campanha */}
+        <CriarCampanhaModal
+          open={mostrarModalCriacao}
+          onOpenChange={setMostrarModalCriacao}
+          onSubmit={handleCriarCampanha}
+          conexoesDisponiveis={conexoesDisponiveis}
+          isLoading={isCreatingCampanha}
+        />
+
         {/* Modal de confirmação para exclusão */}
         <AlertDialog 
           open={!!campanhaParaExcluir} 
@@ -573,8 +601,7 @@ const Campanhas = () => {
           </AlertDialogContent>
         </AlertDialog>
 
-        {/* TODO: Implementar modais de criação e detalhes */}
-        {/* Modal de criação será implementado no próximo arquivo */}
+        {/* TODO: Implementar modal de detalhes */}
         {/* Modal de detalhes será implementado no próximo arquivo */}
       </div>
     </SidebarLayout>
