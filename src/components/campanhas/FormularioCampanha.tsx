@@ -125,11 +125,20 @@ export const FormularioCampanha: React.FC<FormularioCampanhaProps> = ({
   // Submit do formulário
   const handleSubmit = async (data: FormData, salvarRascunho: boolean = false) => {
     try {
+      // Preparar dados do agendamento apenas se habilitado e com data válida
+      let agendamentoFinal = undefined;
+      if (agendamentoHabilitado && data.agendamento?.dataInicio) {
+        agendamentoFinal = {
+          dataInicio: data.agendamento.dataInicio,
+          recorrente: data.agendamento.recorrente || false
+        };
+      }
+
       const dadosCampanha: CampanhaFormData = {
         ...data,
         anexos: anexosSelecionados,
         contatos: contatosSelecionados,
-        agendamento: agendamentoHabilitado ? data.agendamento : undefined,
+        agendamento: agendamentoFinal,
         salvarRascunho
       };
 
