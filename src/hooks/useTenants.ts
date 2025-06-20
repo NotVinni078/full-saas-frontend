@@ -108,7 +108,7 @@ export const useTenants = (): TenantsData => {
           ? log.details as Record<string, any> 
           : undefined,
         user_id: log.user_id || undefined,
-        ip_address: log.ip_address || undefined,
+        ip_address: (log.ip_address && typeof log.ip_address === 'string') ? log.ip_address : undefined,
         user_agent: log.user_agent || undefined,
         created_at: new Date(log.created_at)
       }));
