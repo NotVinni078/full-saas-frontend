@@ -135,7 +135,11 @@ export const FormularioCampanha: React.FC<FormularioCampanhaProps> = ({
       }
 
       const dadosCampanha: CampanhaFormData = {
-        ...data,
+        nome: data.nome,
+        descricao: data.descricao,
+        conexaoId: data.conexaoId,
+        mensagem: data.mensagem,
+        configuracaoTempo: data.configuracaoTempo,
         anexos: anexosSelecionados,
         contatos: contatosSelecionados,
         agendamento: agendamentoFinal,
