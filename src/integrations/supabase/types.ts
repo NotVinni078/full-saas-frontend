@@ -9,7 +9,333 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      campanhas: {
+        Row: {
+          arquivo: string | null
+          canais: string[]
+          contatos_enviados: number
+          contatos_total: number
+          created_at: string | null
+          data_fim: string | null
+          data_inicio: string
+          id: string
+          mensagem: string
+          nome: string
+          remetente: string
+          status: Database["public"]["Enums"]["campanha_status"]
+          taxa_sucesso: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          arquivo?: string | null
+          canais?: string[]
+          contatos_enviados?: number
+          contatos_total?: number
+          created_at?: string | null
+          data_fim?: string | null
+          data_inicio: string
+          id?: string
+          mensagem: string
+          nome: string
+          remetente: string
+          status?: Database["public"]["Enums"]["campanha_status"]
+          taxa_sucesso?: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          arquivo?: string | null
+          canais?: string[]
+          contatos_enviados?: number
+          contatos_total?: number
+          created_at?: string | null
+          data_fim?: string | null
+          data_inicio?: string
+          id?: string
+          mensagem?: string
+          nome?: string
+          remetente?: string
+          status?: Database["public"]["Enums"]["campanha_status"]
+          taxa_sucesso?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campanhas_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      connections: {
+        Row: {
+          configuracao: Json
+          created_at: string | null
+          id: string
+          nome: string
+          sector_id: string
+          status: Database["public"]["Enums"]["connection_status"]
+          tipo: Database["public"]["Enums"]["connection_type"]
+          updated_at: string | null
+        }
+        Insert: {
+          configuracao?: Json
+          created_at?: string | null
+          id?: string
+          nome: string
+          sector_id: string
+          status?: Database["public"]["Enums"]["connection_status"]
+          tipo: Database["public"]["Enums"]["connection_type"]
+          updated_at?: string | null
+        }
+        Update: {
+          configuracao?: Json
+          created_at?: string | null
+          id?: string
+          nome?: string
+          sector_id?: string
+          status?: Database["public"]["Enums"]["connection_status"]
+          tipo?: Database["public"]["Enums"]["connection_type"]
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "connections_sector_id_fkey"
+            columns: ["sector_id"]
+            isOneToOne: false
+            referencedRelation: "sectors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contact_tags: {
+        Row: {
+          contact_id: string
+          created_at: string | null
+          id: string
+          tag_id: string
+        }
+        Insert: {
+          contact_id: string
+          created_at?: string | null
+          id?: string
+          tag_id: string
+        }
+        Update: {
+          contact_id?: string
+          created_at?: string | null
+          id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_tags_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contact_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contacts: {
+        Row: {
+          avatar: string
+          canal: Database["public"]["Enums"]["contact_canal"]
+          created_at: string | null
+          email: string | null
+          endereco: string | null
+          id: string
+          nome: string
+          observacoes: string | null
+          sector_id: string | null
+          status: Database["public"]["Enums"]["contact_status"]
+          telefone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          avatar: string
+          canal?: Database["public"]["Enums"]["contact_canal"]
+          created_at?: string | null
+          email?: string | null
+          endereco?: string | null
+          id?: string
+          nome: string
+          observacoes?: string | null
+          sector_id?: string | null
+          status?: Database["public"]["Enums"]["contact_status"]
+          telefone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          avatar?: string
+          canal?: Database["public"]["Enums"]["contact_canal"]
+          created_at?: string | null
+          email?: string | null
+          endereco?: string | null
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          sector_id?: string | null
+          status?: Database["public"]["Enums"]["contact_status"]
+          telefone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contacts_sector_id_fkey"
+            columns: ["sector_id"]
+            isOneToOne: false
+            referencedRelation: "sectors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sectors: {
+        Row: {
+          ativo: boolean
+          cor: string
+          created_at: string | null
+          descricao: string | null
+          id: string
+          nome: string
+          updated_at: string | null
+        }
+        Insert: {
+          ativo?: boolean
+          cor?: string
+          created_at?: string | null
+          descricao?: string | null
+          id?: string
+          nome: string
+          updated_at?: string | null
+        }
+        Update: {
+          ativo?: boolean
+          cor?: string
+          created_at?: string | null
+          descricao?: string | null
+          id?: string
+          nome?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      tags: {
+        Row: {
+          ativo: boolean
+          cor: string
+          created_at: string | null
+          descricao: string | null
+          id: string
+          nome: string
+          updated_at: string | null
+        }
+        Insert: {
+          ativo?: boolean
+          cor?: string
+          created_at?: string | null
+          descricao?: string | null
+          id?: string
+          nome: string
+          updated_at?: string | null
+        }
+        Update: {
+          ativo?: boolean
+          cor?: string
+          created_at?: string | null
+          descricao?: string | null
+          id?: string
+          nome?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_sectors: {
+        Row: {
+          created_at: string | null
+          id: string
+          sector_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          sector_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          sector_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_sectors_sector_id_fkey"
+            columns: ["sector_id"]
+            isOneToOne: false
+            referencedRelation: "sectors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_sectors_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      users: {
+        Row: {
+          avatar: string
+          cargo: string | null
+          created_at: string | null
+          email: string
+          id: string
+          nome: string
+          perfil: Database["public"]["Enums"]["user_profile"]
+          status: Database["public"]["Enums"]["user_status"]
+          telefone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          avatar: string
+          cargo?: string | null
+          created_at?: string | null
+          email: string
+          id: string
+          nome: string
+          perfil?: Database["public"]["Enums"]["user_profile"]
+          status?: Database["public"]["Enums"]["user_status"]
+          telefone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          avatar?: string
+          cargo?: string | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          nome?: string
+          perfil?: Database["public"]["Enums"]["user_profile"]
+          status?: Database["public"]["Enums"]["user_status"]
+          telefone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +344,30 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      campanha_status:
+        | "rascunho"
+        | "agendada"
+        | "em_andamento"
+        | "pausada"
+        | "finalizada"
+        | "cancelada"
+        | "erro"
+      connection_status: "ativo" | "inativo" | "configurando"
+      connection_type:
+        | "whatsapp"
+        | "instagram"
+        | "facebook"
+        | "telegram"
+        | "webchat"
+      contact_canal:
+        | "whatsapp"
+        | "instagram"
+        | "facebook"
+        | "telegram"
+        | "webchat"
+      contact_status: "online" | "offline" | "ausente"
+      user_profile: "admin" | "gerente" | "atendente"
+      user_status: "ativo" | "inativo"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +482,34 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      campanha_status: [
+        "rascunho",
+        "agendada",
+        "em_andamento",
+        "pausada",
+        "finalizada",
+        "cancelada",
+        "erro",
+      ],
+      connection_status: ["ativo", "inativo", "configurando"],
+      connection_type: [
+        "whatsapp",
+        "instagram",
+        "facebook",
+        "telegram",
+        "webchat",
+      ],
+      contact_canal: [
+        "whatsapp",
+        "instagram",
+        "facebook",
+        "telegram",
+        "webchat",
+      ],
+      contact_status: ["online", "offline", "ausente"],
+      user_profile: ["admin", "gerente", "atendente"],
+      user_status: ["ativo", "inativo"],
+    },
   },
 } as const
