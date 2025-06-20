@@ -139,7 +139,12 @@ export const FormularioCampanha: React.FC<FormularioCampanhaProps> = ({
         descricao: data.descricao,
         conexaoId: data.conexaoId,
         mensagem: data.mensagem,
-        configuracaoTempo: data.configuracaoTempo,
+        configuracaoTempo: {
+          mensagensPorIntervalo: data.configuracaoTempo?.mensagensPorIntervalo || 50,
+          intervaloMinutos: data.configuracaoTempo?.intervaloMinutos || 10,
+          limiteTentativas: data.configuracaoTempo?.limiteTentativas || 3,
+          intervaloEntreTentativas: data.configuracaoTempo?.intervaloEntreTentativas || 30
+        },
         anexos: anexosSelecionados,
         contatos: contatosSelecionados,
         agendamento: agendamentoFinal,
