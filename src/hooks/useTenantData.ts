@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -112,7 +111,7 @@ export const useTenantData = (): TenantDataHook => {
         status: contact.status as 'active' | 'blocked' | 'archived',
         channel: contact.channel as 'whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'webchat',
         tags: contact.tags || [],
-        custom_fields: contact.custom_fields || {},
+        custom_fields: (contact.custom_fields as Record<string, any>) || {},
         last_interaction: contact.last_interaction ? new Date(contact.last_interaction) : undefined,
         created_at: new Date(contact.created_at),
         updated_at: new Date(contact.updated_at)
@@ -139,8 +138,8 @@ export const useTenantData = (): TenantDataHook => {
         name: conn.name,
         type: conn.type as 'whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'webchat',
         status: conn.status as 'active' | 'inactive' | 'error' | 'configuring',
-        configuration: conn.configuration || {},
-        credentials: conn.credentials || {},
+        configuration: (conn.configuration as Record<string, any>) || {},
+        credentials: (conn.credentials as Record<string, any>) || {},
         webhook_url: conn.webhook_url || undefined,
         last_sync: conn.last_sync ? new Date(conn.last_sync) : undefined,
         created_at: new Date(conn.created_at),
