@@ -532,6 +532,7 @@ export type Database = {
           priority: string | null
           status: string | null
           tags: string[] | null
+          ticket_id: string | null
           updated_at: string | null
         }
         Insert: {
@@ -544,6 +545,7 @@ export type Database = {
           priority?: string | null
           status?: string | null
           tags?: string[] | null
+          ticket_id?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -556,6 +558,7 @@ export type Database = {
           priority?: string | null
           status?: string | null
           tags?: string[] | null
+          ticket_id?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -571,6 +574,13 @@ export type Database = {
             columns: ["contact_id"]
             isOneToOne: false
             referencedRelation: "tenant_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenant_conversations_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_tickets"
             referencedColumns: ["id"]
           },
         ]
@@ -732,6 +742,123 @@ export type Database = {
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenant_ticket_history: {
+        Row: {
+          action: string
+          created_at: string | null
+          id: string
+          new_values: Json | null
+          notes: string | null
+          old_values: Json | null
+          ticket_id: string
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          id?: string
+          new_values?: Json | null
+          notes?: string | null
+          old_values?: Json | null
+          ticket_id: string
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          id?: string
+          new_values?: Json | null
+          notes?: string | null
+          old_values?: Json | null
+          ticket_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_ticket_history_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_tickets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenant_ticket_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenant_tickets: {
+        Row: {
+          assigned_user_id: string | null
+          channel: string
+          closed_at: string | null
+          contact_id: string
+          created_at: string | null
+          custom_fields: Json | null
+          description: string | null
+          id: string
+          last_activity_at: string | null
+          priority: string | null
+          resolved_at: string | null
+          status: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_user_id?: string | null
+          channel: string
+          closed_at?: string | null
+          contact_id: string
+          created_at?: string | null
+          custom_fields?: Json | null
+          description?: string | null
+          id?: string
+          last_activity_at?: string | null
+          priority?: string | null
+          resolved_at?: string | null
+          status?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_user_id?: string | null
+          channel?: string
+          closed_at?: string | null
+          contact_id?: string
+          created_at?: string | null
+          custom_fields?: Json | null
+          description?: string | null
+          id?: string
+          last_activity_at?: string | null
+          priority?: string | null
+          resolved_at?: string | null
+          status?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_tickets_assigned_user_id_fkey"
+            columns: ["assigned_user_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenant_tickets_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_contacts"
             referencedColumns: ["id"]
           },
         ]
