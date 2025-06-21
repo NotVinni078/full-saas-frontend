@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -267,7 +266,38 @@ export const useTenantTickets = (): TenantTicketsHook => {
   };
 
   const assignTicket = async (ticketId: string, userId: string) => {
-    await updateTicket(ticketId, { assigned_user_id: userId });
+    try {
+      const { error } = await supabase
+        .from('tenant_tickets')
+        .update({ assigned_user_id: userId })
+        .eq('id', ticketId);
+
+      if (error) throw error;
+      
+      // Create assignment history entry
+      await supabase
+        .from('tenant_ticket_history')
+        .insert({
+          ticket_id: ticketId,
+          user_id: userId,
+          action: 'assigned',
+          notes: `Ticket atribuído para o usuário ${userId}`
+        });
+      
+      toast({
+        title: "Sucesso",
+        description: "Ticket atribuído com sucesso",
+      });
+      
+      await refetchTickets();
+    } catch (error) {
+      console.error('Error assigning ticket:', error);
+      toast({
+        title: "Erro", 
+        description: "Erro ao atribuir ticket",
+        variant: "destructive"
+      });
+    }
   };
 
   const changeTicketStatus = async (ticketId: string, status: TenantTicket['status'], notes?: string) => {

@@ -1,7 +1,8 @@
-
 import React, { useState } from 'react';
 import SidebarLayout from '@/components/SidebarLayout';
 import TicketsList from '@/components/tickets/TicketsList';
+import TicketAssignment from '@/components/tickets/TicketAssignment';
+import AssignmentNotification from '@/components/tickets/AssignmentNotification';
 import { TenantTicket } from '@/hooks/useTenantTickets';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -23,6 +24,12 @@ const Atendimentos = () => {
   const [selectedTicket, setSelectedTicket] = useState<TenantTicket | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showTicketDetail, setShowTicketDetail] = useState(false);
+  const [showAssignmentNotification, setShowAssignmentNotification] = useState<{
+    ticketTitle: string;
+    assignedUserName: string;
+    assignedBy?: string;
+    ticketId: string;
+  } | null>(null);
   
   // Form states for creating new ticket
   const [newTicketForm, setNewTicketForm] = useState({
@@ -72,6 +79,29 @@ const Atendimentos = () => {
     
     await updateTicket(selectedTicket.id, { status });
     setSelectedTicket({ ...selectedTicket, status });
+  };
+
+  const handleAssignmentChange = (ticketId: string, userId: string | null) => {
+    if (selectedTicket && userId) {
+      // Update the selected ticket with the new assignment
+      const updatedTicket = { 
+        ...selectedTicket, 
+        assigned_user_id: userId,
+        assigned_user: {
+          id: userId,
+          name: 'Usuario', // This will be updated by the refetch
+          email: 'user@example.com'
+        }
+      };
+      setSelectedTicket(updatedTicket);
+
+      // Show notification
+      setShowAssignmentNotification({
+        ticketTitle: selectedTicket.title,
+        assignedUserName: 'Agente',
+        ticketId: ticketId
+      });
+    }
   };
 
   const statusLabels = {
@@ -276,6 +306,12 @@ const Atendimentos = () => {
 
                   {/* Sidebar */}
                   <div className="space-y-6">
+                    {/* Assignment Component */}
+                    <TicketAssignment 
+                      ticket={selectedTicket}
+                      onAssignmentChange={handleAssignmentChange}
+                    />
+
                     {/* Contact Info */}
                     <Card>
                       <CardHeader>
@@ -366,6 +402,16 @@ const Atendimentos = () => {
             )}
           </DialogContent>
         </Dialog>
+
+        {/* Assignment Notification */}
+        {showAssignmentNotification && (
+          <AssignmentNotification
+            ticketTitle={showAssignmentNotification.ticketTitle}
+            assignedUserName={showAssignmentNotification.assignedUserName}
+            assignedBy={showAssignmentNotification.assignedBy}
+            ticketId={showAssignmentNotification.ticketId}
+          />
+        )}
       </div>
     </SidebarLayout>
   );
