@@ -27,6 +27,12 @@ export const TenantProvider = ({ children }: { children: ReactNode }) => {
       
       setCurrentTenant(tenant);
       localStorage.setItem('currentTenantSlug', tenant.slug);
+      
+      // Log da atividade de inicialização
+      logActivity(tenant.id, 'tenant_initialized', { 
+        tenant_name: tenant.name,
+        tenant_slug: tenant.slug 
+      });
     }
   }, [tenants, currentTenant]);
 
@@ -41,19 +47,26 @@ export const TenantProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
+    const previousTenant = currentTenant;
     setCurrentTenant(tenant);
     localStorage.setItem('currentTenantSlug', tenant.slug);
     
     // Log da atividade de mudança de tenant
     await logActivity(tenant.id, 'switch_tenant', { 
-      from: currentTenant?.slug, 
-      to: tenant.slug 
+      from: previousTenant?.slug, 
+      to: tenant.slug,
+      from_name: previousTenant?.name,
+      to_name: tenant.name
     });
 
     toast({
       title: "Sucesso",
       description: `Mudou para o tenant: ${tenant.name}`,
     });
+
+    // Força um reload da página para garantir que todos os dados sejam recarregados
+    // para o novo tenant (isso pode ser otimizado futuramente)
+    window.location.reload();
   };
 
   const contextValue: TenantContextType = {
@@ -67,7 +80,14 @@ export const TenantProvider = ({ children }: { children: ReactNode }) => {
     deleteTenant,
     logActivity: async (action: string, details?: Record<string, any>) => {
       if (currentTenant) {
-        await logActivity(currentTenant.id, action, details);
+        await logActivity(currentTenant.id, action, {
+          ...details,
+          tenant_context: {
+            tenant_id: currentTenant.id,
+            tenant_name: currentTenant.name,
+            tenant_slug: currentTenant.slug
+          }
+        });
       }
     }
   };

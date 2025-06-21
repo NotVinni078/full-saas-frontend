@@ -9,6 +9,7 @@ import { BrandProvider } from "./contexts/BrandContext";
 import { AnunciosProvider } from "./contexts/AnunciosContext";
 import { SupabaseDataProvider } from "./contexts/SupabaseDataContext";
 import { TenantProvider } from "./contexts/TenantContext";
+import { TenantDataProvider } from "./contexts/TenantDataContext";
 
 const queryClient = new QueryClient();
 
@@ -18,11 +19,13 @@ createRoot(document.getElementById("root")!).render(
       <BrowserRouter>
         <BrandProvider>
           <TenantProvider>
-            <AnunciosProvider>
-              <SupabaseDataProvider>
-                <App />
-              </SupabaseDataProvider>
-            </AnunciosProvider>
+            <TenantDataProvider>
+              <AnunciosProvider>
+                <SupabaseDataProvider>
+                  <App />
+                </SupabaseDataProvider>
+              </AnunciosProvider>
+            </TenantDataProvider>
           </TenantProvider>
         </BrandProvider>
       </BrowserRouter>
