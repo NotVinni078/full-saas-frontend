@@ -669,6 +669,155 @@ export type Database = {
         }
         Relationships: []
       }
+      tenant_schedule_contacts: {
+        Row: {
+          contact_id: string
+          created_at: string
+          id: string
+          schedule_id: string
+        }
+        Insert: {
+          contact_id: string
+          created_at?: string
+          id?: string
+          schedule_id: string
+        }
+        Update: {
+          contact_id?: string
+          created_at?: string
+          id?: string
+          schedule_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_schedule_contacts_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenant_schedule_contacts_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_scheduled_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenant_schedule_executions: {
+        Row: {
+          contacts_failed: number
+          contacts_sent: number
+          created_at: string
+          error_details: Json | null
+          executed_at: string
+          id: string
+          schedule_id: string
+          status: string
+        }
+        Insert: {
+          contacts_failed?: number
+          contacts_sent?: number
+          created_at?: string
+          error_details?: Json | null
+          executed_at?: string
+          id?: string
+          schedule_id: string
+          status?: string
+        }
+        Update: {
+          contacts_failed?: number
+          contacts_sent?: number
+          created_at?: string
+          error_details?: Json | null
+          executed_at?: string
+          id?: string
+          schedule_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_schedule_executions_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_scheduled_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenant_scheduled_messages: {
+        Row: {
+          audio_url: string | null
+          channel: string
+          created_at: string
+          created_by: string | null
+          custom_days: number | null
+          has_attachments: boolean
+          has_recurrence: boolean
+          id: string
+          include_signature: boolean
+          message_content: string | null
+          message_type: string
+          next_execution: string | null
+          recurrence_type: string | null
+          scheduled_date: string
+          scheduled_time: string
+          sector: string | null
+          sent_at: string | null
+          status: string
+          ticket_status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          audio_url?: string | null
+          channel?: string
+          created_at?: string
+          created_by?: string | null
+          custom_days?: number | null
+          has_attachments?: boolean
+          has_recurrence?: boolean
+          id?: string
+          include_signature?: boolean
+          message_content?: string | null
+          message_type?: string
+          next_execution?: string | null
+          recurrence_type?: string | null
+          scheduled_date: string
+          scheduled_time: string
+          sector?: string | null
+          sent_at?: string | null
+          status?: string
+          ticket_status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          audio_url?: string | null
+          channel?: string
+          created_at?: string
+          created_by?: string | null
+          custom_days?: number | null
+          has_attachments?: boolean
+          has_recurrence?: boolean
+          id?: string
+          include_signature?: boolean
+          message_content?: string | null
+          message_type?: string
+          next_execution?: string | null
+          recurrence_type?: string | null
+          scheduled_date?: string
+          scheduled_time?: string
+          sector?: string | null
+          sent_at?: string | null
+          status?: string
+          ticket_status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       tenant_settings: {
         Row: {
           category: string | null
@@ -794,6 +943,70 @@ export type Database = {
           },
         ]
       }
+      tenant_ticket_messages: {
+        Row: {
+          contact_id: string | null
+          content: string
+          created_at: string | null
+          direction: string
+          id: string
+          message_type: string | null
+          metadata: Json | null
+          read_at: string | null
+          ticket_id: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          contact_id?: string | null
+          content: string
+          created_at?: string | null
+          direction: string
+          id?: string
+          message_type?: string | null
+          metadata?: Json | null
+          read_at?: string | null
+          ticket_id: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          contact_id?: string | null
+          content?: string
+          created_at?: string | null
+          direction?: string
+          id?: string
+          message_type?: string | null
+          metadata?: Json | null
+          read_at?: string | null
+          ticket_id?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_ticket_messages_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenant_ticket_messages_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_tickets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenant_ticket_messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenant_tickets: {
         Row: {
           assigned_user_id: string | null
@@ -805,6 +1018,7 @@ export type Database = {
           description: string | null
           id: string
           last_activity_at: string | null
+          last_message_at: string | null
           priority: string | null
           resolved_at: string | null
           status: string | null
@@ -822,6 +1036,7 @@ export type Database = {
           description?: string | null
           id?: string
           last_activity_at?: string | null
+          last_message_at?: string | null
           priority?: string | null
           resolved_at?: string | null
           status?: string | null
@@ -839,6 +1054,7 @@ export type Database = {
           description?: string | null
           id?: string
           last_activity_at?: string | null
+          last_message_at?: string | null
           priority?: string | null
           resolved_at?: string | null
           status?: string | null
@@ -1033,7 +1249,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      calculate_next_execution: {
+        Args: {
+          base_date: string
+          recurrence_type: string
+          custom_days?: number
+        }
+        Returns: string
+      }
     }
     Enums: {
       campanha_status:
