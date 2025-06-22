@@ -449,7 +449,7 @@ export const useScheduledMessages = (): UseScheduledMessagesHook => {
 
   useEffect(() => {
     let mounted = true;
-    let channel: any = null;
+    let realtimeChannel: any = null;
 
     const initializeData = async () => {
       if (mounted) {
@@ -458,30 +458,35 @@ export const useScheduledMessages = (): UseScheduledMessagesHook => {
     };
 
     const setupRealtimeSubscription = () => {
-      // Create a unique channel name to avoid conflicts
-      const channelName = `scheduled-messages-${Date.now()}`;
-      
-      channel = supabase
-        .channel(channelName)
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'tenant_scheduled_messages'
-          },
-          () => {
-            if (mounted) {
-              console.log('Real-time update received for scheduled messages');
-              refetchData();
+      try {
+        // Create a unique channel name to avoid conflicts
+        const channelName = `scheduled-messages-${Date.now()}-${Math.random()}`;
+        
+        realtimeChannel = supabase
+          .channel(channelName)
+          .on(
+            'postgres_changes',
+            {
+              event: '*',
+              schema: 'public',
+              table: 'tenant_scheduled_messages'
+            },
+            (payload) => {
+              if (mounted) {
+                console.log('Real-time update received for scheduled messages:', payload);
+                refetchData();
+              }
             }
-          }
-        );
-
-      // Subscribe to the channel
-      channel.subscribe((status: string) => {
-        console.log('Subscription status:', status);
-      });
+          )
+          .subscribe((status) => {
+            console.log('Subscription status:', status);
+            if (status === 'SUBSCRIBED') {
+              console.log('Successfully subscribed to scheduled messages updates');
+            }
+          });
+      } catch (error) {
+        console.error('Error setting up realtime subscription:', error);
+      }
     };
 
     initializeData();
@@ -489,9 +494,9 @@ export const useScheduledMessages = (): UseScheduledMessagesHook => {
 
     return () => {
       mounted = false;
-      if (channel) {
+      if (realtimeChannel) {
         console.log('Cleaning up subscription');
-        supabase.removeChannel(channel);
+        supabase.removeChannel(realtimeChannel);
       }
     };
   }, []); // Empty dependency array to run only once
