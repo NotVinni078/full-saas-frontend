@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -449,28 +448,53 @@ export const useScheduledMessages = (): UseScheduledMessagesHook => {
   };
 
   useEffect(() => {
-    refetchData();
+    let mounted = true;
+    let channel: any = null;
 
-    // Set up real-time subscription
-    const channel = supabase
-      .channel('scheduled-messages')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'tenant_scheduled_messages'
-        },
-        () => {
-          refetchData();
-        }
-      )
-      .subscribe();
+    const initializeData = async () => {
+      if (mounted) {
+        await refetchData();
+      }
+    };
+
+    const setupRealtimeSubscription = () => {
+      // Create a unique channel name to avoid conflicts
+      const channelName = `scheduled-messages-${Date.now()}`;
+      
+      channel = supabase
+        .channel(channelName)
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'tenant_scheduled_messages'
+          },
+          () => {
+            if (mounted) {
+              console.log('Real-time update received for scheduled messages');
+              refetchData();
+            }
+          }
+        );
+
+      // Subscribe to the channel
+      channel.subscribe((status: string) => {
+        console.log('Subscription status:', status);
+      });
+    };
+
+    initializeData();
+    setupRealtimeSubscription();
 
     return () => {
-      supabase.removeChannel(channel);
+      mounted = false;
+      if (channel) {
+        console.log('Cleaning up subscription');
+        supabase.removeChannel(channel);
+      }
     };
-  }, []);
+  }, []); // Empty dependency array to run only once
 
   return {
     scheduledMessages,
