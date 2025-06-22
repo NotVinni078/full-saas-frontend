@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -228,18 +227,18 @@ export const ScheduleDetailsModal: React.FC<ScheduleDetailsModalProps> = ({
                       <div key={scheduleContact.id} className="flex items-center gap-3 p-2 bg-muted/50 rounded-lg">
                         <Avatar className="h-8 w-8">
                           <AvatarFallback>
-                            {scheduleContact.contact?.nome?.charAt(0)?.toUpperCase() || <User className="h-4 w-4" />}
+                            {scheduleContact.contact?.name?.charAt(0)?.toUpperCase() || <User className="h-4 w-4" />}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
                           <p className="font-medium text-sm">
-                            {scheduleContact.contact?.nome || 'Nome não disponível'}
+                            {scheduleContact.contact?.name || 'Nome não disponível'}
                           </p>
                           <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                            {scheduleContact.contact?.telefone && (
+                            {scheduleContact.contact?.phone && (
                               <div className="flex items-center gap-1">
                                 <Phone className="h-3 w-3" />
-                                {scheduleContact.contact.telefone}
+                                {scheduleContact.contact.phone}
                               </div>
                             )}
                             {scheduleContact.contact?.email && (
