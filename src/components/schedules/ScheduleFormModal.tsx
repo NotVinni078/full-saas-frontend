@@ -15,7 +15,44 @@ import { useTenantDataContext } from '@/contexts/TenantDataContext';
 import DateTimePicker from '@/components/selectors/DateTimePicker';
 import RecurrenceSelector from '@/components/selectors/RecurrenceSelector';
 import ChannelSelector from '@/components/selectors/ChannelSelector';
-import ContactSelector from '@/components/selectors/ContactSelector';
+
+// Simple ContactSelector for this component
+const ContactSelector: React.FC<{
+  selectedContacts: string[];
+  onContactsChange: (contacts: string[]) => void;
+  contacts: any[];
+}> = ({ selectedContacts, onContactsChange, contacts }) => {
+  const handleContactToggle = (contactId: string) => {
+    if (selectedContacts.includes(contactId)) {
+      onContactsChange(selectedContacts.filter(id => id !== contactId));
+    } else {
+      onContactsChange([...selectedContacts, contactId]);
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="max-h-40 overflow-y-auto">
+        {contacts.map((contact) => (
+          <div key={contact.id} className="flex items-center space-x-2 p-2">
+            <input
+              type="checkbox"
+              checked={selectedContacts.includes(contact.id)}
+              onChange={() => handleContactToggle(contact.id)}
+              className="rounded"
+            />
+            <label className="text-sm">
+              {contact.name || contact.nome} - {contact.phone || contact.telefone}
+            </label>
+          </div>
+        ))}
+      </div>
+      <p className="text-sm text-muted-foreground">
+        {selectedContacts.length} contato(s) selecionado(s)
+      </p>
+    </div>
+  );
+};
 
 export interface ScheduleFormModalProps {
   schedule?: ScheduledMessage;
@@ -45,7 +82,7 @@ export const ScheduleFormModal: React.FC<ScheduleFormModalProps> = ({
     scheduled_date: undefined as Date | undefined,
     scheduled_time: '09:00',
     has_recurrence: false,
-    recurrence_type: undefined as string | undefined,
+    recurrence_type: '' as string,
     custom_days: 1,
     channel: 'whatsapp' as 'whatsapp' | 'instagram' | 'facebook' | 'telegram',
     ticket_status: 'pending' as 'finished' | 'pending' | 'in_progress',
@@ -66,7 +103,7 @@ export const ScheduleFormModal: React.FC<ScheduleFormModalProps> = ({
         scheduled_date: new Date(schedule.scheduled_date),
         scheduled_time: schedule.scheduled_time,
         has_recurrence: schedule.has_recurrence,
-        recurrence_type: schedule.recurrence_type,
+        recurrence_type: schedule.recurrence_type || '',
         custom_days: schedule.custom_days || 1,
         channel: schedule.channel,
         ticket_status: schedule.ticket_status,
@@ -86,7 +123,7 @@ export const ScheduleFormModal: React.FC<ScheduleFormModalProps> = ({
         scheduled_date: undefined,
         scheduled_time: '09:00',
         has_recurrence: false,
-        recurrence_type: undefined,
+        recurrence_type: '',
         custom_days: 1,
         channel: 'whatsapp',
         ticket_status: 'pending',
@@ -107,7 +144,9 @@ export const ScheduleFormModal: React.FC<ScheduleFormModalProps> = ({
       const scheduleData = {
         ...formData,
         scheduled_date: formData.scheduled_date.toISOString().split('T')[0],
-        recurrence_type: formData.has_recurrence ? formData.recurrence_type : undefined,
+        recurrence_type: formData.has_recurrence && formData.recurrence_type ? 
+          formData.recurrence_type as 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'semiannual' | 'annual' | 'custom' : 
+          undefined,
         custom_days: formData.recurrence_type === 'custom' ? formData.custom_days : undefined
       };
 
@@ -117,7 +156,7 @@ export const ScheduleFormModal: React.FC<ScheduleFormModalProps> = ({
       } else {
         // Create new schedule
         const newSchedule = await createScheduledMessage(scheduleData);
-        if (newSchedule && selectedContacts.length > 0) {
+        if (selectedContacts.length > 0) {
           await addContactsToSchedule(newSchedule.id, selectedContacts);
         }
       }
@@ -182,7 +221,7 @@ export const ScheduleFormModal: React.FC<ScheduleFormModalProps> = ({
               <Label>Canal de Envio</Label>
               <ChannelSelector
                 value={formData.channel}
-                onValueChange={(channel) => setFormData({ ...formData, channel })}
+                onValueChange={(channel) => setFormData({ ...formData, channel: channel as 'whatsapp' | 'instagram' | 'facebook' | 'telegram' })}
               />
             </div>
           </div>
@@ -224,7 +263,7 @@ export const ScheduleFormModal: React.FC<ScheduleFormModalProps> = ({
               {formData.has_recurrence && (
                 <CardContent>
                   <RecurrenceSelector
-                    value={formData.recurrence_type || ''}
+                    value={formData.recurrence_type}
                     customDays={formData.custom_days}
                     onValueChange={(type) => setFormData({ ...formData, recurrence_type: type })}
                     onCustomDaysChange={(days) => setFormData({ ...formData, custom_days: days })}
@@ -250,7 +289,6 @@ export const ScheduleFormModal: React.FC<ScheduleFormModalProps> = ({
                   selectedContacts={selectedContacts}
                   onContactsChange={setSelectedContacts}
                   contacts={contacts}
-                  multiple={true}
                 />
               </CardContent>
             </Card>
@@ -324,7 +362,7 @@ export const ScheduleFormModal: React.FC<ScheduleFormModalProps> = ({
                 <div className={`flex h-8 w-8 items-center justify-center rounded-full border-2 ${
                   currentStep > index + 1 ? 'bg-primary border-primary text-primary-foreground' :
                   currentStep === index + 1 ? 'border-primary text-primary' :
-                  'border-muted-foreground text-muted-foreground'
+                  'border-mute-foreground text-muted-foreground'
                 }`}>
                   {index + 1}
                 </div>

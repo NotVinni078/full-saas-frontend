@@ -35,8 +35,8 @@ export interface ScheduleContact {
   created_at: string;
   contact?: {
     id: string;
-    nome: string;
-    telefone: string;
+    name: string;
+    phone: string;
     email?: string;
   };
 }
@@ -59,7 +59,7 @@ interface UseScheduledMessagesHook {
   error: string | null;
   
   // CRUD operations
-  createScheduledMessage: (message: Omit<ScheduledMessage, 'id' | 'created_at' | 'updated_at' | 'status'>) => Promise<void>;
+  createScheduledMessage: (message: Omit<ScheduledMessage, 'id' | 'created_at' | 'updated_at' | 'status'>) => Promise<ScheduledMessage>;
   updateScheduledMessage: (id: string, updates: Partial<ScheduledMessage>) => Promise<void>;
   deleteScheduledMessage: (id: string) => Promise<void>;
   
@@ -96,8 +96,8 @@ export const useScheduledMessages = (): UseScheduledMessagesHook => {
             created_at,
             tenant_contacts (
               id,
-              nome,
-              telefone,
+              name,
+              phone,
               email
             )
           )
@@ -106,8 +106,28 @@ export const useScheduledMessages = (): UseScheduledMessagesHook => {
 
       if (error) throw error;
 
-      const mappedMessages: ScheduledMessage[] = data.map(msg => ({
-        ...msg,
+      const mappedMessages: ScheduledMessage[] = (data || []).map(msg => ({
+        id: msg.id,
+        title: msg.title,
+        message_content: msg.message_content,
+        message_type: msg.message_type as 'text' | 'audio' | 'image' | 'document',
+        audio_url: msg.audio_url,
+        include_signature: msg.include_signature,
+        has_attachments: msg.has_attachments,
+        scheduled_date: msg.scheduled_date,
+        scheduled_time: msg.scheduled_time,
+        has_recurrence: msg.has_recurrence,
+        recurrence_type: msg.recurrence_type as 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'semiannual' | 'annual' | 'custom' | undefined,
+        custom_days: msg.custom_days,
+        channel: msg.channel as 'whatsapp' | 'instagram' | 'facebook' | 'telegram',
+        ticket_status: msg.ticket_status as 'finished' | 'pending' | 'in_progress',
+        sector: msg.sector,
+        status: msg.status as 'scheduled' | 'sent' | 'cancelled' | 'failed',
+        created_by: msg.created_by,
+        created_at: msg.created_at,
+        updated_at: msg.updated_at,
+        sent_at: msg.sent_at,
+        next_execution: msg.next_execution,
         contacts: msg.tenant_schedule_contacts?.map((sc: any) => ({
           id: sc.id,
           schedule_id: msg.id,
@@ -115,8 +135,8 @@ export const useScheduledMessages = (): UseScheduledMessagesHook => {
           created_at: sc.created_at,
           contact: sc.tenant_contacts ? {
             id: sc.tenant_contacts.id,
-            nome: sc.tenant_contacts.nome,
-            telefone: sc.tenant_contacts.telefone,
+            name: sc.tenant_contacts.name,
+            phone: sc.tenant_contacts.phone,
             email: sc.tenant_contacts.email
           } : undefined
         })) || []
@@ -137,13 +157,25 @@ export const useScheduledMessages = (): UseScheduledMessagesHook => {
         .order('executed_at', { ascending: false });
 
       if (error) throw error;
-      setScheduleExecutions(data || []);
+      
+      const mappedExecutions: ScheduleExecution[] = (data || []).map(exec => ({
+        id: exec.id,
+        schedule_id: exec.schedule_id,
+        executed_at: exec.executed_at,
+        status: exec.status as 'success' | 'failed' | 'partial',
+        contacts_sent: exec.contacts_sent,
+        contacts_failed: exec.contacts_failed,
+        error_details: exec.error_details,
+        created_at: exec.created_at
+      }));
+      
+      setScheduleExecutions(mappedExecutions);
     } catch (error) {
       console.error('Error fetching schedule executions:', error);
     }
   };
 
-  const createScheduledMessage = async (messageData: Omit<ScheduledMessage, 'id' | 'created_at' | 'updated_at' | 'status'>) => {
+  const createScheduledMessage = async (messageData: Omit<ScheduledMessage, 'id' | 'created_at' | 'updated_at' | 'status'>): Promise<ScheduledMessage> => {
     try {
       const { data, error } = await supabase
         .from('tenant_scheduled_messages')
@@ -162,7 +194,31 @@ export const useScheduledMessages = (): UseScheduledMessagesHook => {
       });
 
       await refetchData();
-      return data;
+      
+      return {
+        id: data.id,
+        title: data.title,
+        message_content: data.message_content,
+        message_type: data.message_type as 'text' | 'audio' | 'image' | 'document',
+        audio_url: data.audio_url,
+        include_signature: data.include_signature,
+        has_attachments: data.has_attachments,
+        scheduled_date: data.scheduled_date,
+        scheduled_time: data.scheduled_time,
+        has_recurrence: data.has_recurrence,
+        recurrence_type: data.recurrence_type as 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'semiannual' | 'annual' | 'custom' | undefined,
+        custom_days: data.custom_days,
+        channel: data.channel as 'whatsapp' | 'instagram' | 'facebook' | 'telegram',
+        ticket_status: data.ticket_status as 'finished' | 'pending' | 'in_progress',
+        sector: data.sector,
+        status: data.status as 'scheduled' | 'sent' | 'cancelled' | 'failed',
+        created_by: data.created_by,
+        created_at: data.created_at,
+        updated_at: data.updated_at,
+        sent_at: data.sent_at,
+        next_execution: data.next_execution,
+        contacts: []
+      };
     } catch (error) {
       console.error('Error creating scheduled message:', error);
       toast({
@@ -291,8 +347,8 @@ export const useScheduledMessages = (): UseScheduledMessagesHook => {
           *,
           tenant_contacts (
             id,
-            nome,
-            telefone,
+            name,
+            phone,
             email
           )
         `)
@@ -300,15 +356,15 @@ export const useScheduledMessages = (): UseScheduledMessagesHook => {
 
       if (error) throw error;
 
-      return data.map(sc => ({
+      return (data || []).map(sc => ({
         id: sc.id,
         schedule_id: sc.schedule_id,
         contact_id: sc.contact_id,
         created_at: sc.created_at,
         contact: sc.tenant_contacts ? {
           id: sc.tenant_contacts.id,
-          nome: sc.tenant_contacts.nome,
-          telefone: sc.tenant_contacts.telefone,
+          name: sc.tenant_contacts.name,
+          phone: sc.tenant_contacts.phone,
           email: sc.tenant_contacts.email
         } : undefined
       }));
@@ -354,7 +410,17 @@ export const useScheduledMessages = (): UseScheduledMessagesHook => {
         .order('executed_at', { ascending: false });
 
       if (error) throw error;
-      return data || [];
+      
+      return (data || []).map(exec => ({
+        id: exec.id,
+        schedule_id: exec.schedule_id,
+        executed_at: exec.executed_at,
+        status: exec.status as 'success' | 'failed' | 'partial',
+        contacts_sent: exec.contacts_sent,
+        contacts_failed: exec.contacts_failed,
+        error_details: exec.error_details,
+        created_at: exec.created_at
+      }));
     } catch (error) {
       console.error('Error fetching schedule executions:', error);
       return [];
