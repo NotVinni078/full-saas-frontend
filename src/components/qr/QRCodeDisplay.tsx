@@ -24,15 +24,15 @@ const QRCodeDisplay = ({ connectionId, connectionName, onStatusChange }: QRCodeD
   // Estado para armazenar a URL do QR Code
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   
-  // Estado para countdown de expiração
-  const [countdown, setCountdown] = useState<number>(20);
+  // Estado para countdown de expiração (60 segundos agora)
+  const [countdown, setCountdown] = useState<number>(60);
 
   /**
    * Busca o QR Code atual do servidor
    */
   const fetchQRCode = async () => {
     setQrStatus('generating');
-    setCountdown(20);
+    setCountdown(60);
     onStatusChange?.('generating');
 
     try {
@@ -103,8 +103,8 @@ const QRCodeDisplay = ({ connectionId, connectionName, onStatusChange }: QRCodeD
   useEffect(() => {
     fetchQRCode();
     
-    // Verifica status da conexão a cada 2 segundos
-    const statusInterval = setInterval(checkConnectionStatus, 2000);
+    // Verifica status da conexão a cada 3 segundos
+    const statusInterval = setInterval(checkConnectionStatus, 3000);
     
     return () => {
       clearInterval(statusInterval);
@@ -185,7 +185,7 @@ const QRCodeDisplay = ({ connectionId, connectionName, onStatusChange }: QRCodeD
             <div className="w-64 h-64 bg-gray-100 dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center">
               <div className="text-center">
                 <RefreshCw className="h-8 w-8 text-gray-400 animate-spin mx-auto mb-2" />
-                <p className="text-sm text-gray-500">Gerando QR Code...</p>
+                <p className="text-sm text-gray-500">Inicializando Baileys...</p>
               </div>
             </div>
           )}
@@ -216,7 +216,7 @@ const QRCodeDisplay = ({ connectionId, connectionName, onStatusChange }: QRCodeD
                   Conectado!
                 </p>
                 <p className="text-sm text-green-600 dark:text-green-400">
-                  WhatsApp conectado com sucesso
+                  WhatsApp conectado via Baileys
                 </p>
               </div>
             </div>
@@ -247,10 +247,10 @@ const QRCodeDisplay = ({ connectionId, connectionName, onStatusChange }: QRCodeD
             <li>Aguarde a confirmação da conexão</li>
           </ol>
           
-          <div className="mt-3 p-2 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded">
-            <p className="text-xs text-yellow-800 dark:text-yellow-200">
-              <strong>Importante:</strong> O QR Code expira em 20 segundos por segurança. 
-              Se expirar, clique no botão para gerar um novo.
+          <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded">
+            <p className="text-xs text-blue-800 dark:text-blue-200">
+              <strong>Nova implementação:</strong> Agora usando Baileys real! 
+              O QR Code expira em 60 segundos e é gerado pela biblioteca oficial do WhatsApp.
             </p>
           </div>
         </div>
