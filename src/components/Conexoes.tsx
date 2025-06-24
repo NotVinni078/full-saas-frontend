@@ -124,7 +124,7 @@ const Conexoes = () => {
       if (newConnection.channel === 'whatsapp-qr') {
         setQrCodeModal({
           isOpen: true,
-          connectionId: result.connection_id,
+          connectionId: result.connection_id, // This comes from the Edge Function response
           connectionName: newConnection.name
         });
       }

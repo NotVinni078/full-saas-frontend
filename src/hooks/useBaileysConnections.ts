@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -22,6 +21,13 @@ interface CreateConnectionData {
   sectors: string[];
 }
 
+interface CreateConnectionResponse {
+  connection_id: string;
+  qr_code: string;
+  expires_at: string;
+  status: string;
+}
+
 export const useBaileysConnections = () => {
   const [connections, setConnections] = useState<BaileysConnection[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,7 +42,23 @@ export const useBaileysConnections = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setConnections(data || []);
+      
+      // Transform the data to match our interface
+      const transformedData: BaileysConnection[] = (data || []).map(item => ({
+        id: item.id,
+        name: item.name,
+        channel_type: item.channel_type,
+        sectors: item.sectors || [],
+        status: (item.status as 'disconnected' | 'connecting' | 'waiting_scan' | 'connected' | 'error') || 'disconnected',
+        qr_code: item.qr_code,
+        qr_expires_at: item.qr_expires_at,
+        phone_number: item.phone_number,
+        last_activity_at: item.last_activity_at,
+        created_at: item.created_at,
+        updated_at: item.updated_at
+      }));
+      
+      setConnections(transformedData);
     } catch (err) {
       console.error('Erro ao buscar conexões:', err);
       setError('Erro ao carregar conexões');
@@ -46,7 +68,7 @@ export const useBaileysConnections = () => {
   };
 
   // Criar nova conexão
-  const createConnection = async (connectionData: CreateConnectionData): Promise<BaileysConnection | null> => {
+  const createConnection = async (connectionData: CreateConnectionData): Promise<CreateConnectionResponse | null> => {
     try {
       const { data, error } = await supabase.functions.invoke('baileys-whatsapp', {
         body: {
