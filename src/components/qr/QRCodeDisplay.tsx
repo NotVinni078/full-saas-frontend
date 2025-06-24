@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { QrCode, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
+import { useBaileysConnections } from '@/hooks/useBaileysConnections';
 
 interface QRCodeDisplayProps {
   connectionId: string;
@@ -11,50 +12,52 @@ interface QRCodeDisplayProps {
 }
 
 /**
- * Componente para exibir QR Code da API Baileys
- * Funcionalidades implementadas:
- * - Exibição do QR Code em tempo real
- * - Status de conexão atualizado automaticamente
- * - Botão para regenerar QR Code expirado
- * - Layout responsivo com cores dinâmicas
- * - Instruções claras para o usuário
+ * Componente para exibir QR Code real da API Baileys
+ * Integrado com banco de dados e atualizações em tempo real
  */
 const QRCodeDisplay = ({ connectionId, connectionName, onStatusChange }: QRCodeDisplayProps) => {
+  const { getQRCode, getConnectionStatus } = useBaileysConnections();
+  
   // Estado para controlar o status do QR Code
   const [qrStatus, setQrStatus] = useState<'generating' | 'ready' | 'connected' | 'expired'>('generating');
   
   // Estado para armazenar a URL do QR Code
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   
-  // Estado para countdown de expiração (QR Code expira em 20 segundos)
+  // Estado para countdown de expiração
   const [countdown, setCountdown] = useState<number>(20);
 
   /**
-   * Simula a geração do QR Code via API Baileys
-   * Em produção, esta função fará uma chamada real para o backend
+   * Busca o QR Code atual do servidor
    */
-  const generateQRCode = async () => {
+  const fetchQRCode = async () => {
     setQrStatus('generating');
     setCountdown(20);
     onStatusChange?.('generating');
 
     try {
-      // Simula delay da API
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const qrData = await getQRCode(connectionId);
       
-      // Em produção: const response = await fetch(`/api/baileys/qr/${connectionId}`)
-      // Mock QR Code - substitua pela URL real da API
-      const mockQrCode = `data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+CiAgPHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzMzMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk1vY2sgUVIgQ29kZTwvdGV4dD4KICA8dGV4dCB4PSI1MCUiIHk9IjcwJSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmaWxsPSIjNjY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+Q29uZXjDo28gSUQ6ICR7Y29ubmVjdGlvbklkfTwvdGV4dD4KPC9zdmc+`;
-      
-      setQrCodeUrl(mockQrCode);
-      setQrStatus('ready');
-      onStatusChange?.('ready');
-
-      // Inicia o countdown de expiração
-      startCountdown();
-
+      if (qrData) {
+        setQrCodeUrl(qrData.qr_code);
+        setQrStatus('ready');
+        onStatusChange?.('ready');
+        
+        // Calcular countdown baseado na expiração
+        const expiresAt = new Date(qrData.expires_at);
+        const now = new Date();
+        const timeLeft = Math.max(0, Math.floor((expiresAt.getTime() - now.getTime()) / 1000));
+        setCountdown(timeLeft);
+        
+        if (timeLeft > 0) {
+          startCountdown(timeLeft);
+        } else {
+          setQrStatus('expired');
+          onStatusChange?.('expired');
+        }
+      }
     } catch (error) {
-      console.error('Erro ao gerar QR Code:', error);
+      console.error('Erro ao buscar QR Code:', error);
       setQrStatus('expired');
       onStatusChange?.('expired');
     }
@@ -62,39 +65,51 @@ const QRCodeDisplay = ({ connectionId, connectionName, onStatusChange }: QRCodeD
 
   /**
    * Inicia o countdown para expiração do QR Code
-   * QR Codes da API Baileys expiram após 20 segundos
    */
-  const startCountdown = () => {
+  const startCountdown = (initialTime: number) => {
+    let timeLeft = initialTime;
+    
     const timer = setInterval(() => {
-      setCountdown(prev => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          setQrStatus('expired');
-          onStatusChange?.('expired');
-          return 0;
-        }
-        return prev - 1;
-      });
+      timeLeft--;
+      setCountdown(timeLeft);
+      
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        setQrStatus('expired');
+        onStatusChange?.('expired');
+      }
     }, 1000);
+    
+    return timer;
   };
 
   /**
-   * Simula a conexão bem-sucedida do WhatsApp
-   * Em produção, isto seria acionado via WebSocket do backend
+   * Verifica o status da conexão periodicamente
    */
-  const simulateConnection = () => {
-    setTimeout(() => {
-      setQrStatus('connected');
-      onStatusChange?.('connected');
-    }, 8000); // Simula conexão após 8 segundos
+  const checkConnectionStatus = async () => {
+    try {
+      const statusData = await getConnectionStatus(connectionId);
+      
+      if (statusData && statusData.status === 'connected') {
+        setQrStatus('connected');
+        onStatusChange?.('connected');
+      }
+    } catch (error) {
+      console.error('Erro ao verificar status:', error);
+    }
   };
 
-  // Gera o QR Code automaticamente quando o componente monta
+  // Busca o QR Code quando o componente monta
   useEffect(() => {
-    generateQRCode();
-    // Simula conexão para demonstração
-    simulateConnection();
-  }, []);
+    fetchQRCode();
+    
+    // Verifica status da conexão a cada 2 segundos
+    const statusInterval = setInterval(checkConnectionStatus, 2000);
+    
+    return () => {
+      clearInterval(statusInterval);
+    };
+  }, [connectionId]);
 
   /**
    * Retorna o ícone apropriado baseado no status
@@ -175,7 +190,7 @@ const QRCodeDisplay = ({ connectionId, connectionName, onStatusChange }: QRCodeD
             </div>
           )}
 
-          {(qrStatus === 'ready' || qrStatus === 'expired') && (
+          {(qrStatus === 'ready' || qrStatus === 'expired') && qrCodeUrl && (
             <div className="relative">
               <img 
                 src={qrCodeUrl} 
@@ -210,7 +225,7 @@ const QRCodeDisplay = ({ connectionId, connectionName, onStatusChange }: QRCodeD
           {/* Botão para regenerar QR Code */}
           {qrStatus === 'expired' && (
             <Button 
-              onClick={generateQRCode}
+              onClick={fetchQRCode}
               className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               <RefreshCw className="h-4 w-4 mr-2" />
@@ -235,7 +250,7 @@ const QRCodeDisplay = ({ connectionId, connectionName, onStatusChange }: QRCodeD
           <div className="mt-3 p-2 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded">
             <p className="text-xs text-yellow-800 dark:text-yellow-200">
               <strong>Importante:</strong> O QR Code expira em 20 segundos por segurança. 
-              Se expirar, um novo será gerado automaticamente.
+              Se expirar, clique no botão para gerar um novo.
             </p>
           </div>
         </div>

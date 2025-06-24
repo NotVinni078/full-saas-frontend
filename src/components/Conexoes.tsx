@@ -4,33 +4,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, Search, QrCode, Edit } from 'lucide-react';
+import { Plus, Search, QrCode, Edit, AlertCircle } from 'lucide-react';
 import { useSectors } from '@/hooks/useSectors';
 import SectorSelector from '@/components/selectors/SectorSelector';
 import MultipleSectorSelector from '@/components/selectors/MultipleSectorSelector';
 import ChannelSelector from '@/components/selectors/ChannelSelector';
 import ImportSettings from '@/components/selectors/ImportSettings';
-import ConnectionCard from '@/components/cards/ConnectionCard';
 import QRCodeModal from '@/components/qr/QRCodeModal';
-
-/**
- * Interface para definir uma conexão
- * Contém todas as informações necessárias para gerenciar canais
- */
-interface Connection {
-  id: string;
-  name: string;
-  channel: string;
-  sector: string | string[]; // Agora suporta múltiplos setores
-  status: 'connected' | 'disconnected' | 'error';
-  lastActivity: string;
-  importSettings?: {
-    importMessages: boolean;
-    importDate?: Date;
-    showTyping: boolean;
-    showRecording: boolean;
-  };
-}
+import { useBaileysConnections, BaileysConnection } from '@/hooks/useBaileysConnections';
+import ConnectionCard from './cards/ConnectionCard';
 
 /**
  * Interface para nova conexão sendo criada
@@ -44,15 +26,18 @@ interface NewConnection {
 
 /**
  * Componente principal de Gerenciamento de Conexões
- * Melhorias implementadas:
- * - Modal flutuante para QR Code que fecha automaticamente após conexão
- * - Botão "Conectar" dinâmico para conexões desconectadas
- * - Botão "Desconectar" para conexões ativas
- * - Modal QR Code responsivo para todas as telas
- * - Cores dinâmicas da gestão de marca mantidas
- * - Layout responsivo otimizado para celular, tablet e desktop
+ * Agora integrado com API Baileys real e banco de dados
  */
 const Conexoes = () => {
+  const { 
+    connections, 
+    loading, 
+    error, 
+    createConnection, 
+    disconnectConnection, 
+    deleteConnection 
+  } = useBaileysConnections();
+
   // Estado para controlar o diálogo de nova conexão
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
@@ -71,7 +56,7 @@ const Conexoes = () => {
   });
 
   // Estado para conexão sendo editada
-  const [editingConnection, setEditingConnection] = useState<Connection | null>(null);
+  const [editingConnection, setEditingConnection] = useState<BaileysConnection | null>(null);
 
   // Estado para controlar exibição do modal QR Code
   const [qrCodeModal, setQrCodeModal] = useState<{
@@ -87,50 +72,13 @@ const Conexoes = () => {
   // Hook para acessar setores disponíveis
   const { getActiveSectors, getSectorById } = useSectors();
 
-  // Estado para conexões existentes (dados mock atualizados)
-  const [connections, setConnections] = useState<Connection[]>([
-    {
-      id: '1',
-      name: 'WhatsApp Principal',
-      channel: 'whatsapp-qr',
-      sector: ['vendas', 'suporte'], // Múltiplos setores
-      status: 'connected',
-      lastActivity: '2024-01-15 14:30'
-    },
-    {
-      id: '2',
-      name: 'Instagram Oficial',
-      channel: 'instagram',
-      sector: ['marketing'],
-      status: 'connected',
-      lastActivity: '2024-01-15 14:25'
-    },
-    {
-      id: '3',
-      name: 'Telegram Suporte',
-      channel: 'telegram',
-      sector: ['suporte', 'vendas'],
-      status: 'disconnected',
-      lastActivity: '2024-01-14 09:15'
-    }
-  ]);
-
   /**
    * Formata a exibição dos setores para o card
    */
-  const formatSectors = (sectors: string | string[]): string => {
-    if (typeof sectors === 'string') {
-      const sector = getSectorById(sectors);
-      return sector?.nome || sectors;
-    }
-    
-    if (Array.isArray(sectors)) {
-      return sectors
-        .map(id => getSectorById(id)?.nome || id)
-        .join(', ');
-    }
-    
-    return '';
+  const formatSectors = (sectors: string[]): string => {
+    return sectors
+      .map(id => getSectorById(id)?.nome || id)
+      .join(', ');
   };
 
   /**
@@ -138,137 +86,90 @@ const Conexoes = () => {
    */
   const filteredConnections = connections.filter(connection => {
     const searchLower = searchTerm.toLowerCase();
-    const sectorNames = formatSectors(connection.sector).toLowerCase();
+    const sectorNames = formatSectors(connection.sectors).toLowerCase();
     
     return connection.name.toLowerCase().includes(searchLower) ||
-           connection.channel.toLowerCase().includes(searchLower) ||
+           connection.channel_type.toLowerCase().includes(searchLower) ||
            sectorNames.includes(searchLower);
   });
 
   /**
    * Manipula a criação de uma nova conexão
    */
-  const handleCreateConnection = () => {
+  const handleCreateConnection = async () => {
     if (!newConnection.name || !newConnection.sector || !newConnection.channel) {
       alert('Por favor, preencha todos os campos obrigatórios.');
       return;
     }
 
-    const connection: Connection = {
-      id: Date.now().toString(),
+    const sectorsArray = Array.isArray(newConnection.sector) ? newConnection.sector : [newConnection.sector];
+    
+    const result = await createConnection({
       name: newConnection.name,
-      channel: newConnection.channel,
-      sector: newConnection.sector,
-      status: 'disconnected',
-      lastActivity: 'Nunca conectado',
-      importSettings: newConnection.importSettings
-    };
-
-    setConnections(prev => [...prev, connection]);
-    
-    // Reset do formulário
-    setNewConnection({
-      name: '',
-      sector: [],
-      channel: '',
-      importSettings: undefined
+      sectors: sectorsArray
     });
-    
-    setIsDialogOpen(false);
-    
-    // Abre modal QR Code se for WhatsApp Baileys
-    if (newConnection.channel === 'whatsapp-qr') {
-      setQrCodeModal({
-        isOpen: true,
-        connectionId: connection.id,
-        connectionName: connection.name
+
+    if (result) {
+      // Reset do formulário
+      setNewConnection({
+        name: '',
+        sector: [],
+        channel: '',
+        importSettings: undefined
       });
+      
+      setIsDialogOpen(false);
+      
+      // Abre modal QR Code se for WhatsApp QR
+      if (newConnection.channel === 'whatsapp-qr') {
+        setQrCodeModal({
+          isOpen: true,
+          connectionId: result.connection_id,
+          connectionName: newConnection.name
+        });
+      }
     }
-    
-    console.log('Nova conexão criada:', connection);
   };
 
   /**
    * Manipula a conexão de uma conexão desconectada
    * Abre o modal QR Code para canais que necessitam
    */
-  const handleConnect = (id: string) => {
-    const connection = connections.find(conn => conn.id === id);
+  const handleConnect = (connectionId: string) => {
+    const connection = connections.find(conn => conn.id === connectionId);
     
     if (!connection) return;
     
     // Se for WhatsApp QR, abre o modal
-    if (connection.channel === 'whatsapp-qr') {
+    if (connection.channel_type === 'whatsapp-qr') {
       setQrCodeModal({
         isOpen: true,
-        connectionId: id,
+        connectionId: connectionId,
         connectionName: connection.name
       });
-    } else {
-      // Para outros canais, conecta diretamente
-      setConnections(prev => prev.map(conn => 
-        conn.id === id 
-          ? { ...conn, status: 'connected' as const, lastActivity: new Date().toLocaleString('pt-BR') }
-          : conn
-      ));
     }
-    
-    console.log('Conectando:', id);
   };
 
   /**
    * Manipula a edição de uma conexão existente
    */
-  const handleEditConnection = (connection: Connection) => {
+  const handleEditConnection = (connection: BaileysConnection) => {
     setEditingConnection(connection);
     setIsEditDialogOpen(true);
   };
 
   /**
-   * Salva as alterações da conexão editada
-   */
-  const handleSaveEdit = () => {
-    if (!editingConnection) return;
-
-    setConnections(prev => prev.map(conn => 
-      conn.id === editingConnection.id ? editingConnection : conn
-    ));
-    
-    setIsEditDialogOpen(false);
-    setEditingConnection(null);
-    console.log('Conexão editada:', editingConnection);
-  };
-
-  /**
-   * Manipula o reinício de uma conexão
-   */
-  const handleRestart = (id: string) => {
-    setConnections(prev => prev.map(conn => 
-      conn.id === id 
-        ? { ...conn, status: 'connected' as const, lastActivity: new Date().toLocaleString('pt-BR') }
-        : conn
-    ));
-    console.log('Conexão reiniciada:', id);
-  };
-
-  /**
    * Manipula a desconexão de uma conexão
    */
-  const handleDisconnect = (id: string) => {
-    setConnections(prev => prev.map(conn => 
-      conn.id === id 
-        ? { ...conn, status: 'disconnected' as const }
-        : conn
-    ));
-    console.log('Conexão desconectada:', id);
+  const handleDisconnect = async (connectionId: string) => {
+    await disconnectConnection(connectionId);
   };
 
   /**
    * Manipula a exclusão de uma conexão
    */
-  const handleDelete = (id: string) => {
-    setConnections(prev => prev.filter(conn => conn.id !== id));
-    console.log('Conexão excluída:', id);
+  const handleDelete = async (connectionId: string) => {
+    await deleteConnection(connectionId);
   };
 
   /**
@@ -279,20 +180,6 @@ const Conexoes = () => {
       ...prev,
       importSettings: settings
     }));
-  };
-
-  /**
-   * Manipula mudanças de status do QR Code no modal
-   * Atualiza o status da conexão quando necessário
-   */
-  const handleQRStatusChange = (status: 'generating' | 'ready' | 'connected' | 'expired') => {
-    if (status === 'connected' && qrCodeModal.connectionId) {
-      setConnections(prev => prev.map(conn => 
-        conn.id === qrCodeModal.connectionId 
-          ? { ...conn, status: 'connected', lastActivity: new Date().toLocaleString('pt-BR') }
-          : conn
-      ));
-    }
   };
 
   /**
@@ -307,83 +194,68 @@ const Conexoes = () => {
   };
 
   /**
-   * Renderiza o código do WebChat quando selecionado
+   * Converte status do banco para status do card
    */
-  const renderWebChatCode = () => {
-    if (newConnection.channel !== 'webchat') return null;
-
-    const webChatCode = `<!-- Código do WebChat - Incorporar no site -->
-<div id="webchat-widget"></div>
-<script>
-  window.WebChatConfig = {
-    apiUrl: 'https://api.seudominio.com',
-    widgetId: 'conexao-${Date.now()}',
-    position: 'bottom-right',
-    theme: 'auto',
-    language: 'pt-BR'
-  };
-  
-  (function() {
-    var script = document.createElement('script');
-    script.src = 'https://cdn.seudominio.com/webchat.min.js';
-    script.async = true;
-    document.head.appendChild(script);
-  })();
-</script>`;
-
-    return (
-      <Card className="mt-4 border-brand bg-brand-background">
-        <CardHeader>
-          <CardTitle className="text-sm text-brand-foreground">
-            Código para Incorporação do WebChat
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded text-xs font-mono overflow-x-auto">
-            <pre className="whitespace-pre-wrap text-brand-foreground">
-              {webChatCode}
-            </pre>
-          </div>
-          <p className="text-xs text-brand-muted mt-2">
-            <strong>Instruções:</strong> Copie este código e cole antes da tag de fechamento &lt;/body&gt; 
-            do seu site. O widget aparecerá automaticamente no canto inferior direito.
-          </p>
-        </CardContent>
-      </Card>
-    );
+  const getCardStatus = (status: string): 'connected' | 'disconnected' | 'error' => {
+    switch (status) {
+      case 'connected':
+        return 'connected';
+      case 'error':
+        return 'error';
+      default:
+        return 'disconnected';
+    }
   };
 
   /**
-   * Renderiza informações de QR Code para WhatsApp Baileys
+   * Formata data de última atividade
    */
-  const renderQRCodeInfo = () => {
-    if (newConnection.channel !== 'whatsapp-qr') return null;
-
-    return (
-      <Card className="mt-4 border-brand bg-brand-background">
-        <CardHeader>
-          <CardTitle className="text-sm text-brand-foreground flex items-center gap-2">
-            <QrCode className="h-4 w-4" />
-            QR Code para Conexão
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="bg-green-50 dark:bg-green-950 p-4 rounded-lg border border-green-200 dark:border-green-800">
-            <p className="text-sm text-green-800 dark:text-green-200 mb-2">
-              <strong>Após criar a conexão:</strong>
-            </p>
-            <ul className="text-xs text-green-700 dark:text-green-300 space-y-1">
-              <li>• Um QR Code será gerado automaticamente</li>
-              <li>• Abra o WhatsApp no seu celular</li>
-              <li>• Vá em Configurações → Aparelhos conectados</li>
-              <li>• Toque em "Conectar um aparelho"</li>
-              <li>• Escaneie o QR Code exibido na tela</li>
-            </ul>
-          </div>
-        </CardContent>
-      </Card>
-    );
+  const formatLastActivity = (lastActivity?: string): string => {
+    if (!lastActivity) return 'Nunca conectado';
+    
+    try {
+      const date = new Date(lastActivity);
+      return date.toLocaleString('pt-BR');
+    } catch {
+      return 'Data inválida';
+    }
   };
+
+  // Exibir loading
+  if (loading) {
+    return (
+      <div className="p-4 lg:p-6 flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-brand-muted">Carregando conexões...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Exibir erro
+  if (error) {
+    return (
+      <div className="p-4 lg:p-6">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-brand-foreground mb-2">
+              Erro ao carregar conexões
+            </h3>
+            <p className="text-brand-muted mb-4">{error}</p>
+            <Button 
+              onClick={() => window.location.reload()}
+              variant="outline"
+              className="border-brand text-brand-foreground"
+            >
+              Tentar novamente
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 lg:p-6 space-y-4 lg:space-y-6">
@@ -471,12 +343,6 @@ const Conexoes = () => {
                 />
               )}
 
-              {/* Código do WebChat */}
-              {renderWebChatCode()}
-
-              {/* Informações do QR Code */}
-              {renderQRCodeInfo()}
-
               {/* Botões de ação */}
               <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 pt-4 border-t border-brand">
                 <Button 
@@ -497,76 +363,6 @@ const Conexoes = () => {
             </div>
           </DialogContent>
         </Dialog>
-
-        {/* Modal de edição de conexão */}
-        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto mx-4 border-brand bg-brand-background">
-            <DialogHeader>
-              <DialogTitle className="text-brand-foreground flex items-center gap-2">
-                <Edit className="h-5 w-5" />
-                Editar Conexão
-              </DialogTitle>
-              <DialogDescription className="text-brand-muted">
-                Modifique as configurações da conexão selecionada
-              </DialogDescription>
-            </DialogHeader>
-            
-            {editingConnection && (
-              <div className="space-y-6 py-4">
-                {/* Campo nome da conexão */}
-                <div className="space-y-2">
-                  <Label className="text-brand-foreground">Nome da Conexão *</Label>
-                  <Input
-                    value={editingConnection.name}
-                    onChange={(e) => setEditingConnection({...editingConnection, name: e.target.value})}
-                    placeholder="Ex: WhatsApp Principal"
-                    className="border-brand bg-brand-background text-brand-foreground"
-                  />
-                </div>
-
-                {/* Seletor de setores (usando seletor único para compatibilidade) */}
-                <div className="space-y-2">
-                  <Label className="text-brand-foreground">Setor Responsável *</Label>
-                  <SectorSelector
-                    value={Array.isArray(editingConnection.sector) ? editingConnection.sector[0] : editingConnection.sector}
-                    onValueChange={(sector) => setEditingConnection({...editingConnection, sector})}
-                    placeholder="Selecione o setor responsável"
-                  />
-                </div>
-
-                {/* Canal (somente leitura) */}
-                <div className="space-y-2">
-                  <Label className="text-brand-foreground">Canal de Comunicação</Label>
-                  <Input
-                    value={editingConnection.channel}
-                    disabled
-                    className="border-brand bg-brand-muted text-brand-muted"
-                  />
-                  <p className="text-xs text-brand-muted">
-                    O canal não pode ser alterado após a criação da conexão.
-                  </p>
-                </div>
-
-                {/* Botões de ação */}
-                <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 pt-4 border-t border-brand">
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setIsEditDialogOpen(false)}
-                    className="w-full sm:w-auto border-brand text-brand-foreground hover:bg-brand-accent"
-                  >
-                    Cancelar
-                  </Button>
-                  <Button 
-                    onClick={handleSaveEdit}
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground w-full sm:w-auto"
-                  >
-                    Salvar Alterações
-                  </Button>
-                </div>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
       </div>
 
       {/* Modal flutuante do QR Code */}
@@ -575,7 +371,6 @@ const Conexoes = () => {
         onClose={closeQRModal}
         connectionId={qrCodeModal.connectionId}
         connectionName={qrCodeModal.connectionName}
-        onStatusChange={handleQRStatusChange}
       />
 
       {/* Grid de conexões existentes */}
@@ -585,18 +380,21 @@ const Conexoes = () => {
             <ConnectionCard
               key={connection.id}
               connection={{
-                ...connection,
-                sector: formatSectors(connection.sector) // Converte para string para exibição
+                id: connection.id,
+                name: connection.name,
+                channel: connection.channel_type,
+                sector: formatSectors(connection.sectors),
+                status: getCardStatus(connection.status),
+                lastActivity: formatLastActivity(connection.last_activity_at)
               }}
-              onRestart={handleRestart}
-              onDisconnect={handleDisconnect}
-              onConnect={handleConnect}
-              onDelete={handleDelete}
-              onEdit={handleEditConnection}
+              onRestart={() => {}}
+              onDisconnect={() => handleDisconnect(connection.id)}
+              onConnect={() => handleConnect(connection.id)}
+              onDelete={() => handleDelete(connection.id)}
+              onEdit={() => {}}
             />
           ))
         ) : (
-          /* Mensagem quando não há conexões */
           <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
             <QrCode className="h-16 w-16 text-brand-muted mb-4" />
             <h3 className="text-lg font-semibold text-brand-foreground mb-2">
@@ -605,7 +403,7 @@ const Conexoes = () => {
             <p className="text-brand-muted mb-4 max-w-md">
               {searchTerm 
                 ? 'Tente alterar os termos da pesquisa ou criar uma nova conexão.'
-                : 'Comece criando sua primeira conexão com um canal de comunicação.'
+                : 'Comece criando sua primeira conexão com WhatsApp.'
               }
             </p>
             {!searchTerm && (

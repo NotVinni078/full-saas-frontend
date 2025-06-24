@@ -335,6 +335,54 @@ export type Database = {
         }
         Relationships: []
       }
+      tenant_baileys_connections: {
+        Row: {
+          channel_type: string
+          created_at: string
+          id: string
+          last_activity_at: string | null
+          name: string
+          phone_number: string | null
+          qr_code: string | null
+          qr_expires_at: string | null
+          sectors: string[] | null
+          session_data: Json | null
+          status: string
+          updated_at: string
+          webhook_url: string | null
+        }
+        Insert: {
+          channel_type?: string
+          created_at?: string
+          id?: string
+          last_activity_at?: string | null
+          name: string
+          phone_number?: string | null
+          qr_code?: string | null
+          qr_expires_at?: string | null
+          sectors?: string[] | null
+          session_data?: Json | null
+          status?: string
+          updated_at?: string
+          webhook_url?: string | null
+        }
+        Update: {
+          channel_type?: string
+          created_at?: string
+          id?: string
+          last_activity_at?: string | null
+          name?: string
+          phone_number?: string | null
+          qr_code?: string | null
+          qr_expires_at?: string | null
+          sectors?: string[] | null
+          session_data?: Json | null
+          status?: string
+          updated_at?: string
+          webhook_url?: string | null
+        }
+        Relationships: []
+      }
       tenant_campaigns: {
         Row: {
           channels: string[] | null
