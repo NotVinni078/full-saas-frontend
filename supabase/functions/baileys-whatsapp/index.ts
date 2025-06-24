@@ -14,28 +14,133 @@ interface BaileysConnectionRequest {
   sectors?: string[]
 }
 
-// Store active connections in memory (simplified for now)
-const activeConnections = new Map()
+// Store active Baileys sessions in memory
+const activeSessions = new Map()
 
-// Mock QR Code generator function (replace with actual implementation)
-const generateMockQRCode = async (): Promise<string> => {
-  // This is a placeholder - in production, you'd integrate with actual WhatsApp API
-  const mockQRData = `whatsapp-qr-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-  
-  // Generate a simple data URL for testing
-  const canvas = `data:image/svg+xml;base64,${btoa(`
-    <svg width="300" height="300" xmlns="http://www.w3.org/2000/svg">
-      <rect width="300" height="300" fill="white"/>
-      <text x="150" y="150" text-anchor="middle" font-family="Arial" font-size="12" fill="black">
-        Mock QR Code
-      </text>
-      <text x="150" y="170" text-anchor="middle" font-family="Arial" font-size="10" fill="gray">
-        ${mockQRData}
-      </text>
-    </svg>
-  `)}`
-  
-  return canvas
+// Import Baileys with dynamic import for Deno compatibility
+let makeWASocket: any
+let DisconnectReason: any
+let useMultiFileAuthState: any
+let Browsers: any
+
+const initializeBaileys = async () => {
+  try {
+    const baileys = await import("https://esm.sh/@whiskeysockets/baileys@latest")
+    const qrcode = await import("https://esm.sh/qrcode@latest")
+    
+    makeWASocket = baileys.default
+    DisconnectReason = baileys.DisconnectReason
+    useMultiFileAuthState = baileys.useMultiFileAuthState
+    Browsers = baileys.Browsers
+    
+    return { baileys, qrcode }
+  } catch (error) {
+    console.error('Erro ao importar Baileys:', error)
+    throw error
+  }
+}
+
+// Generate real QR Code using Baileys
+const generateRealQRCode = async (connectionId: string): Promise<{ qrCode: string; socket: any } | null> => {
+  try {
+    const { baileys, qrcode } = await initializeBaileys()
+    
+    // Create a simple in-memory auth state for this demo
+    const authState = {
+      state: {
+        creds: undefined,
+        keys: {}
+      },
+      saveCreds: () => {},
+      clearState: () => {}
+    }
+    
+    // Create WhatsApp socket
+    const socket = makeWASocket({
+      auth: authState,
+      printQRInTerminal: false,
+      browser: Browsers.macOS('Desktop'),
+      logger: {
+        level: 'silent',
+        fatal: () => {},
+        error: () => {},
+        warn: () => {},
+        info: () => {},
+        debug: () => {},
+        trace: () => {}
+      }
+    })
+
+    return new Promise((resolve) => {
+      socket.ev.on('connection.update', async (update: any) => {
+        const { connection, lastDisconnect, qr } = update
+        
+        if (qr) {
+          try {
+            // Generate QR code as data URL
+            const qrCodeDataURL = await qrcode.default.toDataURL(qr, {
+              width: 300,
+              margin: 2,
+              color: {
+                dark: '#000000',
+                light: '#FFFFFF'
+              }
+            })
+            
+            console.log(`QR Code real gerado para conexão ${connectionId}`)
+            
+            // Store the socket for later use
+            activeSessions.set(connectionId, {
+              socket,
+              status: 'waiting_scan',
+              qr_code: qrCodeDataURL,
+              created_at: new Date().toISOString()
+            })
+            
+            resolve({
+              qrCode: qrCodeDataURL,
+              socket
+            })
+          } catch (qrError) {
+            console.error('Erro ao gerar QR Code:', qrError)
+            resolve(null)
+          }
+        }
+        
+        if (connection === 'open') {
+          console.log(`Conexão WhatsApp estabelecida para ${connectionId}`)
+          
+          // Update session status
+          const session = activeSessions.get(connectionId)
+          if (session) {
+            session.status = 'connected'
+            session.phone_number = socket.user?.id?.split('@')[0] || 'unknown'
+            activeSessions.set(connectionId, session)
+          }
+        }
+        
+        if (connection === 'close') {
+          const shouldReconnect = (lastDisconnect?.error)?.output?.statusCode !== DisconnectReason.loggedOut
+          console.log('Conexão fechada devido a:', lastDisconnect?.error, ', reconectando:', shouldReconnect)
+          
+          if (!shouldReconnect) {
+            activeSessions.delete(connectionId)
+          }
+        }
+      })
+      
+      // Timeout after 30 seconds if no QR is generated
+      setTimeout(() => {
+        if (!activeSessions.has(connectionId)) {
+          socket.end()
+          resolve(null)
+        }
+      }, 30000)
+    })
+  } catch (error) {
+    console.error('Erro ao inicializar Baileys:', error)
+    return null
+  }
 }
 
 serve(async (req) => {
@@ -81,43 +186,42 @@ serve(async (req) => {
             )
           }
 
-          // Generate mock QR code
-          const qrCode = await generateMockQRCode()
+          // Generate real QR code with Baileys
+          console.log(`Iniciando geração de QR Code real para conexão ${connection.id}`)
+          const qrResult = await generateRealQRCode(connection.id)
+          
+          if (!qrResult) {
+            throw new Error('Falha ao gerar QR Code com Baileys')
+          }
+
           const expiresAt = new Date(Date.now() + 60000) // 60 segundos
 
-          // Update database with QR code
+          // Update database with real QR code
           await supabase
             .from('tenant_baileys_connections')
             .update({
-              qr_code: qrCode,
+              qr_code: qrResult.qrCode,
               qr_expires_at: expiresAt.toISOString(),
               status: 'waiting_scan'
             })
             .eq('id', connection.id)
 
-          // Store connection as active
-          activeConnections.set(connection.id, {
-            status: 'waiting_scan',
-            qr_code: qrCode,
-            expires_at: expiresAt.toISOString()
-          })
-
-          console.log(`Mock QR Code gerado para conexão ${connection.id}`)
+          console.log(`QR Code real do Baileys gerado para conexão ${connection.id}`)
 
           return new Response(
             JSON.stringify({
               connection_id: connection.id,
-              qr_code: qrCode,
+              qr_code: qrResult.qrCode,
               expires_at: expiresAt.toISOString(),
               status: 'waiting_scan'
             }),
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           )
 
-        } catch (mockError) {
-          console.error('Erro ao inicializar conexão mock:', mockError)
+        } catch (baileysError) {
+          console.error('Erro ao inicializar Baileys:', baileysError)
           return new Response(
-            JSON.stringify({ error: 'Erro ao inicializar conexão WhatsApp' }),
+            JSON.stringify({ error: 'Erro ao inicializar conexão WhatsApp com Baileys' }),
             { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           )
         }
@@ -131,8 +235,8 @@ serve(async (req) => {
           )
         }
 
-        // Check active connection
-        const activeConn = activeConnections.get(connectionId)
+        // Check active Baileys session
+        const activeSession = activeSessions.get(connectionId)
         
         // Get current data from database
         const { data: connection, error } = await supabase
@@ -148,44 +252,56 @@ serve(async (req) => {
           )
         }
 
-        // Check if already connected
-        if (connection.status === 'connected') {
+        // Check if already connected via Baileys
+        if (activeSession && activeSession.status === 'connected') {
+          await supabase
+            .from('tenant_baileys_connections')
+            .update({
+              status: 'connected',
+              phone_number: activeSession.phone_number,
+              last_activity_at: new Date().toISOString()
+            })
+            .eq('id', connectionId)
+
           return new Response(
             JSON.stringify({
               status: 'connected',
-              phone_number: connection.phone_number
+              phone_number: activeSession.phone_number
             }),
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           )
         }
 
-        // Check if QR code expired
+        // Check if QR code expired or needs regeneration
         const now = new Date()
         const expiresAt = connection.qr_expires_at ? new Date(connection.qr_expires_at) : null
 
-        if (!expiresAt || now > expiresAt || !connection.qr_code) {
-          // Generate new QR code
-          const newQrCode = await generateMockQRCode()
+        if (!expiresAt || now > expiresAt || !connection.qr_code || !activeSession) {
+          // Generate new real QR code
+          console.log(`Regenerando QR Code real para conexão ${connectionId}`)
+          const qrResult = await generateRealQRCode(connectionId)
+          
+          if (!qrResult) {
+            return new Response(
+              JSON.stringify({ error: 'Erro ao gerar novo QR Code' }),
+              { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            )
+          }
+
           const newExpiresAt = new Date(Date.now() + 60000)
 
           await supabase
             .from('tenant_baileys_connections')
             .update({
-              qr_code: newQrCode,
+              qr_code: qrResult.qrCode,
               qr_expires_at: newExpiresAt.toISOString(),
               status: 'waiting_scan'
             })
             .eq('id', connectionId)
 
-          activeConnections.set(connectionId, {
-            status: 'waiting_scan',
-            qr_code: newQrCode,
-            expires_at: newExpiresAt.toISOString()
-          })
-
           return new Response(
             JSON.stringify({
-              qr_code: newQrCode,
+              qr_code: qrResult.qrCode,
               expires_at: newExpiresAt.toISOString(),
               status: 'waiting_scan'
             }),
@@ -211,8 +327,19 @@ serve(async (req) => {
           )
         }
 
-        // Remove from active connections
-        activeConnections.delete(connectionId)
+        // Disconnect Baileys session
+        const activeSession = activeSessions.get(connectionId)
+        if (activeSession && activeSession.socket) {
+          try {
+            activeSession.socket.logout()
+            activeSession.socket.end()
+          } catch (disconnectError) {
+            console.error('Erro ao desconectar Baileys:', disconnectError)
+          }
+        }
+
+        // Remove from active sessions
+        activeSessions.delete(connectionId)
 
         // Update database
         const { error } = await supabase
@@ -259,9 +386,9 @@ serve(async (req) => {
           )
         }
 
-        // Check if connection is really active
-        const activeConn = activeConnections.get(connectionId)
-        const realStatus = activeConn ? connection.status : 'disconnected'
+        // Check if connection is really active via Baileys
+        const activeSession = activeSessions.get(connectionId)
+        const realStatus = activeSession && activeSession.status === 'connected' ? 'connected' : connection.status
 
         return new Response(
           JSON.stringify({

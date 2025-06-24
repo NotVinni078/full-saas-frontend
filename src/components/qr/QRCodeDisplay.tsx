@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { QrCode, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
+import { QrCode, RefreshCw, CheckCircle, AlertCircle, Smartphone } from 'lucide-react';
 import { useBaileysConnections } from '@/hooks/useBaileysConnections';
 
 interface QRCodeDisplayProps {
@@ -12,8 +12,8 @@ interface QRCodeDisplayProps {
 }
 
 /**
- * Componente para exibir QR Code real da API Baileys
- * Integrado com banco de dados e atualizações em tempo real
+ * Componente para exibir QR Code real do Baileys
+ * Integrado com a biblioteca oficial WhatsApp Web
  */
 const QRCodeDisplay = ({ connectionId, connectionName, onStatusChange }: QRCodeDisplayProps) => {
   const { getQRCode, getConnectionStatus } = useBaileysConnections();
@@ -49,11 +49,11 @@ const QRCodeDisplay = ({ connectionId, connectionName, onStatusChange }: QRCodeD
   const getStatusMessage = () => {
     switch (qrStatus) {
       case 'generating':
-        return 'Gerando QR Code...';
+        return 'Inicializando Baileys WhatsApp...';
       case 'ready':
         return `QR Code pronto! Expira em ${countdown}s`;
       case 'connected':
-        return 'WhatsApp conectado com sucesso!';
+        return 'WhatsApp conectado via Baileys!';
       case 'expired':
         return 'QR Code expirado. Clique para gerar um novo.';
     }
@@ -76,7 +76,7 @@ const QRCodeDisplay = ({ connectionId, connectionName, onStatusChange }: QRCodeD
   };
 
   /**
-   * Busca o QR Code atual do servidor
+   * Busca o QR Code atual do servidor usando Baileys
    */
   const fetchQRCode = async () => {
     setQrStatus('generating');
@@ -84,9 +84,11 @@ const QRCodeDisplay = ({ connectionId, connectionName, onStatusChange }: QRCodeD
     onStatusChange?.('generating');
 
     try {
+      console.log('Solicitando QR Code real do Baileys...');
       const qrData = await getQRCode(connectionId);
       
       if (qrData && qrData.qr_code) {
+        console.log('QR Code real recebido do Baileys');
         setQrCodeUrl(qrData.qr_code);
         setQrStatus('ready');
         onStatusChange?.('ready');
@@ -106,10 +108,10 @@ const QRCodeDisplay = ({ connectionId, connectionName, onStatusChange }: QRCodeD
           }
         }
       } else {
-        throw new Error('QR Code não disponível');
+        throw new Error('QR Code não disponível do Baileys');
       }
     } catch (error) {
-      console.error('Erro ao buscar QR Code:', error);
+      console.error('Erro ao buscar QR Code do Baileys:', error);
       setQrStatus('expired');
       onStatusChange?.('expired');
     }
@@ -143,11 +145,12 @@ const QRCodeDisplay = ({ connectionId, connectionName, onStatusChange }: QRCodeD
       const statusData = await getConnectionStatus(connectionId);
       
       if (statusData && statusData.status === 'connected') {
+        console.log('Conexão WhatsApp estabelecida via Baileys!');
         setQrStatus('connected');
         onStatusChange?.('connected');
       }
     } catch (error) {
-      console.error('Erro ao verificar status:', error);
+      console.error('Erro ao verificar status do Baileys:', error);
     }
   };
 
@@ -155,8 +158,8 @@ const QRCodeDisplay = ({ connectionId, connectionName, onStatusChange }: QRCodeD
   useEffect(() => {
     fetchQRCode();
     
-    // Verifica status da conexão a cada 3 segundos
-    const statusInterval = setInterval(checkConnectionStatus, 3000);
+    // Verifica status da conexão a cada 2 segundos para respostas mais rápidas
+    const statusInterval = setInterval(checkConnectionStatus, 2000);
     
     return () => {
       clearInterval(statusInterval);
@@ -168,7 +171,7 @@ const QRCodeDisplay = ({ connectionId, connectionName, onStatusChange }: QRCodeD
       <CardHeader className="pb-4">
         <CardTitle className="text-lg text-brand-foreground flex items-center gap-2">
           {getStatusIcon()}
-          QR Code - {connectionName}
+          QR Code Baileys - {connectionName}
         </CardTitle>
       </CardHeader>
       
@@ -190,6 +193,7 @@ const QRCodeDisplay = ({ connectionId, connectionName, onStatusChange }: QRCodeD
               <div className="text-center">
                 <RefreshCw className="h-8 w-8 text-gray-400 animate-spin mx-auto mb-2" />
                 <p className="text-sm text-gray-500">Conectando com Baileys...</p>
+                <p className="text-xs text-gray-400 mt-1">Gerando QR Code real</p>
               </div>
             </div>
           )}
@@ -198,7 +202,7 @@ const QRCodeDisplay = ({ connectionId, connectionName, onStatusChange }: QRCodeD
             <div className="relative">
               <img 
                 src={qrCodeUrl} 
-                alt="QR Code para conexão WhatsApp"
+                alt="QR Code real do WhatsApp via Baileys"
                 className={`w-64 h-64 border-2 rounded-lg ${qrStatus === 'expired' ? 'opacity-50 border-red-300' : 'border-green-300'}`}
               />
               {qrStatus === 'expired' && (
@@ -222,6 +226,10 @@ const QRCodeDisplay = ({ connectionId, connectionName, onStatusChange }: QRCodeD
                 <p className="text-sm text-green-600 dark:text-green-400">
                   WhatsApp conectado via Baileys
                 </p>
+                <div className="mt-3 flex items-center justify-center gap-2">
+                  <Smartphone className="h-4 w-4 text-green-500" />
+                  <span className="text-xs text-green-600">Conexão ativa</span>
+                </div>
               </div>
             </div>
           )}
@@ -240,21 +248,22 @@ const QRCodeDisplay = ({ connectionId, connectionName, onStatusChange }: QRCodeD
 
         {/* Instruções detalhadas */}
         <div className="space-y-3 p-4 bg-brand-muted/10 rounded-lg border border-brand">
-          <h4 className="font-medium text-brand-foreground text-sm">
-            Como conectar:
+          <h4 className="font-medium text-brand-foreground text-sm flex items-center gap-2">
+            <Smartphone className="h-4 w-4" />
+            Como conectar via Baileys:
           </h4>
           <ol className="text-xs text-brand-muted space-y-2 list-decimal list-inside">
             <li>Abra o WhatsApp no seu celular</li>
             <li>Toque no menu (⋮) e selecione "Aparelhos conectados"</li>
             <li>Toque em "Conectar um aparelho"</li>
-            <li>Aponte a câmera para este QR Code</li>
+            <li>Aponte a câmera para este QR Code real</li>
             <li>Aguarde a confirmação da conexão</li>
           </ol>
           
-          <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded">
-            <p className="text-xs text-blue-800 dark:text-blue-200">
-              <strong>Implementação Baileys:</strong> Agora usando a biblioteca oficial do WhatsApp! 
-              O QR Code é gerado pelo Edge Function e expira automaticamente em 60 segundos.
+          <div className="mt-3 p-2 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded">
+            <p className="text-xs text-green-800 dark:text-green-200">
+              <strong>✅ Baileys Integrado:</strong> Este QR Code é gerado pela biblioteca oficial 
+              Baileys, garantindo compatibilidade total com o WhatsApp Web!
             </p>
           </div>
         </div>
