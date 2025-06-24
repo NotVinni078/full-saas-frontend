@@ -24,8 +24,56 @@ const QRCodeDisplay = ({ connectionId, connectionName, onStatusChange }: QRCodeD
   // Estado para armazenar a URL do QR Code
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   
-  // Estado para countdown de expiração (60 segundos agora)
+  // Estado para countdown de expiração (60 segundos)
   const [countdown, setCountdown] = useState<number>(60);
+
+  /**
+   * Retorna o ícone apropriado baseado no status
+   */
+  const getStatusIcon = () => {
+    switch (qrStatus) {
+      case 'generating':
+        return <RefreshCw className="h-5 w-5 text-blue-500 animate-spin" />;
+      case 'ready':
+        return <QrCode className="h-5 w-5 text-green-500" />;
+      case 'connected':
+        return <CheckCircle className="h-5 w-5 text-green-600" />;
+      case 'expired':
+        return <AlertCircle className="h-5 w-5 text-red-500" />;
+    }
+  };
+
+  /**
+   * Retorna a mensagem de status apropriada
+   */
+  const getStatusMessage = () => {
+    switch (qrStatus) {
+      case 'generating':
+        return 'Gerando QR Code...';
+      case 'ready':
+        return `QR Code pronto! Expira em ${countdown}s`;
+      case 'connected':
+        return 'WhatsApp conectado com sucesso!';
+      case 'expired':
+        return 'QR Code expirado. Clique para gerar um novo.';
+    }
+  };
+
+  /**
+   * Retorna a cor do status baseada no estado atual
+   */
+  const getStatusColor = () => {
+    switch (qrStatus) {
+      case 'generating':
+        return 'text-blue-600 bg-blue-50 dark:bg-blue-950 dark:text-blue-400';
+      case 'ready':
+        return 'text-green-600 bg-green-50 dark:bg-green-950 dark:text-green-400';
+      case 'connected':
+        return 'text-green-700 bg-green-100 dark:bg-green-900 dark:text-green-300';
+      case 'expired':
+        return 'text-red-600 bg-red-50 dark:bg-red-950 dark:text-red-400';
+    }
+  };
 
   /**
    * Busca o QR Code atual do servidor
@@ -38,23 +86,27 @@ const QRCodeDisplay = ({ connectionId, connectionName, onStatusChange }: QRCodeD
     try {
       const qrData = await getQRCode(connectionId);
       
-      if (qrData) {
+      if (qrData && qrData.qr_code) {
         setQrCodeUrl(qrData.qr_code);
         setQrStatus('ready');
         onStatusChange?.('ready');
         
         // Calcular countdown baseado na expiração
-        const expiresAt = new Date(qrData.expires_at);
-        const now = new Date();
-        const timeLeft = Math.max(0, Math.floor((expiresAt.getTime() - now.getTime()) / 1000));
-        setCountdown(timeLeft);
-        
-        if (timeLeft > 0) {
-          startCountdown(timeLeft);
-        } else {
-          setQrStatus('expired');
-          onStatusChange?.('expired');
+        if (qrData.expires_at) {
+          const expiresAt = new Date(qrData.expires_at);
+          const now = new Date();
+          const timeLeft = Math.max(0, Math.floor((expiresAt.getTime() - now.getTime()) / 1000));
+          setCountdown(timeLeft);
+          
+          if (timeLeft > 0) {
+            startCountdown(timeLeft);
+          } else {
+            setQrStatus('expired');
+            onStatusChange?.('expired');
+          }
         }
+      } else {
+        throw new Error('QR Code não disponível');
       }
     } catch (error) {
       console.error('Erro ao buscar QR Code:', error);
@@ -111,54 +163,6 @@ const QRCodeDisplay = ({ connectionId, connectionName, onStatusChange }: QRCodeD
     };
   }, [connectionId]);
 
-  /**
-   * Retorna o ícone apropriado baseado no status
-   */
-  const getStatusIcon = () => {
-    switch (qrStatus) {
-      case 'generating':
-        return <RefreshCw className="h-5 w-5 text-blue-500 animate-spin" />;
-      case 'ready':
-        return <QrCode className="h-5 w-5 text-green-500" />;
-      case 'connected':
-        return <CheckCircle className="h-5 w-5 text-green-600" />;
-      case 'expired':
-        return <AlertCircle className="h-5 w-5 text-red-500" />;
-    }
-  };
-
-  /**
-   * Retorna a mensagem de status apropriada
-   */
-  const getStatusMessage = () => {
-    switch (qrStatus) {
-      case 'generating':
-        return 'Gerando QR Code...';
-      case 'ready':
-        return `QR Code pronto! Expira em ${countdown}s`;
-      case 'connected':
-        return 'WhatsApp conectado com sucesso!';
-      case 'expired':
-        return 'QR Code expirado. Clique para gerar um novo.';
-    }
-  };
-
-  /**
-   * Retorna a cor do status baseada no estado atual
-   */
-  const getStatusColor = () => {
-    switch (qrStatus) {
-      case 'generating':
-        return 'text-blue-600 bg-blue-50 dark:bg-blue-950 dark:text-blue-400';
-      case 'ready':
-        return 'text-green-600 bg-green-50 dark:bg-green-950 dark:text-green-400';
-      case 'connected':
-        return 'text-green-700 bg-green-100 dark:bg-green-900 dark:text-green-300';
-      case 'expired':
-        return 'text-red-600 bg-red-50 dark:bg-red-950 dark:text-red-400';
-    }
-  };
-
   return (
     <Card className="border-brand bg-brand-background">
       <CardHeader className="pb-4">
@@ -185,7 +189,7 @@ const QRCodeDisplay = ({ connectionId, connectionName, onStatusChange }: QRCodeD
             <div className="w-64 h-64 bg-gray-100 dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center">
               <div className="text-center">
                 <RefreshCw className="h-8 w-8 text-gray-400 animate-spin mx-auto mb-2" />
-                <p className="text-sm text-gray-500">Inicializando Baileys...</p>
+                <p className="text-sm text-gray-500">Conectando com Baileys...</p>
               </div>
             </div>
           )}
@@ -249,8 +253,8 @@ const QRCodeDisplay = ({ connectionId, connectionName, onStatusChange }: QRCodeD
           
           <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded">
             <p className="text-xs text-blue-800 dark:text-blue-200">
-              <strong>Nova implementação:</strong> Agora usando Baileys real! 
-              O QR Code expira em 60 segundos e é gerado pela biblioteca oficial do WhatsApp.
+              <strong>Implementação Baileys:</strong> Agora usando a biblioteca oficial do WhatsApp! 
+              O QR Code é gerado pelo Edge Function e expira automaticamente em 60 segundos.
             </p>
           </div>
         </div>
