@@ -2,13 +2,12 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MessageSquare, Wifi, WifiOff } from 'lucide-react';
-import { useGlobalData } from '@/contexts/GlobalDataContext';
+import { MessageSquare, QrCode, Globe, Bot } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 /**
  * Interface para props do seletor de canais
- * Agora trabalha com conexões reais ao invés de tipos de canal
+ * Agora trabalha com tipos de canal disponíveis para criar conexões
  */
 interface ChannelSelectorProps {
   value: string;
@@ -16,28 +15,94 @@ interface ChannelSelectorProps {
 }
 
 /**
- * Componente seletor de conexões ativas
- * Exibe apenas as conexões já configuradas e ativas no sistema
- * Bloqueia seleção de WebChat para agendamentos
- * Mostra status de conectividade de cada conexão
+ * Tipos de canais disponíveis para criar novas conexões
+ * Cada canal tem suas características específicas
+ */
+interface ChannelType {
+  id: string;
+  name: string;
+  type: string;
+  description: string;
+  icon: React.ReactNode;
+  badge: string;
+  available: boolean;
+  requirements?: string;
+}
+
+/**
+ * Componente seletor de tipos de canal para novas conexões
+ * Exibe todos os canais disponíveis para configuração
  * Responsivo para desktop, tablet e mobile com cores dinâmicas
  */
 const ChannelSelector = ({ value, onValueChange }: ChannelSelectorProps) => {
-  const { connections } = useGlobalData();
-
   /**
-   * Filtra conexões disponíveis para agendamento
-   * Remove WebChat pois não é permitido para agendamentos
-   * Apenas conexões ativas são mostradas
+   * Canais disponíveis para criar novas conexões
    */
-  const availableConnections = connections.filter(conn => 
-    conn.tipo !== 'webchat' && conn.status === 'ativo'
-  );
+  const availableChannels: ChannelType[] = [
+    {
+      id: 'whatsapp-qr',
+      name: 'WhatsApp QR Code',
+      type: 'whatsapp',
+      description: 'Conecte via QR Code - Ideal para testes e uso pessoal',
+      icon: getChannelLogo('whatsapp'),
+      badge: 'Gratuito',
+      available: true
+    },
+    {
+      id: 'whatsapp-meta',
+      name: 'WhatsApp Meta Oficial',
+      type: 'whatsapp',
+      description: 'API oficial do Meta - Requer aprovação e verificação',
+      icon: getChannelLogo('whatsapp'),
+      badge: 'Oficial',
+      available: true,
+      requirements: 'Conta Business verificada'
+    },
+    {
+      id: 'instagram-meta',
+      name: 'Instagram Meta Oficial',
+      type: 'instagram',
+      description: 'API oficial do Instagram para empresas',
+      icon: getChannelLogo('instagram'),
+      badge: 'Oficial',
+      available: true,
+      requirements: 'Conta Business + Página Facebook'
+    },
+    {
+      id: 'facebook-meta',
+      name: 'Facebook Meta Oficial',
+      type: 'facebook',
+      description: 'Messenger via Meta Business API',
+      icon: getChannelLogo('facebook'),
+      badge: 'Oficial',
+      available: true,
+      requirements: 'Página Facebook + Permissões'
+    },
+    {
+      id: 'telegram',
+      name: 'Telegram',
+      type: 'telegram',
+      description: 'Bot do Telegram via API oficial',
+      icon: getChannelLogo('telegram'),
+      badge: 'Bot',
+      available: true,
+      requirements: 'Token do @BotFather'
+    },
+    {
+      id: 'webchat',
+      name: 'WebChat',
+      type: 'webchat',
+      description: 'Chat incorporado no seu site',
+      icon: getChannelLogo('webchat'),
+      badge: 'Widget',
+      available: true
+    }
+  ];
 
   /**
    * Obtém logo oficial da plataforma com fallback para ícone
    */
-  const getChannelLogo = (tipo: string) => {
+  function getChannelLogo(tipo: string) {
     const iconClasses = "h-5 w-5 flex-shrink-0";
     
     switch (tipo.toLowerCase()) {
@@ -73,6 +138,12 @@ const ChannelSelector = ({ value, onValueChange }: ChannelSelectorProps) => {
             </svg>
           </div>
         );
+      case 'webchat':
+        return (
+          <div className={`${iconClasses} rounded-full bg-indigo-500 flex items-center justify-center`}>
+            <Globe className="h-3 w-3 text-white" />
+          </div>
+        );
       default:
         return (
           <div className={`${iconClasses} rounded-full bg-gray-500 flex items-center justify-center`}>
@@ -80,94 +151,144 @@ const ChannelSelector = ({ value, onValueChange }: ChannelSelectorProps) => {
           </div>
         );
     }
-  };
+  }
 
   /**
-   * Obtém ícone de status da conexão
+   * Obtém cor do badge baseado no tipo
    */
-  const getStatusIcon = (status: string) => {
-    return status === 'ativo' 
-      ? <Wifi className="h-3 w-3 text-green-500" />
-      : <WifiOff className="h-3 w-3 text-red-500" />;
+  const getBadgeVariant = (badge: string) => {
+    switch (badge.toLowerCase()) {
+      case 'gratuito':
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      case 'oficial':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+      case 'bot':
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
+      case 'widget':
+        return 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200';
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+    }
   };
 
-  const selectedConnection = availableConnections.find(conn => conn.id === value);
+  const selectedChannel = availableChannels.find(channel => channel.id === value);
 
   return (
     <div className="space-y-3">
       {/* Título da seção com cores dinâmicas */}
       <Label className="text-base font-medium text-foreground">
-        Selecionar Conexão Ativa
+        Selecionar Tipo de Canal *
       </Label>
       
-      {/* Dropdown responsivo para seleção de conexões */}
+      {/* Dropdown responsivo para seleção de canais */}
       <Select value={value} onValueChange={onValueChange}>
         <SelectTrigger className="w-full border-border bg-background text-foreground">
-          <SelectValue placeholder="Escolha uma conexão ativa">
-            {selectedConnection && (
+          <SelectValue placeholder="Escolha o tipo de canal para conectar">
+            {selectedChannel && (
               <div className="flex items-center gap-3">
-                {getChannelLogo(selectedConnection.tipo)}
-                <span className="font-medium">{selectedConnection.nome}</span>
-                <Badge variant="outline" className="text-xs">
-                  {selectedConnection.tipo}
+                {selectedChannel.icon}
+                <span className="font-medium">{selectedChannel.name}</span>
+                <Badge 
+                  variant="outline" 
+                  className={`text-xs ${getBadgeVariant(selectedChannel.badge)}`}
+                >
+                  {selectedChannel.badge}
                 </Badge>
-                {getStatusIcon(selectedConnection.status)}
               </div>
             )}
           </SelectValue>
         </SelectTrigger>
         
         <SelectContent className="border-border bg-background max-h-80 overflow-y-auto z-50">
-          {availableConnections.length > 0 ? (
-            availableConnections.map((connection) => (
-              <SelectItem 
-                key={connection.id} 
-                value={connection.id}
-                className="cursor-pointer hover:bg-accent focus:bg-accent text-foreground"
-              >
-                <div className="flex items-center gap-3 py-2">
-                  {getChannelLogo(connection.tipo)}
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-foreground">
-                      {connection.nome}
-                    </div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {connection.tipo} • {connection.status === 'ativo' ? 'Conectado' : 'Desconectado'}
-                    </div>
+          {availableChannels.map((channel) => (
+            <SelectItem 
+              key={channel.id} 
+              value={channel.id}
+              className="cursor-pointer hover:bg-accent focus:bg-accent text-foreground"
+              disabled={!channel.available}
+            >
+              <div className="flex items-center gap-3 py-2 w-full">
+                {channel.icon}
+                
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-foreground">
+                    {channel.name}
                   </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-xs">
-                      {connection.tipo}
-                    </Badge>
-                    {getStatusIcon(connection.status)}
+                  <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                    {channel.description}
                   </div>
+                  {channel.requirements && (
+                    <div className="text-xs text-orange-600 dark:text-orange-400 mt-1">
+                      Requer: {channel.requirements}
+                    </div>
+                  )}
                 </div>
-              </SelectItem>
-            ))
-          ) : (
-            <div className="p-4 text-center text-muted-foreground">
-              <div className="flex flex-col items-center gap-2">
-                <WifiOff className="h-6 w-6 opacity-50" />
-                <p className="text-sm">Nenhuma conexão ativa encontrada</p>
-                <p className="text-xs">Configure suas conexões primeiro</p>
+                
+                <div className="flex items-center gap-2">
+                  <Badge 
+                    variant="outline" 
+                    className={`text-xs ${getBadgeVariant(channel.badge)}`}
+                  >
+                    {channel.badge}
+                  </Badge>
+                </div>
               </div>
-            </div>
-          )}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
 
-      {/* Aviso sobre WebChat bloqueado */}
-      <div className="mt-3 p-3 bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800 rounded-lg">
-        <div className="flex items-center gap-2 text-orange-800 dark:text-orange-200">
-          <MessageSquare className="h-4 w-4" />
-          <span className="text-sm font-medium">WebChat não disponível para agendamentos</span>
+      {/* Informações sobre QR Code quando WhatsApp QR for selecionado */}
+      {value === 'whatsapp-qr' && (
+        <div className="mt-3 p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg">
+          <div className="flex items-center gap-2 text-green-800 dark:text-green-200">
+            <QrCode className="h-4 w-4" />
+            <span className="text-sm font-medium">QR Code será gerado automaticamente</span>
+          </div>
+          <p className="text-xs text-green-700 dark:text-green-300 mt-1">
+            Após criar a conexão, escaneie o QR Code com seu WhatsApp pessoal
+          </p>
         </div>
-        <p className="text-xs text-orange-700 dark:text-orange-300 mt-1">
-          Use apenas conexões de redes sociais para enviar mensagens agendadas
-        </p>
-      </div>
+      )}
+
+      {/* Informações sobre APIs oficiais quando Meta for selecionado */}
+      {(value === 'whatsapp-meta' || value === 'instagram-meta' || value === 'facebook-meta') && (
+        <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <div className="flex items-center gap-2 text-blue-800 dark:text-blue-200">
+            <Globe className="h-4 w-4" />
+            <span className="text-sm font-medium">API Oficial do Meta</span>
+          </div>
+          <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+            Configuração via Meta Business. Requer conta verificada e aprovação do Meta
+          </p>
+        </div>
+      )}
+
+      {/* Informações sobre Telegram quando selecionado */}
+      {value === 'telegram' && (
+        <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <div className="flex items-center gap-2 text-blue-800 dark:text-blue-200">
+            <Bot className="h-4 w-4" />
+            <span className="text-sm font-medium">Bot do Telegram</span>
+          </div>
+          <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+            Crie um bot via @BotFather e insira o token de acesso na configuração
+          </p>
+        </div>
+      )}
+
+      {/* Informações sobre WebChat quando selecionado */}
+      {value === 'webchat' && (
+        <div className="mt-3 p-3 bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
+          <div className="flex items-center gap-2 text-indigo-800 dark:text-indigo-200">
+            <Globe className="h-4 w-4" />
+            <span className="text-sm font-medium">Widget para seu site</span>
+          </div>
+          <p className="text-xs text-indigo-700 dark:text-indigo-300 mt-1">
+            Código HTML será gerado para incorporar o chat no seu website
+          </p>
+        </div>
+      )}
     </div>
   );
 };
