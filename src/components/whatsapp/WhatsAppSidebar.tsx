@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Search, Plus, MoreVertical, Filter, MessageSquare, Clock, CheckCircle, Users, Bot } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -125,9 +124,9 @@ const WhatsAppSidebar: React.FC<WhatsAppSidebarProps> = ({
           />
         </div>
 
-        {/* Novos filtros de atendimento */}
+        {/* Updated filter layout */}
         <div className="grid grid-cols-3 gap-1">
-          {/* Linha superior */}
+          {/* Top row: Finalizados, Aguardando, Em atendimento */}
           <Button
             variant={activeFilter === 'finalizados' ? 'default' : 'ghost'}
             size="sm"
@@ -137,29 +136,6 @@ const WhatsAppSidebar: React.FC<WhatsAppSidebarProps> = ({
             <CheckCircle className="w-3 h-3 mr-1" />
             Finalizados
           </Button>
-          
-          <Button
-            variant={activeFilter === 'em_atendimento' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setActiveFilter('em_atendimento')}
-            className="text-xs whitespace-nowrap h-8"
-          >
-            <MessageSquare className="w-3 h-3 mr-1" />
-            Em atendimento
-          </Button>
-          
-          <Button
-            variant={activeFilter === 'grupos' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setActiveFilter('grupos')}
-            className="text-xs whitespace-nowrap h-8"
-          >
-            <Users className="w-3 h-3 mr-1" />
-            Grupos
-          </Button>
-
-          {/* Linha inferior */}
-          <div></div> {/* Espaço vazio acima de "Aguardando" */}
           
           <Button
             variant={activeFilter === 'aguardando' ? 'default' : 'ghost'}
@@ -172,6 +148,19 @@ const WhatsAppSidebar: React.FC<WhatsAppSidebarProps> = ({
           </Button>
           
           <Button
+            variant={activeFilter === 'em_atendimento' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setActiveFilter('em_atendimento')}
+            className="text-xs whitespace-nowrap h-8"
+          >
+            <MessageSquare className="w-3 h-3 mr-1" />
+            Em atendimento
+          </Button>
+
+          {/* Bottom row: empty, Chatbot, Grupos */}
+          <div></div> {/* Empty space */}
+          
+          <Button
             variant={activeFilter === 'chatbot' ? 'default' : 'ghost'}
             size="sm"
             onClick={() => setActiveFilter('chatbot')}
@@ -179,6 +168,16 @@ const WhatsAppSidebar: React.FC<WhatsAppSidebarProps> = ({
           >
             <Bot className="w-3 h-3 mr-1" />
             Chatbot
+          </Button>
+          
+          <Button
+            variant={activeFilter === 'grupos' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setActiveFilter('grupos')}
+            className="text-xs whitespace-nowrap h-8"
+          >
+            <Users className="w-3 h-3 mr-1" />
+            Grupos
           </Button>
         </div>
       </div>
