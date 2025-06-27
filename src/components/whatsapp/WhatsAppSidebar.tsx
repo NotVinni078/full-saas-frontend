@@ -24,14 +24,35 @@ const WhatsAppSidebar: React.FC<WhatsAppSidebarProps> = ({
   isMobile = false
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState('all');
+  const [activeFilter, setActiveFilter] = useState('em_atendimento');
   const { tickets } = useTenantTickets();
 
   const filteredTickets = tickets.filter(ticket => {
     const matchesSearch = ticket.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          ticket.contact?.name.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesFilter = activeFilter === 'all' || ticket.status === activeFilter;
+    let matchesFilter = false;
+    switch (activeFilter) {
+      case 'finalizados':
+        matchesFilter = ticket.status === 'resolved' || ticket.status === 'closed';
+        break;
+      case 'em_atendimento':
+        matchesFilter = ticket.status === 'in_progress' || ticket.status === 'open';
+        break;
+      case 'aguardando':
+        matchesFilter = ticket.status === 'pending';
+        break;
+      case 'chatbot':
+        // Assumindo que tickets do chatbot têm uma tag ou campo específico
+        matchesFilter = ticket.tags.includes('chatbot') || ticket.channel === 'webchat';
+        break;
+      case 'grupos':
+        // Assumindo que grupos têm uma identificação específica
+        matchesFilter = ticket.tags.includes('grupo') || ticket.custom_fields.isGroup;
+        break;
+      default:
+        matchesFilter = true;
+    }
     
     return matchesSearch && matchesFilter;
   });
@@ -104,42 +125,60 @@ const WhatsAppSidebar: React.FC<WhatsAppSidebarProps> = ({
           />
         </div>
 
-        {/* Filtros de status */}
-        <div className="flex gap-1 overflow-x-auto">
+        {/* Novos filtros de atendimento */}
+        <div className="grid grid-cols-3 gap-1">
+          {/* Linha superior */}
           <Button
-            variant={activeFilter === 'all' ? 'default' : 'ghost'}
+            variant={activeFilter === 'finalizados' ? 'default' : 'ghost'}
             size="sm"
-            onClick={() => setActiveFilter('all')}
-            className="text-xs whitespace-nowrap"
-          >
-            Todos
-          </Button>
-          <Button
-            variant={activeFilter === 'open' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setActiveFilter('open')}
-            className="text-xs whitespace-nowrap"
-          >
-            <MessageSquare className="w-3 h-3 mr-1" />
-            Abertos
-          </Button>
-          <Button
-            variant={activeFilter === 'pending' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setActiveFilter('pending')}
-            className="text-xs whitespace-nowrap"
-          >
-            <Clock className="w-3 h-3 mr-1" />
-            Pendentes
-          </Button>
-          <Button
-            variant={activeFilter === 'resolved' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setActiveFilter('resolved')}
-            className="text-xs whitespace-nowrap"
+            onClick={() => setActiveFilter('finalizados')}
+            className="text-xs whitespace-nowrap h-8"
           >
             <CheckCircle className="w-3 h-3 mr-1" />
-            Resolvidos
+            Finalizados
+          </Button>
+          
+          <Button
+            variant={activeFilter === 'em_atendimento' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setActiveFilter('em_atendimento')}
+            className="text-xs whitespace-nowrap h-8"
+          >
+            <MessageSquare className="w-3 h-3 mr-1" />
+            Em atendimento
+          </Button>
+          
+          <Button
+            variant={activeFilter === 'grupos' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setActiveFilter('grupos')}
+            className="text-xs whitespace-nowrap h-8"
+          >
+            <Users className="w-3 h-3 mr-1" />
+            Grupos
+          </Button>
+
+          {/* Linha inferior */}
+          <div></div> {/* Espaço vazio acima de "Aguardando" */}
+          
+          <Button
+            variant={activeFilter === 'aguardando' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setActiveFilter('aguardando')}
+            className="text-xs whitespace-nowrap h-8"
+          >
+            <Clock className="w-3 h-3 mr-1" />
+            Aguardando
+          </Button>
+          
+          <Button
+            variant={activeFilter === 'chatbot' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setActiveFilter('chatbot')}
+            className="text-xs whitespace-nowrap h-8"
+          >
+            <Bot className="w-3 h-3 mr-1" />
+            Chatbot
           </Button>
         </div>
       </div>
