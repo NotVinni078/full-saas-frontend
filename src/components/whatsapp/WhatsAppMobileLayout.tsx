@@ -5,7 +5,6 @@ import WhatsAppChatArea from './WhatsAppChatArea';
 import WhatsAppCreateTicketModal from './WhatsAppCreateTicketModal';
 import AssignmentNotification from '@/components/tickets/AssignmentNotification';
 import { TenantTicket } from '@/hooks/useTenantTickets';
-import { TenantContact, TenantConnection } from '@/hooks/useTenantData';
 
 interface WhatsAppMobileLayoutProps {
   selectedTicket: TenantTicket | null;
@@ -19,8 +18,7 @@ interface WhatsAppMobileLayoutProps {
   newTicketForm: any;
   setNewTicketForm: (form: any) => void;
   handleCreateTicket: () => void;
-  contacts: TenantContact[];
-  connections: TenantConnection[];
+  contacts: any[];
   showAssignmentNotification: any;
   setShowAssignmentNotification: (notification: any) => void;
 }
@@ -38,7 +36,6 @@ const WhatsAppMobileLayout: React.FC<WhatsAppMobileLayoutProps> = ({
   setNewTicketForm,
   handleCreateTicket,
   contacts,
-  connections,
   showAssignmentNotification,
   setShowAssignmentNotification
 }) => {
@@ -77,7 +74,6 @@ const WhatsAppMobileLayout: React.FC<WhatsAppMobileLayoutProps> = ({
         setNewTicketForm={setNewTicketForm}
         handleCreateTicket={handleCreateTicket}
         contacts={contacts}
-        connections={connections}
       />
 
       {/* Notificação de Atribuição */}

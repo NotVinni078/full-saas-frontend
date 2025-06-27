@@ -5,7 +5,6 @@ import WhatsAppChatArea from './WhatsAppChatArea';
 import WhatsAppCreateTicketModal from './WhatsAppCreateTicketModal';
 import AssignmentNotification from '@/components/tickets/AssignmentNotification';
 import { TenantTicket } from '@/hooks/useTenantTickets';
-import { TenantContact, TenantConnection } from '@/hooks/useTenantData';
 
 interface WhatsAppDesktopLayoutProps {
   selectedTicket: TenantTicket | null;
@@ -19,8 +18,7 @@ interface WhatsAppDesktopLayoutProps {
   newTicketForm: any;
   setNewTicketForm: (form: any) => void;
   handleCreateTicket: () => void;
-  contacts: TenantContact[];
-  connections: TenantConnection[];
+  contacts: any[];
   showAssignmentNotification: any;
   setShowAssignmentNotification: (notification: any) => void;
 }
@@ -38,7 +36,6 @@ const WhatsAppDesktopLayout: React.FC<WhatsAppDesktopLayoutProps> = ({
   setNewTicketForm,
   handleCreateTicket,
   contacts,
-  connections,
   showAssignmentNotification,
   setShowAssignmentNotification
 }) => {
@@ -71,7 +68,6 @@ const WhatsAppDesktopLayout: React.FC<WhatsAppDesktopLayoutProps> = ({
         setNewTicketForm={setNewTicketForm}
         handleCreateTicket={handleCreateTicket}
         contacts={contacts}
-        connections={connections}
       />
 
       {/* Notificação de Atribuição */}

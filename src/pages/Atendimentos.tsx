@@ -18,16 +18,17 @@ const Atendimentos = () => {
     ticketId: string;
   } | null>(null);
   
-  // Updated form states for creating new ticket (removed priority)
+  // Form states for creating new ticket
   const [newTicketForm, setNewTicketForm] = useState({
     title: '',
     description: '',
     contact_id: '',
+    priority: 'normal' as TenantTicket['priority'],
     channel: 'whatsapp' as TenantTicket['channel']
   });
 
   const { createTicket, updateTicket } = useTenantTickets();
-  const { contacts, connections } = useTenantDataContext();
+  const { contacts } = useTenantDataContext();
 
   const handleCreateTicket = async () => {
     if (!newTicketForm.title.trim() || !newTicketForm.contact_id) {
@@ -38,7 +39,7 @@ const Atendimentos = () => {
       title: newTicketForm.title,
       description: newTicketForm.description,
       contact_id: newTicketForm.contact_id,
-      priority: 'normal', // Set default priority since it's not in the form
+      priority: newTicketForm.priority,
       channel: newTicketForm.channel,
       status: 'open',
       tags: [],
@@ -50,6 +51,7 @@ const Atendimentos = () => {
       title: '',
       description: '',
       contact_id: '',
+      priority: 'normal',
       channel: 'whatsapp'
     });
   };
@@ -103,7 +105,6 @@ const Atendimentos = () => {
     setNewTicketForm,
     handleCreateTicket,
     contacts,
-    connections, // Add connections to props
     showAssignmentNotification,
     setShowAssignmentNotification
   };
